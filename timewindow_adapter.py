@@ -69,6 +69,7 @@ def get_linked_chain_order(optimizer, idx_i, idx_j):
     """
     Определяет, находятся ли два класса в одной связанной цепочке, 
     и если да, то в каком порядке они должны следовать.
+    Учитывает транзитивные связи через linked_classes и правильный порядок из исходных данных.
     
     Args:
         optimizer: Экземпляр ScheduleOptimizer
@@ -79,22 +80,65 @@ def get_linked_chain_order(optimizer, idx_i, idx_j):
             в_одной_цепочке: True, если классы в одной цепочке
             порядок_i_j: 1, если i должен быть перед j, -1, если j перед i, 0 - неопределенно
     """
-    if not hasattr(optimizer, "linked_chains") or not optimizer.linked_chains:
-        return False, 0
+    # Сначала проверяем формальные linked_chains
+    if hasattr(optimizer, "linked_chains") and optimizer.linked_chains:
+        for chain in optimizer.linked_chains:
+            if idx_i in chain and idx_j in chain:
+                # Оба класса в одной цепочке - определяем их порядок
+                i_pos = chain.index(idx_i)
+                j_pos = chain.index(idx_j)
+                
+                if i_pos < j_pos:
+                    return True, 1  # i должен быть перед j
+                else:
+                    return True, -1  # j должен быть перед i
     
-    # Проверяем каждую цепочку
-    for chain in optimizer.linked_chains:
-        if idx_i in chain and idx_j in chain:
-            # Оба класса в одной цепочке - определяем их порядок
-            i_pos = chain.index(idx_i)
-            j_pos = chain.index(idx_j)
-            
-            if i_pos < j_pos:
-                return True, 1  # i должен быть перед j
-            else:
-                return True, -1  # j должен быть перед i
+    # Проверяем порядок на основе исходных linked_classes
+    def find_order_in_linked_classes(class_i_idx, class_j_idx):
+        """Определяет порядок классов на основе структуры linked_classes"""
+        for idx, c in enumerate(optimizer.classes):
+            if hasattr(c, 'linked_classes') and c.linked_classes:
+                # Проверяем позиции в списке связанных классов
+                class_i_pos = None
+                class_j_pos = None
+                
+                # Если idx - это class_i_idx, то он идет первым (позиция -1)
+                if idx == class_i_idx:
+                    class_i_pos = -1
+                
+                # Если idx - это class_j_idx, то он идет первым (позиция -1)  
+                if idx == class_j_idx:
+                    class_j_pos = -1
+                
+                # Ищем позиции в списке linked_classes
+                for linked_idx, linked_class in enumerate(c.linked_classes):
+                    try:
+                        linked_class_idx = optimizer._find_class_index(linked_class)
+                        if linked_class_idx == class_i_idx:
+                            class_i_pos = linked_idx
+                        if linked_class_idx == class_j_idx:
+                            class_j_pos = linked_idx
+                    except:
+                        continue
+                
+                # Если нашли оба класса в одной цепочке linked_classes
+                if class_i_pos is not None and class_j_pos is not None:
+                    if class_i_pos < class_j_pos:
+                        return 1  # i должен быть перед j
+                    elif class_i_pos > class_j_pos:
+                        return -1  # j должен быть перед i
+        
+        return 0  # Порядок не определен
     
-    # Классы не в одной цепочке или одного из них нет в цепочках
+    # Проверяем транзитивные связи через linked_classes
+    if are_classes_transitively_linked(optimizer, idx_i, idx_j):
+        print(f"DEBUG: Classes {idx_i} and {idx_j} are transitively linked")
+        
+        # Определяем порядок на основе исходных linked_classes
+        order = find_order_in_linked_classes(idx_i, idx_j)
+        return True, order
+    
+    # Классы не связаны
     return False, 0
 
 def add_time_separation_constraints(optimizer, idx_i, idx_j, c_i, c_j):
@@ -115,7 +159,7 @@ def add_time_separation_constraints(optimizer, idx_i, idx_j, c_i, c_j):
     in_same_chain, chain_order = get_linked_chain_order(optimizer, idx_i, idx_j)
     
     if in_same_chain:
-        # Добавляем ограничение только в направлении цепочки
+        # Если порядок определен точно (chain_order != 0)
         if chain_order > 0:  # i должен быть перед j
             duration_i_slots = c_i.duration // optimizer.time_interval
             min_pause = max(1, (c_i.pause_after + c_j.pause_before) // optimizer.time_interval)
@@ -141,6 +185,30 @@ def add_time_separation_constraints(optimizer, idx_i, idx_j, c_i, c_j):
             if not hasattr(optimizer, "applied_constraints"):
                 optimizer.applied_constraints = {}
             optimizer.applied_constraints[reversed_key] = constraint
+            return
+        else:  # chain_order == 0 - классы связаны транзитивно, но порядок не определен
+            # Для транзитивно связанных классов добавляем гибкие ограничения
+            print(f"DEBUG: Classes {idx_i} and {idx_j} are transitively linked, adding flexible sequencing")
+            
+            # Добавляем одностороннее ограничение для последовательности связанных классов
+            # Выбираем порядок на основе индексов (меньший индекс идет первым)
+            if idx_i < idx_j:
+                duration_i_slots = c_i.duration // optimizer.time_interval
+                min_pause = max(1, (c_i.pause_after + c_j.pause_before) // optimizer.time_interval)
+                constraint = optimizer.model.Add(optimizer.start_vars[idx_i] + duration_i_slots + min_pause <= 
+                                              optimizer.start_vars[idx_j])
+                print(f"  Added flexible transitivity constraint: class {idx_i} before class {idx_j}")
+            else:
+                duration_j_slots = c_j.duration // optimizer.time_interval
+                min_pause = max(1, (c_j.pause_after + c_i.pause_before) // optimizer.time_interval)
+                constraint = optimizer.model.Add(optimizer.start_vars[idx_j] + duration_j_slots + min_pause <= 
+                                              optimizer.start_vars[idx_i])
+                print(f"  Added flexible transitivity constraint: class {idx_j} before class {idx_i}")
+            
+            # Сохраняем примененные ограничения
+            if not hasattr(optimizer, "applied_constraints"):
+                optimizer.applied_constraints = {}
+            optimizer.applied_constraints[pair_key] = constraint
             return
     
     # СУЩЕСТВУЮЩИЙ КОД: для несвязанных классов или если порядок не определен
@@ -243,9 +311,34 @@ def analyze_related_classes(optimizer):
             if len(day_classes) > 1:
                 print(f"  Analyzing group {group} on day {day} with {len(day_classes)} classes")
                 
+                # НОВАЯ ЛОГИКА: Включаем все транзитивно связанные классы
+                all_related_classes = []
+                for idx, c in day_classes:
+                    all_related_classes.append((idx, c))
+                
+                # Добавляем все транзитивно связанные классы, даже если они из других групп
+                if not hasattr(optimizer, '_transitive_links'):
+                    optimizer._transitive_links = build_transitive_links(optimizer)
+                
+                initial_class_indices = {idx for idx, _ in day_classes}
+                related_indices = set(initial_class_indices)
+                
+                # Для каждого класса в группе ищем все связанные классы
+                for idx, _ in day_classes:
+                    # Добавляем транзитивно связанные классы
+                    for linked_idx in optimizer._transitive_links.get(idx, set()):
+                        linked_class = optimizer.classes[linked_idx]
+                        # Проверяем, что связанный класс в том же дне
+                        if linked_class.day == day and linked_idx not in related_indices:
+                            print(f"    Including transitively linked class {linked_idx} from outside group")
+                            all_related_classes.append((linked_idx, linked_class))
+                            related_indices.add(linked_idx)
+                
+                print(f"    Total classes including linked: {len(all_related_classes)}")
+                
                 # Разделение на занятия с фиксированным временем и временными окнами
-                fixed_classes = [(idx, c) for idx, c in day_classes if c.start_time and not c.end_time]
-                window_classes = [(idx, c) for idx, c in day_classes if c.start_time and c.end_time]
+                fixed_classes = [(idx, c) for idx, c in all_related_classes if c.start_time and not c.end_time]
+                window_classes = [(idx, c) for idx, c in all_related_classes if c.start_time and c.end_time]
                 
                 # Сортировка фиксированных занятий по времени начала
                 fixed_classes.sort(key=lambda x: time_to_minutes(x[1].start_time))
@@ -287,29 +380,64 @@ def analyze_related_classes(optimizer):
                     for start_min, end_min, idx, c in timeline:
                         print(f"      Class {idx}: {minutes_to_time(start_min)}-{minutes_to_time(end_min)}")
                     
-                    # Находим "свободные окна" между фиксированными занятиями
-                    free_slots = []
-                    day_start = 8 * 60  # 8:00
-                    day_end = 20 * 60    # 20:00
+                    # Находим пересечение временных окон всех занятий в расширенной группе
+                    all_window_classes = [c for idx, c in all_related_classes if c.start_time and c.end_time]
                     
-                    # Добавляем слот до первого фиксированного занятия
+                    if all_window_classes:
+                        # Определяем общий диапазон времени для всех оконных занятий
+                        common_window_start = max(time_to_minutes(c.start_time) for c in all_window_classes)
+                        common_window_end = min(time_to_minutes(c.end_time) for c in all_window_classes)
+                    else:
+                        # Если нет оконных занятий, используем весь день
+                        common_window_start = 8 * 60  # 8:00
+                        common_window_end = 20 * 60   # 20:00
+                    
+                    # Находим "свободные окна" между фиксированными занятиями в пределах общего временного окна
+                    free_slots = []
+                    
+                    # Добавляем слот до первого фиксированного занятия (только в пределах общего окна)
                     if timeline:
                         first_start = timeline[0][0]
-                        if first_start > day_start:
-                            free_slots.append((day_start, first_start - 5))  # 5 минут буфер
+                        # Начало свободного слота - максимум из начала дня и общего окна
+                        slot_start = max(common_window_start, 8 * 60)
+                        # Конец слота - начало первого фиксированного занятия
+                        slot_end = first_start - 5  # 5 минут буфер
+                        
+                        # Ограничиваем слот пределами общего временного окна
+                        if slot_start < common_window_end and slot_end > common_window_start:
+                            actual_start = max(slot_start, common_window_start)
+                            actual_end = min(slot_end, common_window_end)
+                            if actual_end > actual_start:
+                                free_slots.append((actual_start, actual_end))
                     
-                    # Добавляем слоты между фиксированными занятиями
+                    # Добавляем слоты между фиксированными занятиями (только в пределах общего окна)
                     for i in range(len(timeline) - 1):
                         current_end = timeline[i][1] + 5  # 5 минут буфер
                         next_start = timeline[i+1][0] - 5  # 5 минут буфер
-                        if next_start > current_end:
-                            free_slots.append((current_end, next_start))
+                        
+                        # Ограничиваем слот пределами общего временного окна
+                        if current_end < common_window_end and next_start > common_window_start:
+                            actual_start = max(current_end, common_window_start)
+                            actual_end = min(next_start, common_window_end)
+                            if actual_end > actual_start:
+                                free_slots.append((actual_start, actual_end))
                     
-                    # Добавляем слот после последнего фиксированного занятия
+                    # Добавляем слот после последнего фиксированного занятия (только в пределах общего окна)
                     if timeline:
                         last_end = timeline[-1][1] + 5  # 5 минут буфер
-                        if last_end < day_end:
-                            free_slots.append((last_end, day_end))
+                        # Конец свободного слота - минимум из конца дня и общего окна
+                        slot_end = min(common_window_end, 20 * 60)
+                        
+                        # Ограничиваем слот пределами общего временного окна
+                        if last_end < common_window_end:
+                            actual_start = max(last_end, common_window_start)
+                            actual_end = min(slot_end, common_window_end)
+                            if actual_end > actual_start:
+                                free_slots.append((actual_start, actual_end))
+                    
+                    # Если нет фиксированных занятий, весь общий временной диапазон свободен
+                    elif all_window_classes:
+                        free_slots.append((common_window_start, common_window_end))
                     
                     # Выводим информацию о свободных слотах
                     print(f"    Free time slots:")
@@ -974,3 +1102,72 @@ def add_objective_weights_for_timewindows(optimizer):
             print(f"  Added incentive for class {idx} to start EARLY in its assigned slot (weight: 10)")
     
     return additional_terms
+
+def build_transitive_links(optimizer):
+    """
+    Строит полные транзитивные связи между классами на основе linked_classes.
+    Если класс A связан с B, а B связан с C, то A и C тоже должны быть связаны.
+    
+    Args:
+        optimizer: Экземпляр ScheduleOptimizer
+        
+    Returns:
+        dict: Словарь транзитивных связей {class_idx: set(связанных_классов)}
+    """
+    # Строим граф связей (двунаправленный)
+    direct_links = {}
+    for idx in range(len(optimizer.classes)):
+        direct_links[idx] = set()
+    
+    # Добавляем прямые связи через linked_classes
+    for idx, c in enumerate(optimizer.classes):
+        if hasattr(c, 'linked_classes') and c.linked_classes:
+            for linked_class in c.linked_classes:
+                try:
+                    linked_idx = optimizer._find_class_index(linked_class)
+                    # Добавляем связь в обе стороны
+                    direct_links[idx].add(linked_idx)
+                    direct_links[linked_idx].add(idx)
+                except:
+                    pass
+    
+    # Построение транзитивного замыкания с использованием алгоритма Флойда-Уоршалла
+    transitive_links = {}
+    for idx in range(len(optimizer.classes)):
+        transitive_links[idx] = set(direct_links[idx])
+    
+    # Применяем транзитивность: если A->B и B->C, то A->C
+    for k in range(len(optimizer.classes)):
+        for i in range(len(optimizer.classes)):
+            for j in range(len(optimizer.classes)):
+                if k in transitive_links[i] and j in transitive_links[k]:
+                    transitive_links[i].add(j)
+    
+    # Удаляем самоссылки
+    for idx in range(len(optimizer.classes)):
+        transitive_links[idx].discard(idx)
+    
+    # Логирование для отладки
+    print("DEBUG: Built transitive links:")
+    for idx, links in transitive_links.items():
+        if links:
+            print(f"  Class {idx} is transitively linked to: {sorted(links)}")
+    
+    return transitive_links
+
+def are_classes_transitively_linked(optimizer, idx_i, idx_j):
+    """
+    Проверяет, связаны ли два класса транзитивно через linked_classes.
+    
+    Args:
+        optimizer: Экземпляр ScheduleOptimizer
+        idx_i, idx_j: Индексы проверяемых классов
+        
+    Returns:
+        bool: True, если классы связаны транзитивно
+    """
+    if not hasattr(optimizer, '_transitive_links'):
+        optimizer._transitive_links = build_transitive_links(optimizer)
+    
+    return idx_j in optimizer._transitive_links.get(idx_i, set()) or \
+           idx_i in optimizer._transitive_links.get(idx_j, set())
