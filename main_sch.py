@@ -9,6 +9,7 @@ from timewindow_adapter import apply_timewindow_improvements, add_objective_weig
 from reader import ScheduleReader
 from scheduler_base import ScheduleOptimizer
 from output_utils import get_schedule_dataframe, export_to_excel, get_teacher_schedule
+from constraint_registry import export_constraint_registry, print_infeasible_summary
 
 default_output_path = "optimized_schedule.xlsx"
 
@@ -160,13 +161,34 @@ def main():
         export_to_excel(optimizer, filename=args.output)
         print("Export completed successfully.")
         
+        # Export constraint registry for analysis
+        export_constraint_registry(optimizer.constraint_registry, optimizer, only_conflicts=False)
+        
         print(f"\nSchedule generation complete.")
         print(f"Generated schedule saved to: {os.path.abspath(args.output)}")
         
         return 0
     else:
         print(f"\nNo solution found within the time limit ({elapsed_time:.2f} seconds).")
-        print("Try increasing the time limit or relaxing some constraints.")
+        
+        # Check if the problem is INFEASIBLE
+        if hasattr(optimizer, 'solver_status') and optimizer.solver_status == 'INFEASIBLE':
+            print("\n❌ PROBLEM IS INFEASIBLE - No valid solution exists with current constraints.")
+            
+            # Отчеты уже сгенерированы в solver
+            print("\n💡 Possible solutions:")
+            print("  1. Relax some time constraints")
+            print("  2. Add more rooms or increase room capacity")
+            print("  3. Adjust teacher availability")
+            print("  4. Reduce required classes or increase time slots")
+            print("  5. Review constraint_registry_infeasible.txt for detailed analysis")
+            
+        else:
+            print("The solver timed out. Try increasing the time limit or relaxing some constraints.")
+            
+            # Export constraint registry for analysis even on timeout
+            export_constraint_registry(optimizer.constraint_registry, optimizer, only_conflicts=False)
+        
         return 1
 
 

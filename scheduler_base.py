@@ -7,6 +7,7 @@ from typing import Dict, List, Tuple, Optional, Set, Any
 # Импорт из локальных модулей
 from reader import ScheduleReader, ScheduleClass
 from sequential_scheduling_checker import enforce_window_chain_sequencing
+from constraint_registry import ConstraintRegistry, ConstraintType
 
 class ScheduleOptimizer:
     """
@@ -25,14 +26,30 @@ class ScheduleOptimizer:
         self.classes = classes
         self.time_interval = time_interval
         
-        # Create a map of classes by subject+teacher for easy lookup
+        # Create a map of classes by subject+teacher+group+day+time for easy lookup
         self.class_map = {}
         for idx, c in enumerate(classes):
-            key = f"{c.subject}_{c.teacher}_{c.day}_{c.start_time}"
+            # Include group and end_time to avoid key collisions
+            key = f"{c.subject}_{c.teacher}_{c.group}_{c.day}_{c.start_time}_{c.end_time}"
             self.class_map[key] = idx
         
+        # Create direct object-to-index mapping for more reliable lookups
+        self.object_index_map = {c: idx for idx, c in enumerate(classes)}
+        
         print(f"Created class_map with {len(self.class_map)} entries.")
+        print(f"Created object_index_map with {len(self.object_index_map)} entries.")
         print(f"Classes list has {len(classes)} elements.")
+        
+        # Check for any remaining key collisions and warn about them
+        if len(self.class_map) < len(classes):
+            print(f"WARNING: Key collision detected! class_map has {len(self.class_map)} entries but classes list has {len(classes)} elements.")
+            collision_keys = {}
+            for idx, c in enumerate(classes):
+                key = f"{c.subject}_{c.teacher}_{c.group}_{c.day}_{c.start_time}_{c.end_time}"
+                if key in collision_keys:
+                    print(f"  Collision: Key '{key}' used by classes {collision_keys[key]} and {idx}")
+                else:
+                    collision_keys[key] = idx
         
         # Extract all unique resources
         self.teachers = sorted(set(c.teacher for c in classes if c.teacher))
@@ -54,6 +71,9 @@ class ScheduleOptimizer:
         self.start_vars = {}
         self.room_vars = {}
         self.day_vars = {}
+        
+        # Initialize constraint registry for tracking all constraints
+        self.constraint_registry = ConstraintRegistry()
         
         # Results
         self.solution = None
@@ -98,29 +118,223 @@ class ScheduleOptimizer:
         return max(0, min(end1, end2) - max(start1, start2))
     
     def _find_class_index(self, c: ScheduleClass) -> int:
-        """Find the index of a class in the classes list using the class_map."""
-        key = f"{c.subject}_{c.teacher}_{c.day}_{c.start_time}"
+        """Find the index of a class in the classes list using object mapping first, then string key."""
+        # Try direct object lookup first (most reliable)
+        if c in self.object_index_map:
+            return self.object_index_map[c]
+        
+        # Fallback to string key lookup with improved key format
+        key = f"{c.subject}_{c.teacher}_{c.group}_{c.day}_{c.start_time}_{c.end_time}"
         if key in self.class_map:
             return self.class_map[key]
         
-        # Fallback for classes not in the map - try to find by attributes
+        # Fallback for classes not found by either method - try to find by attributes
         for idx, cls in enumerate(self.classes):
             if (cls.subject == c.subject and cls.teacher == c.teacher and 
-                cls.day == c.day and cls.start_time == c.start_time):
+                cls.group == c.group and cls.day == c.day and 
+                cls.start_time == c.start_time and cls.end_time == c.end_time):
+                print(f"WARNING: Found class by attribute comparison for {key}")
                 return idx
         
         # If we can't find the class, print details and raise an error
         print(f"ERROR: Could not find linked class in the classes list:")
         print(f"  Subject: {c.subject}")
         print(f"  Teacher: {c.teacher}")
+        print(f"  Group: {c.group}")
         print(f"  Day: {c.day}")
         print(f"  Start Time: {c.start_time}")
+        print(f"  End Time: {c.end_time}")
+        print(f"  Key: {key}")
         print(f"Available classes:")
         for idx, cls in enumerate(self.classes):
-            print(f"  {idx}: {cls.subject} - {cls.teacher} - {cls.day} - {cls.start_time}")
+            print(f"  {idx}: {cls.subject} - {cls.teacher} - {cls.group} - {cls.day} - {cls.start_time} - {cls.end_time}")
         
         raise ValueError(f"Could not find linked class {c} in the classes list")
     
+    def add_constraint(self, constraint_expr, constraint_type: ConstraintType, 
+                      origin_module: str, origin_function: str,
+                      class_i: Optional[int] = None, class_j: Optional[int] = None,
+                      description: str = "", variables_used: List[str] = None):
+        """
+        Централизованная обертка для добавления ограничений с отслеживанием.
+        
+        Args:
+            constraint_expr: CP-SAT ограничение
+            constraint_type: Тип ограничения из ConstraintType
+            origin_module: Модуль, из которого добавлено ограничение
+            origin_function: Функция, из которой добавлено ограничение
+            class_i, class_j: Индексы классов (если применимо)
+            description: Описание ограничения
+            variables_used: Список использованных переменных
+            
+        Returns:
+            ConstraintInfo: Информация о добавленном ограничении
+        """
+        import inspect
+        
+        # Автоматическое определение origin_module и origin_function если не указаны
+        if origin_module == "auto" or origin_function == "auto":
+            frame = inspect.currentframe().f_back
+            if origin_module == "auto":
+                origin_module = frame.f_globals.get('__name__', 'unknown')
+            if origin_function == "auto":
+                origin_function = frame.f_code.co_name
+        
+        # Извлечение имен переменных для отслеживания
+        if variables_used is None:
+            variables_used = []
+            
+            # Попытка извлечь переменные из ограничения
+            if hasattr(constraint_expr, 'variables'):
+                variables_used = [str(var) for var in constraint_expr.variables]
+            
+            # Дополнительная попытка для классов с известными индексами
+            if class_i is not None or class_j is not None:
+                # Добавляем стандартные переменные для классов
+                if class_i is not None:
+                    variables_used.extend([
+                        f"start_vars[{class_i}]",
+                        f"day_vars[{class_i}]",
+                        f"room_vars[{class_i}]",
+                        f"assigned_vars[{class_i}]"
+                    ])
+                if class_j is not None:
+                    variables_used.extend([
+                        f"start_vars[{class_j}]",
+                        f"day_vars[{class_j}]",
+                        f"room_vars[{class_j}]",
+                        f"assigned_vars[{class_j}]"
+                    ])
+                
+                # Удаляем дубликаты
+                variables_used = list(set(variables_used))
+            
+            # Если все еще нет переменных, попытка автоматического определения
+            if not variables_used:
+                constraint_str = str(constraint_expr)
+                # Ищем паттерны переменных в строке ограничения
+                import re
+                var_patterns = [
+                    r'start_vars\[\d+\]',
+                    r'day_vars\[\d+\]',
+                    r'room_vars\[\d+\]',
+                    r'assigned_vars\[\d+\]',
+                    r'i_before_j_\d+_\d+',
+                    r'same_room_\d+_\d+',
+                    r'time_overlap_\d+_\d+',
+                    r'conflict_\d+_\d+'
+                ]
+                
+                for pattern in var_patterns:
+                    matches = re.findall(pattern, constraint_str)
+                    variables_used.extend(matches)
+                
+                # Удаляем дубликаты
+                variables_used = list(set(variables_used))
+        
+        # Улучшаем описание на основе типа ограничения и доступных данных
+        if not description:
+            if constraint_type == ConstraintType.CHAIN_ORDERING and class_i is not None and class_j is not None:
+                description = f"Chain ordering: class {class_i} before class {class_j}"
+            elif constraint_type == ConstraintType.SEPARATION and class_i is not None and class_j is not None:
+                description = f"Time separation: classes {class_i} and {class_j}"
+            elif constraint_type == ConstraintType.RESOURCE_CONFLICT and class_i is not None and class_j is not None:
+                description = f"Resource conflict prevention: classes {class_i} and {class_j}"
+            elif constraint_type == ConstraintType.TIME_WINDOW and class_i is not None:
+                description = f"Time window constraint: class {class_i}"
+            elif constraint_type == ConstraintType.FIXED_TIME and class_i is not None:
+                description = f"Fixed time constraint: class {class_i}"
+            else:
+                description = f"{constraint_type.value} constraint"
+        
+        # Добавление в реестр
+        constraint_info = self.constraint_registry.add_constraint(
+            constraint_expr=constraint_expr,
+            constraint_type=constraint_type,
+            origin_module=origin_module,
+            origin_function=origin_function,
+            class_i=class_i,
+            class_j=class_j,
+            description=description,
+            variables_used=variables_used
+        )
+        
+        # ВАЖНО: Добавляем ограничение в CP-SAT модель (если еще не добавлено)
+        if hasattr(constraint_expr, 'OnlyEnforceIf') or hasattr(constraint_expr, 'Not'):
+            # Это уже добавленное ограничение, возвращаем как есть
+            actual_constraint = constraint_expr
+        else:
+            # Это выражение, нужно добавить в модель
+            actual_constraint = self.model.Add(constraint_expr)
+        
+        print(f"  ✓ Added constraint {constraint_info.constraint_id}: {description}")
+        return actual_constraint  # Возвращаем фактическое ограничение CP-SAT
+    
+    def skip_constraint(self, constraint_type: ConstraintType, 
+                       origin_module: str, origin_function: str,
+                       class_i: Optional[int] = None, class_j: Optional[int] = None,
+                       reason: str = ""):
+        """
+        Регистрирует пропущенное ограничение.
+        
+        Args:
+            constraint_type: Тип ограничения
+            origin_module: Модуль, из которого должно было быть добавлено ограничение
+            origin_function: Функция, из которой должно было быть добавлено ограничение
+            class_i, class_j: Индексы классов (если применимо)
+            reason: Причина пропуска
+        """
+        import inspect
+        
+        # Автоматическое определение origin_module и origin_function если не указаны
+        if origin_module == "auto" or origin_function == "auto":
+            frame = inspect.currentframe().f_back
+            if origin_module == "auto":
+                origin_module = frame.f_globals.get('__name__', 'unknown')
+            if origin_function == "auto":
+                origin_function = frame.f_code.co_name
+        
+        self.constraint_registry.skip_constraint(
+            constraint_type=constraint_type,
+            origin_module=origin_module,
+            origin_function=origin_function,
+            class_i=class_i,
+            class_j=class_j,
+            reason=reason
+        )
+        
+        print(f"  ⚠️  Skipped constraint {constraint_type.value}: {reason}")
+    
+    def add_constraint_exception(self, class_i: int, class_j: int, reason: str):
+        """
+        Добавляет исключение для пары классов.
+        
+        Args:
+            class_i, class_j: Индексы классов
+            reason: Причина исключения
+        """
+        self.constraint_registry.add_exception(class_i, class_j, reason)
+        print(f"  🚫 Added constraint exception for classes {class_i} ↔ {class_j}: {reason}")
+    
+    def detect_constraint_conflict(self, constraint_ids: List[str], conflict_type: str,
+                                 description: str, classes_involved: List[int]):
+        """
+        Регистрирует обнаруженный конфликт ограничений.
+        
+        Args:
+            constraint_ids: Список ID конфликтующих ограничений
+            conflict_type: Тип конфликта
+            description: Описание конфликта
+            classes_involved: Список вовлеченных классов
+        """
+        self.constraint_registry.detect_conflict(
+            constraint_ids=constraint_ids,
+            conflict_type=conflict_type,
+            description=description,
+            classes_involved=classes_involved
+        )
+        print(f"  ⚠️  Detected constraint conflict: {description}")
+
     def build_model(self):
         """Build the constraint programming model."""
         from model_variables import create_variables
@@ -151,103 +365,126 @@ class ScheduleOptimizer:
         Returns:
             True if a solution was found, False otherwise
         """
+        # Очищаем кеши перед новой оптимизацией
+        from sequential_scheduling import clear_analysis_cache
+        clear_analysis_cache()
+        
         if self.model is None:
             self.build_model()
 
-        # Применение улучшений для временных окон
-        try:
-            from timewindow_adapter import apply_timewindow_improvements
-            apply_timewindow_improvements(self)
-            self.timewindow_already_processed = True
-        except ImportError:
-            print("Warning: timewindow_adapter module not found, skipping timewindow improvements")
+        # Добавить защиту от повторного применения улучшений временных окон
+        if not hasattr(self, 'timewindow_already_processed'):
+            # НОВОЕ: Обнаружение циклов перед применением ограничений
+            try:
+                from conflict_detector import detect_constraint_cycles, prevent_constraint_cycles
+                cycles = detect_constraint_cycles(self)
+                if cycles:
+                    prevent_constraint_cycles(self, cycles)
+            except ImportError:
+                print("Warning: conflict_detector module not found, skipping cycle detection")
+            
+            try:
+                from timewindow_adapter import apply_timewindow_improvements
+                apply_timewindow_improvements(self)
+                self.timewindow_already_processed = True
+                print("DEBUG: Applied timewindow improvements")
+            except ImportError:
+                print("Warning: timewindow_adapter module not found, skipping timewindow improvements")
+        else:
+            print("DEBUG: Timewindow improvements already applied, skipping")
         
         # Create the solver
         solver = cp_model.CpSolver()
         solver.parameters.max_time_in_seconds = time_limit_seconds
         
-        # Добавляем логирование
-        print("\nAttempting to solve model...")
+        # Добавляем логирование состояния модели
+        print(f"\n📊 MODEL STATISTICS:")
+        print(f"  Variables: {len(self.assigned_vars)} assigned, {len(self.start_vars)} start, {len(self.room_vars)} room, {len(self.day_vars)} day")
+        print(f"  Constraints: {self.constraint_registry.total_added} added, {self.constraint_registry.total_skipped} skipped")
         
-        # Solve the model
+        # Отчет о типах ограничений
+        stats = self.constraint_registry.get_statistics()
+        print(f"  Constraint types: {', '.join([f'{k}: {v}' for k, v in stats['by_type'].items()])}")
+        
+        # Solve the problem
+        print(f"\n🚀 Starting CP-SAT solver (time limit: {time_limit_seconds}s)...")
         status = solver.Solve(self.model)
         
-        # Инициализация solution перед любым использованием
-        solution = []
-        
-        # Детальное логирование статуса
-        print(f"\nSolver status: {status}")
+        # Сохраняем статус решателя для анализа
         if status == cp_model.OPTIMAL:
-            print("Solution is optimal")
+            self.solver_status = 'OPTIMAL'
+            print("✅ Solution found: OPTIMAL")
         elif status == cp_model.FEASIBLE:
-            print("Solution is feasible (but may not be optimal)")
+            self.solver_status = 'FEASIBLE'
+            print("✅ Solution found: FEASIBLE")
         elif status == cp_model.INFEASIBLE:
-            print("Problem is proven infeasible - no solution exists")
-            print("Possible reasons for infeasibility:")
-            print("1. Contradictory constraints for fixed classes")
-            print("2. Insufficient time windows for sequential scheduling")
-            print("3. Conflicting resources without alternatives")
+            self.solver_status = 'INFEASIBLE'
+            print("❌ No solution found: INFEASIBLE")
+            
+            # Генерируем все отчеты для анализа
+            from constraint_registry import generate_all_reports
+            generate_all_reports(self.constraint_registry, optimizer=self, infeasible=True)
+            
+            self.solution = None
+            return False
         elif status == cp_model.MODEL_INVALID:
-            print("Model is invalid - check for contradicting constraints")
+            self.solver_status = 'MODEL_INVALID'
+            print("❌ Model is invalid")
+            self.solution = None
+            return False
         else:
-            print("Solver timed out or was interrupted")
+            self.solver_status = 'TIMEOUT'
+            print(f"❓ Solver returned status: {status}")
+            self.solution = None
+            return False
         
-        if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
-            # Store the solution
-            for idx, c in enumerate(self.classes):
-                # Get assigned values
-                day = self.day_vars[idx]
-                if not isinstance(day, int):
-                    day = solver.Value(day)
+        # Если дошли до этой точки, значит есть решение (OPTIMAL или FEASIBLE)
+        # Store the solution
+        solution = []
+        for idx, c in enumerate(self.classes):
+            # Get assigned values
+            day = self.day_vars[idx]
+            if not isinstance(day, int):
+                day = solver.Value(day)
                     
-                start_slot = self.start_vars[idx]
-                if not isinstance(start_slot, int):
-                    start_slot = solver.Value(start_slot)
+            start_slot = self.start_vars[idx]
+            if not isinstance(start_slot, int):
+                start_slot = solver.Value(start_slot)
                     
-                room_idx = self.room_vars[idx]
-                if not isinstance(room_idx, int):
-                    room_idx = solver.Value(room_idx)
-                
-                day_name = list(self.day_indices.keys())[list(self.day_indices.values()).index(day)]
-                room_name = self.rooms[room_idx]
-                start_time = self.time_slots[start_slot]
-                
-                # Calculate end time
-                time_obj = datetime.strptime(start_time, "%H:%M")
-                time_obj += timedelta(minutes=c.duration)
-                end_time = time_obj.strftime("%H:%M")
-                
-                # Store the assignment
-                solution.append({
-                    "subject": c.subject,
-                    "group": c.group,
-                    "teacher": c.teacher,
-                    "room": room_name,
-                    "building": c.building,
-                    "day": day_name,
-                    "start_time": start_time,
-                    "end_time": end_time,
-                    "duration": c.duration,
-                    "pause_before": c.pause_before,
-                    "pause_after": c.pause_after
-                })
+            room_idx = self.room_vars[idx]
+            if not isinstance(room_idx, int):
+                room_idx = solver.Value(room_idx)
             
-        # В случае INFEASIBLE, вызвать анализ конфликтов
-        if status == cp_model.INFEASIBLE:
-            print("\nAnalyzing conflicts in the model...")
-            try:
-                sufficient_conflicts = solver.SufficientAssumptionsForInfeasibility()
-                print(f"Found {len(sufficient_conflicts)} conflicting constraints:")
-                for i, var_index in enumerate(sufficient_conflicts):
-                    if var_index >= 0:
-                        print(f"  Conflict {i+1}: Constraint with index {var_index}")
-                    else:
-                        print(f"  Conflict {i+1}: Assumption with index {-var_index-1}")
-            except:
-                print("Could not analyze conflicts - feature not supported in this version of OR-Tools")
+            day_name = list(self.day_indices.keys())[list(self.day_indices.values()).index(day)]
+            room_name = self.rooms[room_idx]
+            start_time = self.time_slots[start_slot]
             
-        # Сохраняем solution независимо от результата
+            # Calculate end time
+            time_obj = datetime.strptime(start_time, "%H:%M")
+            time_obj += timedelta(minutes=c.duration)
+            end_time = time_obj.strftime("%H:%M")
+            
+            # Store the assignment
+            solution.append({
+                "subject": c.subject,
+                "group": c.group,
+                "teacher": c.teacher,
+                "room": room_name,
+                "building": c.building,
+                "day": day_name,
+                "start_time": start_time,
+                "end_time": end_time,
+                "duration": c.duration,
+                "pause_before": c.pause_before,
+                "pause_after": c.pause_after
+            })
+        
+        # Сохраняем решение
         self.solution = solution
+        self.solver = solver  # Сохраняем solver для возможного использования позже
         
-        # Возвращаем True только если найдено оптимальное или допустимое решение
-        return status == cp_model.OPTIMAL or status == cp_model.FEASIBLE
+        # Генерируем полный отчет о ограничениях для анализа
+        from constraint_registry import generate_all_reports
+        generate_all_reports(self.constraint_registry, optimizer=self, infeasible=False)
+        
+        return True

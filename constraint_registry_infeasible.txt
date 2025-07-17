@@ -1,0 +1,271 @@
+CONSTRAINT REGISTRY - INFEASIBLE ANALYSIS
+============================================================
+
+📊 CONSTRAINT STATISTICS:
+Total added: 74
+Total skipped: 22
+Total exceptions: 0
+Total conflicts: 0
+
+🔍 POTENTIAL ISSUES ANALYSIS:
+--------------------------------------------------
+❌ Potentially redundant constraints for 1 class pairs:
+  - Classes 0 ↔ 1: 5 constraints
+    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna
+    📋 Types: room_conflict, linked_classes, chain_ordering
+
+⚡ Ordering constraints: 0 sequential, 6 chain
+
+⏰ Fixed time constraints: 1
+
+🔥 Most constrained class pairs:
+  - Classes 0 ↔ 1: 5 constraints
+    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna
+    📋 Types: room_conflict, linked_classes, chain_ordering
+  - Classes 0 ↔ 2: 3 constraints
+    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Mathe, 6B, Tchoudnovskaia Anna
+    📋 Types: room_conflict
+  - Classes 3 ↔ 5: 3 constraints
+    👨‍🏫 Schach, Schach Mi A, Rosov Boris ↔ Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+    📋 Types: room_conflict
+  - Classes 3 ↔ 6: 3 constraints
+    👨‍🏫 Schach, Schach Mi A, Rosov Boris ↔ Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+    📋 Types: room_conflict
+  - Classes 3 ↔ 7: 3 constraints
+    👨‍🏫 Schach, Schach Mi A, Rosov Boris ↔ NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+    📋 Types: room_conflict
+
+📈 Constraint type distribution:
+  time_window: 30
+  room_conflict: 24
+  other: 8
+  chain_ordering: 6
+  linked_classes: 5
+  fixed_time: 1
+
+📁 Constraint origin distribution:
+  resource_constraints: 24
+  model_variables: 18
+  chain_constraints: 17
+  separation_constraints: 10
+  linked_constraints: 5
+
+🔢 Variable usage analysis:
+  Most used variables:
+    start_var[7]: 6 constraints
+    start_var[1]: 5 constraints
+    start_vars[1]: 4 constraints
+    start_vars[6]: 4 constraints
+    room_vars[0]: 4 constraints
+    room_vars[5]: 4 constraints
+    room_vars[6]: 4 constraints
+    room_vars[7]: 4 constraints
+    start_var[2]: 4 constraints
+    start_var[6]: 4 constraints
+
+🔍 DETAILED CONSTRAINT ANALYSIS:
+--------------------------------------------------
+Class Pair: 0 ↔ 1
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+📊 Total constraints: 5
+📋 By type:
+  - linked_classes: 1
+  - room_conflict: 3
+  - chain_ordering: 1
+🔗 Detailed constraints:
+  1. linked_classes
+     📍 linked_constraints:add_linked_constraints
+     📄 Linked sequence (both variable): class 0 ends before class 1 starts
+     🔢 Variables: start_vars[0], start_vars[1]
+  2. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room match check (variable): classes 0 and 1
+     🔢 Variables: room_vars[0], room_vars[1], same_room_0_1
+  3. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room mismatch check (variable): classes 0 and 1
+     🔢 Variables: room_vars[0], room_vars[1], same_room_0_1
+  4. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Prevent room conflicts: classes 0 and 1
+     🔢 Variables: room_conflict_0_1
+  5. chain_ordering
+     📍 chain_constraints:add_chain_sequence_constraints
+     📄 Chain: class 0 -> class 1 (gap: 10 slots)
+     🔢 Variables: start_var[0], start_var[1]
+
+Class Pair: 0 ↔ 2
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+📊 Total constraints: 3
+📋 By type:
+  - room_conflict: 3
+🔗 Detailed constraints:
+  1. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room match check (variable): classes 0 and 2
+     🔢 Variables: room_vars[0], room_vars[2], same_room_0_2
+  2. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room mismatch check (variable): classes 0 and 2
+     🔢 Variables: room_vars[0], room_vars[2], same_room_0_2
+  3. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Prevent room conflicts: classes 0 and 2
+     🔢 Variables: room_conflict_0_2
+
+Class Pair: 3 ↔ 5
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+📊 Total constraints: 3
+📋 By type:
+  - room_conflict: 3
+🔗 Detailed constraints:
+  1. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room match check (fixed i): classes 3 and 5
+     🔢 Variables: room_vars[5], same_room_3_5
+  2. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room mismatch check (fixed i): classes 3 and 5
+     🔢 Variables: room_vars[5], same_room_3_5
+  3. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Prevent room conflicts: classes 3 and 5
+     🔢 Variables: room_conflict_3_5
+
+Class Pair: 3 ↔ 6
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+📊 Total constraints: 3
+📋 By type:
+  - room_conflict: 3
+🔗 Detailed constraints:
+  1. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room match check (fixed i): classes 3 and 6
+     🔢 Variables: room_vars[6], same_room_3_6
+  2. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room mismatch check (fixed i): classes 3 and 6
+     🔢 Variables: room_vars[6], same_room_3_6
+  3. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Prevent room conflicts: classes 3 and 6
+     🔢 Variables: room_conflict_3_6
+
+Class Pair: 3 ↔ 7
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+📊 Total constraints: 3
+📋 By type:
+  - room_conflict: 3
+🔗 Detailed constraints:
+  1. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room match check (fixed i): classes 3 and 7
+     🔢 Variables: room_vars[7], same_room_3_7
+  2. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room mismatch check (fixed i): classes 3 and 7
+     🔢 Variables: room_vars[7], same_room_3_7
+  3. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Prevent room conflicts: classes 3 and 7
+     🔢 Variables: room_conflict_3_7
+
+Class Pair: 4 ↔ 5
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+📊 Total constraints: 3
+📋 By type:
+  - room_conflict: 3
+🔗 Detailed constraints:
+  1. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room match check (fixed i): classes 4 and 5
+     🔢 Variables: room_vars[5], same_room_4_5
+  2. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room mismatch check (fixed i): classes 4 and 5
+     🔢 Variables: room_vars[5], same_room_4_5
+  3. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Prevent room conflicts: classes 4 and 5
+     🔢 Variables: room_conflict_4_5
+
+Class Pair: 4 ↔ 6
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+📊 Total constraints: 3
+📋 By type:
+  - room_conflict: 3
+🔗 Detailed constraints:
+  1. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room match check (fixed i): classes 4 and 6
+     🔢 Variables: room_vars[6], same_room_4_6
+  2. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room mismatch check (fixed i): classes 4 and 6
+     🔢 Variables: room_vars[6], same_room_4_6
+  3. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Prevent room conflicts: classes 4 and 6
+     🔢 Variables: room_conflict_4_6
+
+Class Pair: 4 ↔ 7
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+📊 Total constraints: 3
+📋 By type:
+  - room_conflict: 3
+🔗 Detailed constraints:
+  1. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room match check (fixed i): classes 4 and 7
+     🔢 Variables: room_vars[7], same_room_4_7
+  2. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Room mismatch check (fixed i): classes 4 and 7
+     🔢 Variables: room_vars[7], same_room_4_7
+  3. room_conflict
+     📍 resource_constraints:_add_room_conflict_constraints
+     📄 Prevent room conflicts: classes 4 and 7
+     🔢 Variables: room_conflict_4_7
+
+Class Pair: 1 ↔ 2
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+📊 Total constraints: 2
+📋 By type:
+  - linked_classes: 1
+  - chain_ordering: 1
+🔗 Detailed constraints:
+  1. linked_classes
+     📍 linked_constraints:add_linked_constraints
+     📄 Linked sequence (both variable): class 1 ends before class 2 starts
+     🔢 Variables: start_vars[1], start_vars[2]
+  2. chain_ordering
+     📍 chain_constraints:add_chain_sequence_constraints
+     📄 Chain: class 1 -> class 2 (gap: 16 slots)
+     🔢 Variables: start_var[1], start_var[2]
+
+Class Pair: 3 ↔ 4
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+📊 Total constraints: 2
+📋 By type:
+  - linked_classes: 1
+  - chain_ordering: 1
+🔗 Detailed constraints:
+  1. linked_classes
+     📍 linked_constraints:add_linked_constraints
+     📄 Linked sequence (both variable): class 3 ends before class 4 starts
+     🔢 Variables: start_vars[3], start_vars[4]
+  2. chain_ordering
+     📍 chain_constraints:add_chain_sequence_constraints
+     📄 Chain: class 3 -> class 4 (gap: 10 slots)
+     🔢 Variables: start_var[3], start_var[4]
+

@@ -1,3 +1,4 @@
+from constraint_registry import ConstraintType
 """
 Модуль для добавления ограничений для связанных занятий.
 """
@@ -51,13 +52,43 @@ def add_linked_constraints(optimizer):
                                            f"have different fixed days")
                     elif isinstance(optimizer.day_vars[prev_idx], int):
                         # Previous day is fixed, linked day must match
-                        optimizer.model.Add(optimizer.day_vars[linked_idx] == optimizer.day_vars[prev_idx])
+                        constraint_expr = optimizer.day_vars[linked_idx] == optimizer.day_vars[prev_idx]
+                        optimizer.add_constraint(
+                            constraint_expr=constraint_expr,
+                            constraint_type=ConstraintType.LINKED_CLASSES,
+                            origin_module=__name__,
+                            origin_function="add_linked_constraints",
+                            class_i=prev_idx,
+                            class_j=linked_idx,
+                            description=f"Linked classes same day (fixed prev): classes {prev_idx} and {linked_idx}",
+                            variables_used=[f"day_vars[{linked_idx}]"]
+                        )
                     elif isinstance(optimizer.day_vars[linked_idx], int):
                         # Linked day is fixed, previous day must match
-                        optimizer.model.Add(optimizer.day_vars[prev_idx] == optimizer.day_vars[linked_idx])
+                        constraint_expr = optimizer.day_vars[prev_idx] == optimizer.day_vars[linked_idx]
+                        optimizer.add_constraint(
+                            constraint_expr=constraint_expr,
+                            constraint_type=ConstraintType.LINKED_CLASSES,
+                            origin_module=__name__,
+                            origin_function="add_linked_constraints",
+                            class_i=prev_idx,
+                            class_j=linked_idx,
+                            description=f"Linked classes same day (fixed linked): classes {prev_idx} and {linked_idx}",
+                            variables_used=[f"day_vars[{prev_idx}]"]
+                        )
                     else:
                         # Neither day is fixed, they must be equal
-                        optimizer.model.Add(optimizer.day_vars[prev_idx] == optimizer.day_vars[linked_idx])
+                        constraint_expr = optimizer.day_vars[prev_idx] == optimizer.day_vars[linked_idx]
+                        optimizer.add_constraint(
+                            constraint_expr=constraint_expr,
+                            constraint_type=ConstraintType.LINKED_CLASSES,
+                            origin_module=__name__,
+                            origin_function="add_linked_constraints",
+                            class_i=prev_idx,
+                            class_j=linked_idx,
+                            description=f"Linked classes same day (both variable): classes {prev_idx} and {linked_idx}",
+                            variables_used=[f"day_vars[{prev_idx}]", f"day_vars[{linked_idx}]"]
+                        )
                     
                     # Second class must start after first class ends
                     if isinstance(optimizer.start_vars[prev_idx], int) and isinstance(optimizer.start_vars[linked_idx], int):
@@ -70,13 +101,33 @@ def add_linked_constraints(optimizer):
                         # Previous start is fixed, calculate end time
                         prev_end = optimizer.start_vars[prev_idx] + (prev_class.duration + prev_class.pause_after) // optimizer.time_interval
                         min_linked_start = prev_end + (linked_class.pause_before // optimizer.time_interval)
-                        optimizer.model.Add(optimizer.start_vars[linked_idx] >= min_linked_start)
+                        constraint_expr = optimizer.start_vars[linked_idx] >= min_linked_start
+                        optimizer.add_constraint(
+                            constraint_expr=constraint_expr,
+                            constraint_type=ConstraintType.LINKED_CLASSES,
+                            origin_module=__name__,
+                            origin_function="add_linked_constraints",
+                            class_i=prev_idx,
+                            class_j=linked_idx,
+                            description=f"Linked sequence (fixed prev): class {prev_idx} ends before class {linked_idx} starts",
+                            variables_used=[f"start_vars[{linked_idx}]"]
+                        )
                     elif isinstance(optimizer.start_vars[linked_idx], int):
                         # Linked start is fixed, calculate latest previous end
                         max_prev_end = optimizer.start_vars[linked_idx] - (linked_class.pause_before // optimizer.time_interval)
                         slots_needed = (prev_class.duration + prev_class.pause_after) // optimizer.time_interval
                         max_prev_start = max_prev_end - slots_needed
-                        optimizer.model.Add(optimizer.start_vars[prev_idx] <= max_prev_start)
+                        constraint_expr = optimizer.start_vars[prev_idx] <= max_prev_start
+                        optimizer.add_constraint(
+                            constraint_expr=constraint_expr,
+                            constraint_type=ConstraintType.LINKED_CLASSES,
+                            origin_module=__name__,
+                            origin_function="add_linked_constraints",
+                            class_i=prev_idx,
+                            class_j=linked_idx,
+                            description=f"Linked sequence (fixed linked): class {prev_idx} ends before class {linked_idx} starts",
+                            variables_used=[f"start_vars[{prev_idx}]"]
+                        )
                     else:
                         # Neither start is fixed
                         # Calculate the number of time slots needed for the previous class
@@ -84,8 +135,17 @@ def add_linked_constraints(optimizer):
                         linked_pause_slots = linked_class.pause_before // optimizer.time_interval
                         
                         # Next class must start after previous class ends plus pause
-                        optimizer.model.Add(optimizer.start_vars[linked_idx] >= 
-                                          optimizer.start_vars[prev_idx] + prev_slots + linked_pause_slots)
+                        constraint_expr = optimizer.start_vars[linked_idx] >= optimizer.start_vars[prev_idx] + prev_slots + linked_pause_slots
+                        optimizer.add_constraint(
+                            constraint_expr=constraint_expr,
+                            constraint_type=ConstraintType.LINKED_CLASSES,
+                            origin_module=__name__,
+                            origin_function="add_linked_constraints",
+                            class_i=prev_idx,
+                            class_j=linked_idx,
+                            description=f"Linked sequence (both variable): class {prev_idx} ends before class {linked_idx} starts",
+                            variables_used=[f"start_vars[{prev_idx}]", f"start_vars[{linked_idx}]"]
+                        )
                     
                     # Update for next iteration
                     prev_class = linked_class

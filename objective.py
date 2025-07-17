@@ -29,8 +29,8 @@ def add_objective_function(optimizer):
             # For classes with variable days, we need to consider all possibilities
             for day in range(len(optimizer.day_indices)):
                 day_match = optimizer.model.NewBoolVar(f"day_match_{idx}_{day}")
-                optimizer.model.Add(day_var == day).OnlyEnforceIf(day_match)
-                optimizer.model.Add(day_var != day).OnlyEnforceIf(day_match.Not())
+                constraint_expr = optimizer.model.Add(day_var == day).OnlyEnforceIf(day_match)
+                constraint_expr = optimizer.model.Add(day_var != day).OnlyEnforceIf(day_match.Not())
                 
                 if day not in teacher_day_classes[teacher]:
                     teacher_day_classes[teacher][day] = []
@@ -61,18 +61,18 @@ def add_objective_function(optimizer):
                     if isinstance(optimizer.room_vars[curr_idx], int) and isinstance(optimizer.room_vars[next_idx], int):
                         # Both rooms are fixed - создаем явное сравнение
                         if optimizer.room_vars[curr_idx] != optimizer.room_vars[next_idx]:
-                            optimizer.model.Add(room_change == 1)
+                            constraint_expr = optimizer.model.Add(room_change == 1)
                         else:
-                            optimizer.model.Add(room_change == 0)
+                            constraint_expr = optimizer.model.Add(room_change == 0)
                     elif isinstance(optimizer.room_vars[curr_idx], int):
-                        optimizer.model.Add(optimizer.room_vars[next_idx] != optimizer.room_vars[curr_idx]).OnlyEnforceIf(room_change)
-                        optimizer.model.Add(optimizer.room_vars[next_idx] == optimizer.room_vars[curr_idx]).OnlyEnforceIf(room_change.Not())
+                        constraint_expr = optimizer.model.Add(optimizer.room_vars[next_idx] != optimizer.room_vars[curr_idx]).OnlyEnforceIf(room_change)
+                        constraint_expr = optimizer.model.Add(optimizer.room_vars[next_idx] == optimizer.room_vars[curr_idx]).OnlyEnforceIf(room_change.Not())
                     elif isinstance(optimizer.room_vars[next_idx], int):
-                        optimizer.model.Add(optimizer.room_vars[curr_idx] != optimizer.room_vars[next_idx]).OnlyEnforceIf(room_change)
-                        optimizer.model.Add(optimizer.room_vars[curr_idx] == optimizer.room_vars[next_idx]).OnlyEnforceIf(room_change.Not())
+                        constraint_expr = optimizer.model.Add(optimizer.room_vars[curr_idx] != optimizer.room_vars[next_idx]).OnlyEnforceIf(room_change)
+                        constraint_expr = optimizer.model.Add(optimizer.room_vars[curr_idx] == optimizer.room_vars[next_idx]).OnlyEnforceIf(room_change.Not())
                     else:
-                        optimizer.model.Add(optimizer.room_vars[curr_idx] != optimizer.room_vars[next_idx]).OnlyEnforceIf(room_change)
-                        optimizer.model.Add(optimizer.room_vars[curr_idx] == optimizer.room_vars[next_idx]).OnlyEnforceIf(room_change.Not())
+                        constraint_expr = optimizer.model.Add(optimizer.room_vars[curr_idx] != optimizer.room_vars[next_idx]).OnlyEnforceIf(room_change)
+                        constraint_expr = optimizer.model.Add(optimizer.room_vars[curr_idx] == optimizer.room_vars[next_idx]).OnlyEnforceIf(room_change.Not())
                     
                     teacher_changes.append(room_change)
             else:
@@ -119,33 +119,33 @@ def add_objective_function(optimizer):
                         if isinstance(optimizer.start_vars[curr_idx], int):
                             curr_end_val = optimizer.start_vars[curr_idx] + (optimizer.classes[curr_idx].duration + 
                                                                     optimizer.classes[curr_idx].pause_after) // optimizer.time_interval
-                            optimizer.model.Add(curr_end == curr_end_val)
+                            constraint_expr = optimizer.model.Add(curr_end == curr_end_val)
                         else:
                             curr_duration = (optimizer.classes[curr_idx].duration + 
                                            optimizer.classes[curr_idx].pause_after) // optimizer.time_interval
-                            optimizer.model.Add(curr_end == optimizer.start_vars[curr_idx] + curr_duration)
+                            constraint_expr = optimizer.model.Add(curr_end == optimizer.start_vars[curr_idx] + curr_duration)
                         
                         next_start = optimizer.model.NewIntVar(0, len(optimizer.time_slots), f"effective_start_{next_idx}")
                         if isinstance(optimizer.start_vars[next_idx], int):
                             next_start_val = optimizer.start_vars[next_idx] - (optimizer.classes[next_idx].pause_before // optimizer.time_interval)
-                            optimizer.model.Add(next_start == next_start_val)
+                            constraint_expr = optimizer.model.Add(next_start == next_start_val)
                         else:
                             next_pause = optimizer.classes[next_idx].pause_before // optimizer.time_interval
-                            optimizer.model.Add(next_start == optimizer.start_vars[next_idx] - next_pause)
+                            constraint_expr = optimizer.model.Add(next_start == optimizer.start_vars[next_idx] - next_pause)
                         
                         # Gap is the difference between next start and current end
                         gap = optimizer.model.NewIntVar(0, len(optimizer.time_slots), f"gap_{curr_idx}_{next_idx}")
-                        optimizer.model.Add(gap == next_start - curr_end)
+                        constraint_expr = optimizer.model.Add(gap == next_start - curr_end)
                         
                         # Only consider positive gaps
                         positive_gap = optimizer.model.NewBoolVar(f"positive_gap_{curr_idx}_{next_idx}")
-                        optimizer.model.Add(gap > 0).OnlyEnforceIf(positive_gap)
-                        optimizer.model.Add(gap <= 0).OnlyEnforceIf(positive_gap.Not())
+                        constraint_expr = optimizer.model.Add(gap > 0).OnlyEnforceIf(positive_gap)
+                        constraint_expr = optimizer.model.Add(gap <= 0).OnlyEnforceIf(positive_gap.Not())
                         
                         # Conditional gap value
                         cond_gap = optimizer.model.NewIntVar(0, len(optimizer.time_slots), f"cond_gap_{curr_idx}_{next_idx}")
-                        optimizer.model.Add(cond_gap == gap).OnlyEnforceIf(positive_gap)
-                        optimizer.model.Add(cond_gap == 0).OnlyEnforceIf(positive_gap.Not())
+                        constraint_expr = optimizer.model.Add(cond_gap == gap).OnlyEnforceIf(positive_gap)
+                        constraint_expr = optimizer.model.Add(cond_gap == 0).OnlyEnforceIf(positive_gap.Not())
                         
                         gaps.append(cond_gap)
     

@@ -3,6 +3,7 @@
 """
 
 from time_utils import time_to_minutes, minutes_to_time
+from sequential_scheduling import can_schedule_sequentially
 
 def check_potential_conflicts(optimizer):
     """Check for obvious conflicts before building the model."""
@@ -50,9 +51,10 @@ def check_potential_conflicts(optimizer):
                                         
                                         if shared_groups:
                                             print(f"\nCONFLICT DETECTED: Teacher {teacher} has overlapping classes with shared groups:")
-                                            print(f"  Class 1: {c_i.subject} for groups {c_i.get_groups()} at {c_i.start_time} ({c_i.duration} min)")
-                                            print(f"  Class 2: {c_j.subject} for groups {c_j.get_groups()} at {c_j.start_time} ({c_j.duration} min)")
+                                            print(f"  Class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} for groups {c_i.get_groups()} at {c_i.start_time} ({c_i.duration} min)")
+                                            print(f"  Class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} for groups {c_j.get_groups()} at {c_j.start_time} ({c_j.duration} min)")
                                             print(f"  Time ranges: {minutes_to_time(start_i)}-{minutes_to_time(end_i)} and {minutes_to_time(start_j)}-{minutes_to_time(end_j)}")
+                                            print(f"  Shared groups: {shared_groups}")
                                             print(f"  These classes cannot be scheduled together with current constraints.")
                                         else:
                                             # Если группы разные, проверяем аудитории
@@ -60,54 +62,69 @@ def check_potential_conflicts(optimizer):
                                             
                                             if shared_rooms and len(c_i.possible_rooms) == 1 and len(c_j.possible_rooms) == 1:
                                                 print(f"\nCONFLICT DETECTED: Teacher {teacher} has overlapping classes in the same fixed room:")
-                                                print(f"  Class 1: {c_i.subject} for groups {c_i.get_groups()} at {c_i.start_time} ({c_i.duration} min)")
-                                                print(f"  Class 2: {c_j.subject} for groups {c_j.get_groups()} at {c_j.start_time} ({c_j.duration} min)")
+                                                print(f"  Class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} for groups {c_i.get_groups()} at {c_i.start_time} ({c_i.duration} min)")
+                                                print(f"  Class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} for groups {c_j.get_groups()} at {c_j.start_time} ({c_j.duration} min)")
                                                 print(f"  Both classes are fixed to room(s): {shared_rooms}")
+                                                print(f"  Time ranges: {minutes_to_time(start_i)}-{minutes_to_time(end_i)} and {minutes_to_time(start_j)}-{minutes_to_time(end_j)}")
                                             else:
                                                 print(f"\nNOTE: Teacher {teacher} has overlapping classes but with different groups and different rooms possible:")
-                                                print(f"  Class 1: {c_i.subject} for groups {c_i.get_groups()} at {c_i.start_time} ({c_i.duration} min)")
-                                                print(f"  Class 2: {c_j.subject} for groups {c_j.get_groups()} at {c_j.start_time} ({c_j.duration} min)")
+                                                print(f"  Class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} for groups {c_i.get_groups()} at {c_i.start_time} ({c_i.duration} min)")
+                                                print(f"  Class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} for groups {c_j.get_groups()} at {c_j.start_time} ({c_j.duration} min)")
+                                                print(f"  Class {idx_i} rooms: {c_i.possible_rooms}")
+                                                print(f"  Class {idx_j} rooms: {c_j.possible_rooms}")
                                                 print(f"  This may be intentional (teacher teaching multiple groups in different rooms).")
                                 
                                 # Если второе занятие с временным окном
                                 elif c_j.start_time and c_j.end_time:
-                                    window_start = time_to_minutes(c_j.start_time)
-                                    window_end = time_to_minutes(c_j.end_time)
-                                    
-                                    # Проверяем, можно ли разместить второе занятие после первого
-                                    earliest_possible_start = end_i + c_j.pause_before
-                                    latest_possible_end = window_end
-                                    
-                                    # Если есть общие группы, всегда считаем конфликтом
+                                    # Проверяем, можно ли разместить оба занятия без конфликта
                                     shared_groups = set(c_i.get_groups()) & set(c_j.get_groups())
                                     
                                     if shared_groups:
                                         print(f"\nWARNING: Teacher {teacher} has fixed class and window class with shared groups:")
-                                        print(f"  Fixed class: {c_i.subject} for groups {c_i.get_groups()} at {c_i.start_time} ({c_i.duration} min)")
-                                        print(f"  Window class: {c_j.subject} for groups {c_j.get_groups()} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
+                                        print(f"  Fixed class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} for groups {c_i.get_groups()} at {c_i.start_time} ({c_i.duration} min)")
+                                        print(f"  Window class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} for groups {c_j.get_groups()} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
+                                        print(f"  Shared groups: {shared_groups}")
                                         print(f"  These classes must not overlap due to shared groups: {shared_groups}")
                                     else:
-                                        # Если группы разные, проверяем возможность последовательного размещения
-                                        if earliest_possible_start + c_j.duration > latest_possible_end:
-                                            shared_rooms = set(c_i.possible_rooms) & set(c_j.possible_rooms)
-                                            
-                                            if shared_rooms and len(c_i.possible_rooms) == 1 and len(c_j.possible_rooms) == 1:
-                                                print(f"\nPOTENTIAL CONFLICT: Teacher {teacher} may not have enough time for both classes in the same fixed room:")
-                                                print(f"  Fixed class: {c_i.subject} at {c_i.start_time} ({c_i.duration} min)")
-                                                print(f"  Window class: {c_j.subject} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
-                                                print(f"  Earliest possible start for window class: {minutes_to_time(earliest_possible_start)}")
-                                                print(f"  Latest possible end for window class: {minutes_to_time(latest_possible_end)}")
-                                                print(f"  Required time: {c_j.duration} min; Available time: {latest_possible_end - earliest_possible_start} min")
-                                                
-                                                if latest_possible_end - earliest_possible_start < c_j.duration:
-                                                    print(f"  WARNING: There is not enough time to schedule both classes!")
-                                                else:
-                                                    print(f"  There should be enough time to schedule both classes.")
+                                        # Используем функцию can_schedule_sequentially для правильной проверки
+                                        can_schedule, info = can_schedule_sequentially(c_i, c_j, idx_i, idx_j, verbose=True)
+                                        
+                                        # New logging for chain & resource gap
+                                        if info.get("reason") == "chain_and_resource_gap":
+                                            start1, end1 = info["c1_interval"]
+                                            start2, end2 = info["c2_interval"]
+                                            gap = info["gap"]
+                                            print(f"SEQUENTIAL via chain & resource-gap: "
+                                                  f"{c_i.subject} {start1//60:02d}:{start1%60:02d}-{end1//60:02d}:{end1%60:02d}, "
+                                                  f"{c_j.subject} {start2//60:02d}:{start2%60:02d}-{end2//60:02d}:{end2%60:02d} "
+                                                  f"(gap {gap} min)")
+                                        
+                                        shared_rooms = set(c_i.possible_rooms) & set(c_j.possible_rooms)
+                                        
+                                        if shared_rooms and len(c_i.possible_rooms) == 1 and len(c_j.possible_rooms) == 1:
+                                            if can_schedule:
+                                                print(f"\nSEQUENTIAL SCHEDULING: Teacher {teacher} can schedule both classes in shared room:")
+                                                print(f"  Fixed class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} at {c_i.start_time} ({c_i.duration} min)")
+                                                print(f"  Window class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
+                                                print(f"  Shared room: {shared_rooms}")
+                                                print(f"  Scheduling reason: {info['reason']}")
                                             else:
-                                                print(f"\nINFO: Teacher {teacher} has fixed class and window class with different groups and room options:")
-                                                print(f"  Fixed class: {c_i.subject} at {c_i.start_time} ({c_i.duration} min)")
-                                                print(f"  Window class: {c_j.subject} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
-                                                print(f"  These can be scheduled in parallel with different rooms.")
+                                                print(f"\nPOTENTIAL CONFLICT: Teacher {teacher} may not have enough time for both classes in the same fixed room:")
+                                                print(f"  Fixed class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} at {c_i.start_time} ({c_i.duration} min)")
+                                                print(f"  Window class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
+                                                print(f"  Shared room: {shared_rooms}")
+                                                print(f"  Conflict reason: {info['reason']}")
+                                                if info.get('available_time') is not None and info.get('required_time') is not None:
+                                                    print(f"  Available time: {info['available_time']}")
+                                                    print(f"  Required time: {info['required_time']}")
+                                                print(f"  WARNING: There is not enough time to schedule both classes!")
+                                        else:
+                                            print(f"\nINFO: Teacher {teacher} has fixed class and window class with different groups and room options:")
+                                            print(f"  Fixed class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} at {c_i.start_time} ({c_i.duration} min)")
+                                            print(f"  Window class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
+                                            print(f"  Class {idx_i} rooms: {c_i.possible_rooms}")
+                                            print(f"  Class {idx_j} rooms: {c_j.possible_rooms}")
+                                            print(f"  These can be scheduled in parallel with different rooms.")
     
     # Проверка конфликтов аудиторий
     print("\nChecking for room conflicts...")
@@ -147,71 +164,296 @@ def check_potential_conflicts(optimizer):
                         # Проверяем пересечение
                         if (start_i < end_j and start_j < end_i):
                             print(f"\nCONFLICT DETECTED: Room {room} has overlapping fixed classes:")
-                            print(f"  Class 1: {c_i.subject} at {c_i.start_time} ({c_i.duration} min)")
-                            print(f"  Class 2: {c_j.subject} at {c_j.start_time} ({c_j.duration} min)")
+                            print(f"  Class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} at {c_i.start_time} ({c_i.duration} min)")
+                            print(f"  Class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} at {c_j.start_time} ({c_j.duration} min)")
                             print(f"  Time ranges: {minutes_to_time(start_i)}-{minutes_to_time(end_i)} and {minutes_to_time(start_j)}-{minutes_to_time(end_j)}")
                             print(f"  These classes cannot be scheduled together in the same room.")
                 
                 # Проверяем совместимость фиксированных занятий с занятиями с временным окном
                 for idx_i, c_i in fixed_classes:
-                    start_i = time_to_minutes(c_i.start_time)
-                    end_i = start_i + c_i.duration + c_i.pause_after
-                    
                     for idx_j, c_j in window_classes:
-                        window_start = time_to_minutes(c_j.start_time)
-                        window_end = time_to_minutes(c_j.end_time)
+                        # Используем функцию can_schedule_sequentially для правильной проверки
+                        can_schedule, info = can_schedule_sequentially(c_i, c_j, idx_i, idx_j, verbose=True)
                         
-                        # Сначала — можно ли вместить окно ДО фиксированного занятия?
-                        if start_i >= window_start + c_j.duration + c_j.pause_after:
-                            print(f"\nSEQUENTIAL SCHEDULING: Room {room} can fit window class BEFORE fixed class:")
-                            print(f"  Window class: {c_j.subject} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
-                            print(f"  Fixed class: {c_i.subject} at {c_i.start_time}-{minutes_to_time(end_i)} ({c_i.duration} min)")
-                            print(f"  Window must start at the beginning of its window: {c_j.start_time}")
-
-                        # Если «до» не подошло, проверяем «после»
-                        elif window_end - end_i >= c_j.duration + c_j.pause_before:
-                            print(f"\nSEQUENTIAL SCHEDULING: Room {room} can fit window class AFTER fixed class:")
-                            print(f"  Fixed class: {c_i.subject} at {c_i.start_time}-{minutes_to_time(end_i)} ({c_i.duration} min)")
-                            print(f"  Window class: {c_j.subject} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
-                            print(f"  Available time after fixed: {window_end - end_i} min")
-                            print(f"  Required for window: {c_j.duration + c_j.pause_before} min")
-
+                        # New logging for chain & resource gap
+                        if info.get("reason") == "chain_and_resource_gap":
+                            start1, end1 = info["c1_interval"]
+                            start2, end2 = info["c2_interval"]
+                            gap = info["gap"]
+                            print(f"SEQUENTIAL via chain & resource-gap: "
+                                  f"{c_i.subject} {start1//60:02d}:{start1%60:02d}-{end1//60:02d}:{end1%60:02d}, "
+                                  f"{c_j.subject} {start2//60:02d}:{start2%60:02d}-{end2//60:02d}:{end2%60:02d} "
+                                  f"(gap {gap} min)")
+                        
+                        if can_schedule:
+                            print(f"\nSEQUENTIAL SCHEDULING: Room {room} can fit window class with fixed class:")
+                            print(f"  Fixed class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} at {c_i.start_time} ({c_i.duration} min)")
+                            print(f"  Window class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
+                            print(f"  Scheduling reason: {info['reason']}")
+                            if info.get('available_time') is not None and info.get('required_time') is not None:
+                                print(f"  Available time: {info['available_time']}")
+                                print(f"  Required time: {info['required_time']}")
                         else:
-                            # Ни «до», ни «после» не влезает
-                            print(f"\nPOTENTIAL CONFLICT: Room {room} - cannot fit window class around fixed class")
-                            print(f"  Fixed: {c_i.subject} at {c_i.start_time}-{minutes_to_time(end_i)}")
-                            print(f"  Window: {c_j.subject} {c_j.start_time}-{c_j.end_time}")
+                            # Проверяем обратный порядок (window -> fixed)
+                            can_schedule_rev, info_rev = can_schedule_sequentially(c_j, c_i, idx_j, idx_i, verbose=True)
+                            
+                            # New logging for chain & resource gap (reverse order)
+                            if info_rev.get("reason") == "chain_and_resource_gap":
+                                start1, end1 = info_rev["c1_interval"]
+                                start2, end2 = info_rev["c2_interval"]
+                                gap = info_rev["gap"]
+                                print(f"SEQUENTIAL via chain & resource-gap (reverse): "
+                                      f"{c_j.subject} {start1//60:02d}:{start1%60:02d}-{end1//60:02d}:{end1%60:02d}, "
+                                      f"{c_i.subject} {start2//60:02d}:{start2%60:02d}-{end2//60:02d}:{end2%60:02d} "
+                                      f"(gap {gap} min)")
+                            
+                            if can_schedule_rev:
+                                print(f"\nSEQUENTIAL SCHEDULING (REVERSE ORDER): Room {room} can fit window before fixed class:")
+                                print(f"  Window class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
+                                print(f"  Fixed class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} at {c_i.start_time} ({c_i.duration} min)")
+                                print(f"  Scheduling reason: {info_rev['reason']}")
+                                if info_rev.get('available_time') is not None and info_rev.get('required_time') is not None:
+                                    print(f"  Available time: {info_rev['available_time']} min, Required time: {info_rev['required_time']} min")
+                            else:
+                                print(f"\nPOTENTIAL CONFLICT: Room {room} - cannot fit window class around fixed class in either order:")
+                                print(f"  Fixed class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} at {c_i.start_time} ({c_i.duration} min)")
+                                print(f"  Window class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
+                                print(f"  Fixed->Window conflict: {info['reason']}")
+                                if info.get('available_time') is not None and info.get('required_time') is not None:
+                                    print(f"  Available time (fixed->window): {info['available_time']}")
+                                    print(f"  Required time: {info['required_time']}")
+                                print(f"  Window->Fixed conflict: {info_rev['reason']}")
+                                if info_rev.get('available_time') is not None and info_rev.get('required_time') is not None:
+                                    print(f"  Available time (window->fixed): {info_rev['available_time']}")
+                                    print(f"  Required time: {info_rev['required_time']}")
+                                print(f"  No sufficient time slot found for sequential scheduling")
                 
                 # Проверяем совместимость занятий с временным окном между собой
                 for i, (idx_i, c_i) in enumerate(window_classes):
-                    window_i_start = time_to_minutes(c_i.start_time)
-                    window_i_end = time_to_minutes(c_i.end_time)
-                    
                     for j, (idx_j, c_j) in enumerate(window_classes[i+1:], i+1):
-                        window_j_start = time_to_minutes(c_j.start_time)
-                        window_j_end = time_to_minutes(c_j.end_time)
+                        # Используем функцию can_schedule_sequentially для правильной проверки
+                        can_schedule, info = can_schedule_sequentially(c_i, c_j, idx_i, idx_j, verbose=True)
                         
-                        # Находим общее временное окно
-                        common_start = max(window_i_start, window_j_start)
-                        common_end = min(window_i_end, window_j_end)
-                        common_duration = common_end - common_start
-                        
-                        # Суммарное время, требуемое для обоих занятий
-                        total_duration = c_i.duration + c_i.pause_after + c_j.pause_before + c_j.duration
-                        
-                        if common_duration >= total_duration:
+                        if can_schedule:
                             print(f"\nSEQUENTIAL SCHEDULING: Room {room} can fit both window classes sequentially:")
-                            print(f"  Class 1: {c_i.subject} with window {c_i.start_time}-{c_i.end_time} ({c_i.duration} min)")
-                            print(f"  Class 2: {c_j.subject} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
-                            print(f"  Common window: {minutes_to_time(common_start)}-{minutes_to_time(common_end)} ({common_duration} min)")
-                            print(f"  Required time: {total_duration} min")
+                            print(f"  Class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} with window {c_i.start_time}-{c_i.end_time} ({c_i.duration} min)")
+                            print(f"  Class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
+                            print(f"  Scheduling reason: {info['reason']}")
+                            if info.get('common_window'):
+                                print(f"  Common window: {info['common_window']}")
+                            if info.get('available_time') is not None and info.get('required_time') is not None:
+                                print(f"  Available time: {info['available_time']}")
+                                print(f"  Required time: {info['required_time']}")
                         else:
-                            print(f"\nPOTENTIAL CONFLICT: Room {room} - insufficient common window for sequential scheduling:")
-                            print(f"  Class 1: {c_i.subject} with window {c_i.start_time}-{c_i.end_time} ({c_i.duration} min)")
-                            print(f"  Class 2: {c_j.subject} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
-                            print(f"  Common window: {minutes_to_time(common_start)}-{minutes_to_time(common_end)} ({common_duration} min)")
-                            print(f"  Required time: {total_duration} min")
-                            print(f"  WARNING: Not enough time in common window to schedule both classes!")
+                            # Проверяем, нужно ли попробовать обратный порядок для неперекрывающихся окон
+                            if info.get('reason') == 'windows_separate_wrong_order':
+                                print(f"\nCHECKING REVERSE ORDER: Trying {c_j.subject} before {c_i.subject}...")
+                                can_schedule_rev, info_rev = can_schedule_sequentially(c_j, c_i, idx_j, idx_i, verbose=True)
+                                
+                                if can_schedule_rev:
+                                    print(f"\nSEQUENTIAL SCHEDULING (REVERSE ORDER): Room {room} can fit both window classes:")
+                                    print(f"  Class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
+                                    print(f"  Class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} with window {c_i.start_time}-{c_i.end_time} ({c_i.duration} min)")
+                                    print(f"  Scheduling reason: {info_rev['reason']}")
+                                    if info_rev.get('available_time') is not None and info_rev.get('required_time') is not None:
+                                        print(f"  Available time: {info_rev['available_time']}")
+                                        print(f"  Required time: {info_rev['required_time']}")
+                                else:
+                                    print(f"\nPOTENTIAL CONFLICT: Room {room} - classes cannot be scheduled sequentially in either order:")
+                                    print(f"  Class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} with window {c_i.start_time}-{c_i.end_time} ({c_i.duration} min)")
+                                    print(f"  Class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
+                                    print(f"  Forward order conflict: {info['reason']}")
+                                    if info.get('available_time') is not None:
+                                        print(f"  Available time: {info['available_time']}")
+                                        print(f"  Required time: {info.get('required_time', 'N/A')}")
+                                    print(f"  Reverse order conflict: {info_rev['reason']}")
+                                    if info_rev.get('available_time') is not None:
+                                        print(f"  Available time (reverse): {info_rev['available_time']}")
+                                        print(f"  Required time: {info_rev.get('required_time', 'N/A')}")
+                                    print(f"  WARNING: These classes cannot be scheduled together in this room!")
+                            else:
+                                print(f"\nPOTENTIAL CONFLICT: Room {room} - classes cannot be scheduled sequentially:")
+                                print(f"  Class {idx_i}: {c_i.subject} - {c_i.group} - {c_i.teacher} with window {c_i.start_time}-{c_i.end_time} ({c_i.duration} min)")
+                                print(f"  Class {idx_j}: {c_j.subject} - {c_j.group} - {c_j.teacher} with window {c_j.start_time}-{c_j.end_time} ({c_j.duration} min)")
+                                print(f"  Conflict reason: {info['reason']}")
+                                if info.get('common_window'):
+                                    print(f"  Common window: {info['common_window']}")
+                                if info.get('available_time') is not None and info.get('required_time') is not None:
+                                    print(f"  Available time: {info['available_time']}")
+                                    print(f"  Required time: {info['required_time']}")
+                                print(f"  WARNING: These classes cannot be scheduled together in this room!")
     
     print("\nConflict check completed.")
+
+
+def detect_constraint_cycles(optimizer):
+    """
+    Обнаруживает циклические зависимости между ограничениями цепочек и преподавателей.
+    
+    Args:
+        optimizer: Экземпляр ScheduleOptimizer
+        
+    Returns:
+        list: Список обнаруженных циклов
+    """
+    print("\nDetecting constraint cycles...")
+    
+    # Строим граф зависимостей между классами
+    dependency_graph = {}
+    
+    # Добавляем зависимости от цепочек
+    for idx, c in enumerate(optimizer.classes):
+        dependency_graph[idx] = set()
+        
+        # Проверяем связанные классы (цепочки)
+        if hasattr(c, 'linked_to') and c.linked_to:
+            for linked_info in c.linked_to:
+                if isinstance(linked_info, dict) and 'class' in linked_info:
+                    linked_class = linked_info['class']
+                    # Найдем индекс связанного класса
+                    for j, other_c in enumerate(optimizer.classes):
+                        if other_c == linked_class:
+                            dependency_graph[idx].add(j)
+                            break
+    
+    # Добавляем зависимости от преподавателей (для классов одного преподавателя в один день)
+    teacher_classes = {}
+    for idx, c in enumerate(optimizer.classes):
+        if c.teacher and c.day:
+            key = (c.teacher, c.day)
+            if key not in teacher_classes:
+                teacher_classes[key] = []
+            teacher_classes[key].append(idx)
+    
+    # Для каждого преподавателя в каждый день добавляем взаимные зависимости
+    for teacher_day, class_indices in teacher_classes.items():
+        if len(class_indices) > 1:
+            for i in class_indices:
+                for j in class_indices:
+                    if i != j:
+                        dependency_graph[i].add(j)
+    
+    # Обнаруживаем циклы с помощью DFS
+    visited = set()
+    rec_stack = set()
+    cycles = []
+    
+    def dfs(node, path):
+        if node in rec_stack:
+            # Найден цикл
+            cycle_start = path.index(node)
+            cycle = path[cycle_start:] + [node]
+            cycles.append(cycle)
+            return True
+        
+        if node in visited:
+            return False
+        
+        visited.add(node)
+        rec_stack.add(node)
+        path.append(node)
+        
+        for neighbor in dependency_graph[node]:
+            if dfs(neighbor, path):
+                pass  # Цикл уже найден и добавлен
+        
+        rec_stack.remove(node)
+        path.pop()
+        return False
+    
+    # Запускаем DFS для всех узлов
+    for idx in range(len(optimizer.classes)):
+        if idx not in visited:
+            dfs(idx, [])
+    
+    # Логируем результаты
+    if cycles:
+        print(f"WARNING: Detected {len(cycles)} constraint cycles:")
+        for i, cycle in enumerate(cycles):
+            print(f"  Cycle {i+1}: {' -> '.join(map(str, cycle))}")
+            
+            # Детальная информация о цикле
+            for j in range(len(cycle) - 1):
+                idx1, idx2 = cycle[j], cycle[j+1]
+                c1, c2 = optimizer.classes[idx1], optimizer.classes[idx2]
+                
+                # Проверяем тип связи
+                if hasattr(c1, 'linked_to') and c1.linked_to:
+                    for linked_info in c1.linked_to:
+                        if isinstance(linked_info, dict) and 'class' in linked_info:
+                            if linked_info['class'] == c2:
+                                print(f"    {idx1} -> {idx2}: Chain constraint ({c1.subject} -> {c2.subject})")
+                                break
+                elif c1.teacher == c2.teacher and c1.day == c2.day:
+                    print(f"    {idx1} -> {idx2}: Teacher constraint (same teacher {c1.teacher} on {c1.day})")
+    else:
+        print("No constraint cycles detected.")
+    
+    return cycles
+
+
+def prevent_constraint_cycles(optimizer, cycles):
+    """
+    Предотвращает циклические зависимости путем модификации ограничений.
+    
+    Args:
+        optimizer: Экземпляр ScheduleOptimizer
+        cycles: Список обнаруженных циклов
+    """
+    if not cycles:
+        return
+    
+    print(f"\nPreventing {len(cycles)} constraint cycles...")
+    
+    for i, cycle in enumerate(cycles):
+        print(f"  Processing cycle {i+1}: {' -> '.join(map(str, cycle))}")
+        
+        # Стратегия: разорвать цикл, удалив наименее критичное ограничение
+        # Приоритет: цепочки важнее ограничений преподавателя
+        
+        weakest_link = None
+        weakest_score = float('inf')
+        
+        for j in range(len(cycle) - 1):
+            idx1, idx2 = cycle[j], cycle[j+1]
+            c1, c2 = optimizer.classes[idx1], optimizer.classes[idx2]
+            
+            # Оценка критичности связи
+            score = 0
+            
+            # Проверяем, является ли это цепочечной связью
+            is_chain_link = False
+            if hasattr(c1, 'linked_to') and c1.linked_to:
+                for linked_info in c1.linked_to:
+                    if isinstance(linked_info, dict) and 'class' in linked_info:
+                        if linked_info['class'] == c2:
+                            is_chain_link = True
+                            score += 10  # Цепочки более критичны
+                            break
+            
+            # Проверяем, является ли это ограничением преподавателя
+            if c1.teacher == c2.teacher and c1.day == c2.day:
+                score += 5  # Ограничения преподавателя менее критичны
+            
+            # Учитываем фиксированное время
+            if c1.start_time and not c1.end_time:
+                score += 3  # Фиксированное время повышает критичность
+            if c2.start_time and not c2.end_time:
+                score += 3
+            
+            if score < weakest_score:
+                weakest_score = score
+                weakest_link = (idx1, idx2)
+        
+        if weakest_link:
+            idx1, idx2 = weakest_link
+            print(f"    Breaking weakest link: {idx1} -> {idx2} (score: {weakest_score})")
+            
+            # Помечаем эту связь как исключение
+            if not hasattr(optimizer, 'constraint_exceptions'):
+                optimizer.constraint_exceptions = set()
+            optimizer.constraint_exceptions.add((idx1, idx2))
+            optimizer.constraint_exceptions.add((idx2, idx1))  # Для симметрии
+            
+            print(f"    Added constraint exception for classes {idx1} and {idx2}")
     

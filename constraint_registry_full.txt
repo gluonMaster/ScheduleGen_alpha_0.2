@@ -1,0 +1,853 @@
+CONSTRAINT REGISTRY - FULL EXPORT
+============================================================
+
+📊 STATISTICS:
+Total added: 74
+Total skipped: 22
+Total exceptions: 0
+Total conflicts: 0
+
+🔗 ADDED CONSTRAINTS:
+--------------------------------------------------
+Constraint #1:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+🔢 Variables: start_vars[0]
+📄 Description: Time window constraint: class 0 start >= 16:00
+⏳ Condition: Class 0 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #2:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+🔢 Variables: start_vars[0]
+📄 Description: Time window constraint: class 0 end <= 19:45
+⏳ Condition: Class 0 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #3:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_vars[1]
+📄 Description: Time window constraint: class 1 start >= 16:00
+⏳ Condition: Class 1 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #4:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_vars[1]
+📄 Description: Time window constraint: class 1 end <= 19:45
+⏳ Condition: Class 1 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #5:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_vars[2]
+📄 Description: Time window constraint: class 2 start >= 16:00
+⏳ Condition: Class 2 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #6:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_vars[2]
+📄 Description: Time window constraint: class 2 end <= 19:45
+⏳ Condition: Class 2 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #7:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+🔢 Variables: start_vars[3]
+📄 Description: Time window constraint: class 3 start >= 16:00
+⏳ Condition: Class 3 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #8:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+🔢 Variables: start_vars[3]
+📄 Description: Time window constraint: class 3 end <= 17:35
+⏳ Condition: Class 3 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #9:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+🔢 Variables: start_vars[4]
+📄 Description: Time window constraint: class 4 start >= 16:00
+⏳ Condition: Class 4 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #10:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+🔢 Variables: start_vars[4]
+📄 Description: Time window constraint: class 4 end <= 17:35
+⏳ Condition: Class 4 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #11:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+🔢 Variables: start_vars[5]
+📄 Description: Time window constraint: class 5 start >= 16:00
+⏳ Condition: Class 5 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #12:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+🔢 Variables: start_vars[5]
+📄 Description: Time window constraint: class 5 end <= 20:00
+⏳ Condition: Class 5 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #13:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_vars[6]
+📄 Description: Time window constraint: class 6 start >= 16:00
+⏳ Condition: Class 6 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #14:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_vars[6]
+📄 Description: Time window constraint: class 6 end <= 20:00
+⏳ Condition: Class 6 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #15:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_vars[7]
+📄 Description: Time window constraint: class 7 start >= 16:00
+⏳ Condition: Class 7 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #16:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_vars[7]
+📄 Description: Time window constraint: class 7 end <= 20:00
+⏳ Condition: Class 7 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #17:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
+🔢 Variables: start_vars[8]
+📄 Description: Time window constraint: class 8 start >= 15:00
+⏳ Condition: Class 8 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #18:
+🔗 Type: time_window
+📍 Origin: model_variables:create_variables
+👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
+🔢 Variables: start_vars[8]
+📄 Description: Time window constraint: class 8 end <= 17:00
+⏳ Condition: Class 8 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #19:
+🔗 Type: linked_classes
+📍 Origin: linked_constraints:add_linked_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_vars[0], start_vars[1]
+📄 Description: Linked sequence (both variable): class 0 ends before class 1 starts
+🕐 Added: 14:21:33
+------------------------------
+Constraint #20:
+🔗 Type: linked_classes
+📍 Origin: linked_constraints:add_linked_constraints
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_vars[1], start_vars[2]
+📄 Description: Linked sequence (both variable): class 1 ends before class 2 starts
+🕐 Added: 14:21:33
+------------------------------
+Constraint #21:
+🔗 Type: linked_classes
+📍 Origin: linked_constraints:add_linked_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+🔢 Variables: start_vars[3], start_vars[4]
+📄 Description: Linked sequence (both variable): class 3 ends before class 4 starts
+🕐 Added: 14:21:33
+------------------------------
+Constraint #22:
+🔗 Type: linked_classes
+📍 Origin: linked_constraints:add_linked_constraints
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_vars[5], start_vars[6]
+📄 Description: Linked sequence (both variable): class 5 ends before class 6 starts
+🕐 Added: 14:21:33
+------------------------------
+Constraint #23:
+🔗 Type: linked_classes
+📍 Origin: linked_constraints:add_linked_constraints
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_vars[6], start_vars[7]
+📄 Description: Linked sequence (both variable): class 6 ends before class 7 starts
+🕐 Added: 14:21:33
+------------------------------
+Constraint #24:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+🔢 Variables: room_vars[0], room_vars[1], same_room_0_1
+📄 Description: Room match check (variable): classes 0 and 1
+🕐 Added: 14:21:33
+------------------------------
+Constraint #25:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+🔢 Variables: room_vars[0], room_vars[1], same_room_0_1
+📄 Description: Room mismatch check (variable): classes 0 and 1
+🕐 Added: 14:21:33
+------------------------------
+Constraint #26:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+🔢 Variables: room_conflict_0_1
+📄 Description: Prevent room conflicts: classes 0 and 1
+🕐 Added: 14:21:33
+------------------------------
+Constraint #27:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+🔢 Variables: room_vars[0], room_vars[2], same_room_0_2
+📄 Description: Room match check (variable): classes 0 and 2
+🕐 Added: 14:21:33
+------------------------------
+Constraint #28:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+🔢 Variables: room_vars[0], room_vars[2], same_room_0_2
+📄 Description: Room mismatch check (variable): classes 0 and 2
+🕐 Added: 14:21:33
+------------------------------
+Constraint #29:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+🔢 Variables: room_conflict_0_2
+📄 Description: Prevent room conflicts: classes 0 and 2
+🕐 Added: 14:21:33
+------------------------------
+Constraint #30:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+🔢 Variables: room_vars[5], same_room_3_5
+📄 Description: Room match check (fixed i): classes 3 and 5
+🕐 Added: 14:21:33
+------------------------------
+Constraint #31:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+🔢 Variables: room_vars[5], same_room_3_5
+📄 Description: Room mismatch check (fixed i): classes 3 and 5
+🕐 Added: 14:21:33
+------------------------------
+Constraint #32:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+🔢 Variables: room_conflict_3_5
+📄 Description: Prevent room conflicts: classes 3 and 5
+🕐 Added: 14:21:33
+------------------------------
+Constraint #33:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: room_vars[6], same_room_3_6
+📄 Description: Room match check (fixed i): classes 3 and 6
+🕐 Added: 14:21:33
+------------------------------
+Constraint #34:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: room_vars[6], same_room_3_6
+📄 Description: Room mismatch check (fixed i): classes 3 and 6
+🕐 Added: 14:21:33
+------------------------------
+Constraint #35:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: room_conflict_3_6
+📄 Description: Prevent room conflicts: classes 3 and 6
+🕐 Added: 14:21:33
+------------------------------
+Constraint #36:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: room_vars[7], same_room_3_7
+📄 Description: Room match check (fixed i): classes 3 and 7
+🕐 Added: 14:21:33
+------------------------------
+Constraint #37:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: room_vars[7], same_room_3_7
+📄 Description: Room mismatch check (fixed i): classes 3 and 7
+🕐 Added: 14:21:33
+------------------------------
+Constraint #38:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: room_conflict_3_7
+📄 Description: Prevent room conflicts: classes 3 and 7
+🕐 Added: 14:21:33
+------------------------------
+Constraint #39:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+🔢 Variables: room_vars[5], same_room_4_5
+📄 Description: Room match check (fixed i): classes 4 and 5
+🕐 Added: 14:21:33
+------------------------------
+Constraint #40:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+🔢 Variables: room_vars[5], same_room_4_5
+📄 Description: Room mismatch check (fixed i): classes 4 and 5
+🕐 Added: 14:21:33
+------------------------------
+Constraint #41:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+🔢 Variables: room_conflict_4_5
+📄 Description: Prevent room conflicts: classes 4 and 5
+🕐 Added: 14:21:33
+------------------------------
+Constraint #42:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: room_vars[6], same_room_4_6
+📄 Description: Room match check (fixed i): classes 4 and 6
+🕐 Added: 14:21:33
+------------------------------
+Constraint #43:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: room_vars[6], same_room_4_6
+📄 Description: Room mismatch check (fixed i): classes 4 and 6
+🕐 Added: 14:21:33
+------------------------------
+Constraint #44:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: room_conflict_4_6
+📄 Description: Prevent room conflicts: classes 4 and 6
+🕐 Added: 14:21:33
+------------------------------
+Constraint #45:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: room_vars[7], same_room_4_7
+📄 Description: Room match check (fixed i): classes 4 and 7
+🕐 Added: 14:21:33
+------------------------------
+Constraint #46:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: room_vars[7], same_room_4_7
+📄 Description: Room mismatch check (fixed i): classes 4 and 7
+🕐 Added: 14:21:33
+------------------------------
+Constraint #47:
+🔗 Type: room_conflict
+📍 Origin: resource_constraints:_add_room_conflict_constraints
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: room_conflict_4_7
+📄 Description: Prevent room conflicts: classes 4 and 7
+🕐 Added: 14:21:33
+------------------------------
+Constraint #48:
+🔗 Type: chain_ordering
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_var[0], start_var[1]
+📄 Description: Chain: class 0 -> class 1 (gap: 10 slots)
+⏳ Condition: Class 0 must end before Class 1 starts
+🕐 Added: 14:21:33
+------------------------------
+Constraint #49:
+🔗 Type: chain_ordering
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_var[1], start_var[2]
+📄 Description: Chain: class 1 -> class 2 (gap: 16 slots)
+⏳ Condition: Class 1 must end before Class 2 starts
+🕐 Added: 14:21:33
+------------------------------
+Constraint #50:
+🔗 Type: time_window
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+🔢 Variables: start_var[0]
+📄 Description: Time window lower bound: class 0 >= slot 96
+⏳ Condition: Class 0 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #51:
+🔗 Type: time_window
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+🔢 Variables: start_var[0]
+📄 Description: Time window upper bound: class 0 <= slot 132
+⏳ Condition: Class 0 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #52:
+🔗 Type: time_window
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_var[1]
+📄 Description: Time window lower bound: class 1 >= slot 106
+⏳ Condition: Class 1 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #53:
+🔗 Type: time_window
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_var[1]
+📄 Description: Time window upper bound: class 1 <= slot 126
+⏳ Condition: Class 1 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #54:
+🔗 Type: time_window
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_var[2]
+📄 Description: Time window lower bound: class 2 >= slot 122
+⏳ Condition: Class 2 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #55:
+🔗 Type: time_window
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_var[2]
+📄 Description: Time window upper bound: class 2 <= slot 132
+⏳ Condition: Class 2 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #56:
+🔗 Type: chain_ordering
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_var[6], start_var[7]
+📄 Description: Chain: class 6 -> class 7 (gap: 19 slots)
+⏳ Condition: Class 6 must end before Class 7 starts
+🕐 Added: 14:21:33
+------------------------------
+Constraint #57:
+🔗 Type: time_window
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_var[6]
+📄 Description: Time window lower bound: class 6 >= slot 96
+⏳ Condition: Class 6 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #58:
+🔗 Type: time_window
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_var[6]
+📄 Description: Time window upper bound: class 6 <= slot 126
+⏳ Condition: Class 6 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #59:
+🔗 Type: time_window
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_var[7]
+📄 Description: Time window lower bound: class 7 >= slot 115
+⏳ Condition: Class 7 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #60:
+🔗 Type: time_window
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_var[7]
+📄 Description: Time window upper bound: class 7 <= slot 135
+⏳ Condition: Class 7 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #61:
+🔗 Type: other
+📍 Origin: separation_constraints:_get_class_time_variables
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_var[1], end_var[1]
+📄 Description: End time variable: end_1 = start_1 + 15
+🕐 Added: 14:21:33
+------------------------------
+Constraint #62:
+🔗 Type: other
+📍 Origin: separation_constraints:_get_class_time_variables
+👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
+🔢 Variables: start_var[8], end_var[8]
+📄 Description: End time variable: end_8 = start_8 + 9
+🕐 Added: 14:21:33
+------------------------------
+Constraint #63:
+🔗 Type: other
+📍 Origin: separation_constraints:_get_class_time_variables
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+🔢 Variables: start_var[2], end_var[2]
+📄 Description: End time variable: end_2 = start_2 + 9
+🕐 Added: 14:21:33
+------------------------------
+Constraint #64:
+🔗 Type: other
+📍 Origin: separation_constraints:_get_class_time_variables
+👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
+🔢 Variables: start_var[8], end_var[8]
+📄 Description: End time variable: end_8 = start_8 + 9
+🕐 Added: 14:21:33
+------------------------------
+Constraint #65:
+🔗 Type: chain_ordering
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+🔢 Variables: start_var[3], start_var[4]
+📄 Description: Chain: class 3 -> class 4 (gap: 10 slots)
+⏳ Condition: Class 3 must end before Class 4 starts
+🕐 Added: 14:21:33
+------------------------------
+Constraint #66:
+🔗 Type: time_window
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+🔢 Variables: start_var[3]
+📄 Description: Time window lower bound: class 3 >= slot 96
+⏳ Condition: Class 3 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #67:
+🔗 Type: time_window
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+🔢 Variables: start_var[3]
+📄 Description: Time window upper bound: class 3 <= slot 106
+⏳ Condition: Class 3 must be within time window
+🕐 Added: 14:21:33
+------------------------------
+Constraint #68:
+🔗 Type: fixed_time
+📍 Origin: chain_constraints:add_chain_sequence_constraints
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+🔢 Variables: start_var[4]
+📄 Description: Fixed start time: class 4 == slot 106
+⏳ Condition: Class 4 has fixed start time
+🕐 Added: 14:21:33
+------------------------------
+Constraint #69:
+🔗 Type: other
+📍 Origin: separation_constraints:_get_class_time_variables
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+🔢 Variables: start_var[5], end_var[5]
+📄 Description: End time variable: end_5 = start_5 + 15
+🕐 Added: 14:21:33
+------------------------------
+Constraint #70:
+🔗 Type: other
+📍 Origin: separation_constraints:_get_class_time_variables
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_var[6], end_var[6]
+📄 Description: End time variable: end_6 = start_6 + 18
+🕐 Added: 14:21:33
+------------------------------
+Constraint #71:
+🔗 Type: other
+📍 Origin: separation_constraints:_get_class_time_variables
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+🔢 Variables: start_var[5], end_var[5]
+📄 Description: End time variable: end_5 = start_5 + 15
+🕐 Added: 14:21:33
+------------------------------
+Constraint #72:
+🔗 Type: other
+📍 Origin: separation_constraints:_get_class_time_variables
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_var[7], end_var[7]
+📄 Description: End time variable: end_7 = start_7 + 9
+🕐 Added: 14:21:33
+------------------------------
+Constraint #73:
+🔗 Type: chain_ordering
+📍 Origin: separation_constraints:add_time_separation_constraints
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_var[5], start_var[7]
+📄 Description: One-way chain: class 5 → class 7
+⏳ Condition: Class 5 must end before Class 7 starts
+🕐 Added: 14:21:33
+------------------------------
+Constraint #74:
+🔗 Type: chain_ordering
+📍 Origin: separation_constraints:add_time_separation_constraints
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+🔢 Variables: start_var[5], start_var[7]
+📄 Description: One-way chain: class 5 → class 7
+⏳ Condition: Class 5 must end before Class 7 starts
+🕐 Added: 14:21:33
+------------------------------
+⏭️ SKIPPED CONSTRAINTS:
+--------------------------------------------------
+Skipped #1:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #2:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #3:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #4:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #5:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #6:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
+📄 Reason: No time overlap
+🕐 Skipped: 14:21:33
+
+Skipped #7:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #8:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #9:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #10:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #11:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #12:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
+📄 Reason: No time overlap
+🕐 Skipped: 14:21:33
+
+Skipped #13:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #14:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #15:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #16:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #17:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+📄 Reason: No resource conflicts detected
+🕐 Skipped: 14:21:33
+
+Skipped #18:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
+📄 Reason: No time overlap
+🕐 Skipped: 14:21:33
+
+Skipped #19:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
+📄 Reason: No time overlap
+🕐 Skipped: 14:21:33
+
+Skipped #20:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
+📄 Reason: No time overlap
+🕐 Skipped: 14:21:33
+
+Skipped #21:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
+📄 Reason: No time overlap
+🕐 Skipped: 14:21:33
+
+Skipped #22:
+🔗 Type: resource_conflict
+📍 Origin: resource_constraints:add_resource_conflict_constraints
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
+📄 Reason: No time overlap
+🕐 Skipped: 14:21:33
+

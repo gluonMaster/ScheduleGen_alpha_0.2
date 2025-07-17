@@ -4,13 +4,17 @@
 from time_utils import time_to_minutes, minutes_to_time
 from time_constraint_utils import create_conflict_variables, add_time_overlap_constraints
 from sequential_scheduling_checker import _check_sequential_scheduling, check_two_window_classes
-#from timewindow_adapter import find_slot_for_time
+from timewindow_utils import find_slot_for_time
 from sequential_scheduling import can_schedule_sequentially
+from constraint_registry import ConstraintType
 
 def add_sequential_constraints(optimizer, i, j, c_i, c_j):
     """
     Добавляет строгие ограничения для последовательного размещения занятий
     """
+    print(f"\n=== ADDING SEQUENTIAL CONSTRAINTS ===")
+    print(f"Classes {i} and {j}: {c_i.subject} vs {c_j.subject}")
+    
     # Создаем булеву переменную для определения порядка занятий
     i_before_j = optimizer.model.NewBoolVar(f"seq_strict_{i}_{j}")
     
@@ -23,17 +27,61 @@ def add_sequential_constraints(optimizer, i, j, c_i, c_j):
     end_j = optimizer.model.NewIntVar(0, len(optimizer.time_slots), f"seq_end_{j}")
     
     # Устанавливаем значения концов занятий
-    optimizer.model.Add(end_i == optimizer.start_vars[i] + duration_i_slots)
-    optimizer.model.Add(end_j == optimizer.start_vars[j] + duration_j_slots)
+    constraint1 = optimizer.model.Add(end_i == optimizer.start_vars[i] + duration_i_slots)
+    constraint2 = optimizer.model.Add(end_j == optimizer.start_vars[j] + duration_j_slots)
+    
+    optimizer.add_constraint(
+        constraint_expr=constraint1,
+        constraint_type=ConstraintType.SEQUENTIAL,
+        origin_module=__name__,
+        origin_function="add_sequential_constraints",
+        class_i=i,
+        class_j=j,
+        description=f"End time calculation for class {i}",
+        variables_used=[str(end_i), f"start_var[{i}]"]
+    )
+    
+    optimizer.add_constraint(
+        constraint_expr=constraint2,
+        constraint_type=ConstraintType.SEQUENTIAL,
+        origin_module=__name__,
+        origin_function="add_sequential_constraints",
+        class_i=i,
+        class_j=j,
+        description=f"End time calculation for class {j}",
+        variables_used=[str(end_j), f"start_var[{j}]"]
+    )
     
     # Минимальный интервал между занятиями - с исправленным округлением вверх
     min_pause = (c_i.pause_after + c_j.pause_before + optimizer.time_interval - 1) // optimizer.time_interval
     
     # Строгое ограничение: i перед j или j перед i, без перекрытия
-    optimizer.model.Add(end_i + min_pause <= optimizer.start_vars[j]).OnlyEnforceIf(i_before_j)
-    optimizer.model.Add(end_j + min_pause <= optimizer.start_vars[i]).OnlyEnforceIf(i_before_j.Not())
+    constraint3 = optimizer.model.Add(end_i + min_pause <= optimizer.start_vars[j]).OnlyEnforceIf(i_before_j)
+    constraint4 = optimizer.model.Add(end_j + min_pause <= optimizer.start_vars[i]).OnlyEnforceIf(i_before_j.Not())
     
-    print(f"  Added STRICT sequential constraints between classes {i} and {j} with min pause {min_pause} slots")
+    optimizer.add_constraint(
+        constraint_expr=constraint3,
+        constraint_type=ConstraintType.SEQUENTIAL,
+        origin_module=__name__,
+        origin_function="add_sequential_constraints",
+        class_i=i,
+        class_j=j,
+        description=f"Sequential ordering (i→j): class {i} before class {j}",
+        variables_used=[str(end_i), f"start_var[{j}]", str(i_before_j)]
+    )
+    
+    optimizer.add_constraint(
+        constraint_expr=constraint4,
+        constraint_type=ConstraintType.SEQUENTIAL,
+        origin_module=__name__,
+        origin_function="add_sequential_constraints",
+        class_i=j,
+        class_j=i,
+        description=f"Sequential ordering (j→i): class {j} before class {i}",
+        variables_used=[str(end_j), f"start_var[{i}]", str(i_before_j)]
+    )
+    
+    print(f"  ✓ Added STRICT sequential constraints between classes {i} and {j} with min pause {min_pause} slots")
 
 def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
     """
@@ -44,8 +92,19 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
         i, j: Индексы классов
         c_i, c_j: Экземпляры ScheduleClass
     """
+    print(f"\n=== ADDING TIME CONFLICT CONSTRAINTS ===")
+    print(f"Classes {i} and {j}: {c_i.subject} vs {c_j.subject}")
+    
     # Проверка: если занятия в разные дни — не анализируем конфликт
     if c_i.day != c_j.day:
+        optimizer.skip_constraint(
+            constraint_type=ConstraintType.TIME_WINDOW,
+            origin_module=__name__,
+            origin_function="_add_time_conflict_constraints",
+            class_i=i,
+            class_j=j,
+            reason=f"Different days: {c_i.day} vs {c_j.day}"
+        )
         return
     
     # Проверяем наличие общих аудиторий и групп
@@ -55,18 +114,55 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
     # Флаг для обязательного добавления ограничений при общих группах
     must_add_constraints = (shared_groups and c_i.day == c_j.day) or (shared_rooms and c_i.day == c_j.day)
     
+    print(f"  Shared rooms: {shared_rooms}")
+    print(f"  Shared groups: {shared_groups}")
+    print(f"  Must add constraints: {must_add_constraints}")
+    
     # Если оба занятия имеют фиксированное время начала
     if c_i.fixed_start_time and c_j.fixed_start_time:
+        print(f"  Both classes have fixed start times")
         # Оба занятия фиксированные - проверяем реальное пересечение
         conflict, same_day, time_overlap = create_conflict_variables(optimizer, i, j, c_i, c_j)
         add_time_overlap_constraints(optimizer, i, j, c_i, c_j, time_overlap)
         
         # Правильная логика определения конфликта
-        optimizer.model.AddBoolAnd([same_day, time_overlap]).OnlyEnforceIf(conflict)
-        optimizer.model.AddBoolOr([same_day.Not(), time_overlap.Not()]).OnlyEnforceIf(conflict.Not())
+        constraint1 = optimizer.model.AddBoolAnd([same_day, time_overlap]).OnlyEnforceIf(conflict)
+        constraint2 = optimizer.model.AddBoolOr([same_day.Not(), time_overlap.Not()]).OnlyEnforceIf(conflict.Not())
+        
+        optimizer.add_constraint(
+            constraint_expr=constraint1,
+            constraint_type=ConstraintType.TIME_WINDOW,
+            origin_module=__name__,
+            origin_function="_add_time_conflict_constraints",
+            class_i=i,
+            class_j=j,
+            description=f"Fixed time conflict detection (AND): {c_i.subject} vs {c_j.subject}",
+            variables_used=[str(conflict), str(same_day), str(time_overlap)]
+        )
+        
+        optimizer.add_constraint(
+            constraint_expr=constraint2,
+            constraint_type=ConstraintType.TIME_WINDOW,
+            origin_module=__name__,
+            origin_function="_add_time_conflict_constraints",
+            class_i=i,
+            class_j=j,
+            description=f"Fixed time conflict detection (OR): {c_i.subject} vs {c_j.subject}",
+            variables_used=[str(conflict), str(same_day), str(time_overlap)]
+        )
         
         # Запрещаем конфликты
-        optimizer.model.Add(conflict == False)
+        constraint3 = optimizer.model.Add(conflict == False)
+        optimizer.add_constraint(
+            constraint_expr=constraint3,
+            constraint_type=ConstraintType.TIME_WINDOW,
+            origin_module=__name__,
+            origin_function="_add_time_conflict_constraints",
+            class_i=i,
+            class_j=j,
+            description=f"Forbid time conflicts: {c_i.subject} vs {c_j.subject}",
+            variables_used=[str(conflict)]
+        )
         
         # Проверяем конфликты аудиторий, даже для фиксированного времени
         if shared_rooms:
@@ -74,24 +170,82 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
             same_room = optimizer.model.NewBoolVar(f"same_room_{i}_{j}")
             if isinstance(optimizer.room_vars[i], int) and isinstance(optimizer.room_vars[j], int):
                 if optimizer.room_vars[i] == optimizer.room_vars[j]:
-                    optimizer.model.Add(same_room == 1)
+                    constraint4 = optimizer.model.Add(same_room == 1)
                 else:
-                    optimizer.model.Add(same_room == 0)
-            elif isinstance(optimizer.room_vars[i], int):
-                optimizer.model.Add(optimizer.room_vars[j] == optimizer.room_vars[i]).OnlyEnforceIf(same_room)
-                optimizer.model.Add(optimizer.room_vars[j] != optimizer.room_vars[i]).OnlyEnforceIf(same_room.Not())
-            elif isinstance(optimizer.room_vars[j], int):
-                optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
-                optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
+                    constraint4 = optimizer.model.Add(same_room == 0)
+                    
+                optimizer.add_constraint(
+                    constraint_expr=constraint4,
+                    constraint_type=ConstraintType.ROOM_CONFLICT,
+                    origin_module=__name__,
+                    origin_function="_add_time_conflict_constraints",
+                    class_i=i,
+                    class_j=j,
+                    description=f"Room assignment constraint: {c_i.subject} vs {c_j.subject}",
+                    variables_used=[str(same_room)]
+                )
             else:
-                optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
-                optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
+                # Добавляем условные ограничения для переменных комнат
+                if isinstance(optimizer.room_vars[i], int):
+                    constraint4 = optimizer.model.Add(optimizer.room_vars[j] == optimizer.room_vars[i]).OnlyEnforceIf(same_room)
+                    constraint5 = optimizer.model.Add(optimizer.room_vars[j] != optimizer.room_vars[i]).OnlyEnforceIf(same_room.Not())
+                elif isinstance(optimizer.room_vars[j], int):
+                    constraint4 = optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
+                    constraint5 = optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
+                else:
+                    constraint4 = optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
+                    constraint5 = optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
+                
+                optimizer.add_constraint(
+                    constraint_expr=constraint4,
+                    constraint_type=ConstraintType.ROOM_CONFLICT,
+                    origin_module=__name__,
+                    origin_function="_add_time_conflict_constraints",
+                    class_i=i,
+                    class_j=j,
+                    description=f"Room equality constraint: {c_i.subject} vs {c_j.subject}",
+                    variables_used=[str(same_room), f"room_var[{i}]", f"room_var[{j}]"]
+                )
+                
+                optimizer.add_constraint(
+                    constraint_expr=constraint5,
+                    constraint_type=ConstraintType.ROOM_CONFLICT,
+                    origin_module=__name__,
+                    origin_function="_add_time_conflict_constraints",
+                    class_i=i,
+                    class_j=j,
+                    description=f"Room inequality constraint: {c_i.subject} vs {c_j.subject}",
+                    variables_used=[str(same_room), f"room_var[{i}]", f"room_var[{j}]"]
+                )
             
             # Если одна и та же аудитория, проверяем конфликты
             room_conflict = optimizer.model.NewBoolVar(f"room_conflict_{i}_{j}")
-            optimizer.model.AddBoolAnd([same_room, conflict]).OnlyEnforceIf(room_conflict)
-            optimizer.model.Add(room_conflict == False)
+            constraint6 = optimizer.model.AddBoolAnd([same_room, conflict]).OnlyEnforceIf(room_conflict)
+            constraint7 = optimizer.model.Add(room_conflict == False)
+            
+            optimizer.add_constraint(
+                constraint_expr=constraint6,
+                constraint_type=ConstraintType.ROOM_CONFLICT,
+                origin_module=__name__,
+                origin_function="_add_time_conflict_constraints",
+                class_i=i,
+                class_j=j,
+                description=f"Room conflict detection: {c_i.subject} vs {c_j.subject}",
+                variables_used=[str(room_conflict), str(same_room), str(conflict)]
+            )
+            
+            optimizer.add_constraint(
+                constraint_expr=constraint7,
+                constraint_type=ConstraintType.ROOM_CONFLICT,
+                origin_module=__name__,
+                origin_function="_add_time_conflict_constraints",
+                class_i=i,
+                class_j=j,
+                description=f"Forbid room conflicts: {c_i.subject} vs {c_j.subject}",
+                variables_used=[str(room_conflict)]
+            )
         
+        print(f"  ✓ Added fixed time conflict constraints for classes {i} and {j}")
         return  # Только после добавления всех проверок для общих аудиторий
 
     # Изменение логики проверки временного перекрытия
@@ -151,10 +305,10 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
         # Для занятий с общими группами проверяем ОБА варианта размещения
         if shared_groups:
             # Прямой порядок (c_i, затем c_j)
-            can_seq_i_j, info_i_j = can_schedule_sequentially(c_i, c_j)
+            can_seq_i_j, info_i_j = can_schedule_sequentially(c_i, c_j, i, j, verbose=False)
             
             # Обратный порядок (c_j, затем c_i)
-            can_seq_j_i, info_j_i = can_schedule_sequentially(c_j, c_i)
+            can_seq_j_i, info_j_i = can_schedule_sequentially(c_j, c_i, j, i, verbose=False)
             
             # Проверяем случай, когда одно занятие фиксированное, а другое оконное
             # Если фиксированное c_i и оконное c_j
@@ -167,7 +321,7 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
                     latest_slot_idx = optimizer._get_time_slot_index(minutes_to_time(latest_start))
                     
                     print(f"  [shared_groups] PRIORITIZING window class {j} BEFORE fixed class {i}")
-                    optimizer.model.Add(optimizer.start_vars[j] <= latest_slot_idx)
+                    constraint_expr = optimizer.model.Add(optimizer.start_vars[j] <= latest_slot_idx)
                     return
                 elif can_seq_i_j and info_i_j['reason'] == 'fits_after_fixed':
                     # c_j можно разместить ПОСЛЕ c_i
@@ -181,14 +335,14 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
                     window_end = time_to_minutes(c_j.end_time)
                     if (window_end - earliest_slot * optimizer.time_interval) >= c_j.duration:
                         print(f"  [shared_groups] Applying AFTER-fixed for class {j}")
-                        optimizer.model.Add(optimizer.start_vars[j] >= earliest_slot)
+                        constraint_expr = optimizer.model.Add(optimizer.start_vars[j] >= earliest_slot)
                     else:
                         print(f"  [WARNING] Not enough time to schedule {j} after {i}, but forcing BEFORE-fixed")
                         # Принудительно размещаем ДО, даже если первоначально это не было обнаружено
                         latest_end = fixed_start - c_i.pause_before
                         latest_start = latest_end - c_j.duration
                         latest_slot_idx = optimizer._get_time_slot_index(minutes_to_time(latest_start))
-                        optimizer.model.Add(optimizer.start_vars[j] <= latest_slot_idx)
+                        constraint_expr = optimizer.model.Add(optimizer.start_vars[j] <= latest_slot_idx)
                     return
                 
             # Если фиксированное c_j и оконное c_i
@@ -201,7 +355,7 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
                     latest_slot_idx = optimizer._get_time_slot_index(minutes_to_time(latest_start))
                     
                     print(f"  [shared_groups] PRIORITIZING window class {i} BEFORE fixed class {j}")
-                    optimizer.model.Add(optimizer.start_vars[i] <= latest_slot_idx)
+                    constraint_expr = optimizer.model.Add(optimizer.start_vars[i] <= latest_slot_idx)
                     return
                 elif can_seq_j_i and info_j_i['reason'] == 'fits_after_fixed':
                     # c_i можно разместить ПОСЛЕ c_j
@@ -215,14 +369,37 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
                     window_end = time_to_minutes(c_i.end_time)
                     if (window_end - earliest_slot * optimizer.time_interval) >= c_i.duration:
                         print(f"  [shared_groups] Applying AFTER-fixed for class {i}")
-                        optimizer.model.Add(optimizer.start_vars[i] >= earliest_slot)
+                        constraint_expr = optimizer.model.Add(optimizer.start_vars[i] >= earliest_slot)
                     else:
                         print(f"  [WARNING] Not enough time to schedule {i} after {j}, but forcing BEFORE-fixed")
                         # Принудительно размещаем ДО, даже если первоначально это не было обнаружено
                         latest_end = fixed_start - c_j.pause_before
                         latest_start = latest_end - c_i.duration
                         latest_slot_idx = optimizer._get_time_slot_index(minutes_to_time(latest_start))
-                        optimizer.model.Add(optimizer.start_vars[i] <= latest_slot_idx)
+                        constraint_expr = optimizer.model.Add(optimizer.start_vars[i] <= latest_slot_idx)
+                    return
+                
+            # НОВОЕ: Обработка неперекрывающихся временных окон
+            if can_seq_i_j and info_i_j['reason'] == 'windows_separate_c1_before_c2':
+                # c_i должен быть строго перед c_j (неперекрывающиеся окна)
+                # Добавляем ограничение: c_i + duration + pause <= start_c_j
+                duration_i_slots = c_i.duration // optimizer.time_interval
+                pause_slots = max(1, (c_i.pause_after + c_j.pause_before) // optimizer.time_interval)
+                
+                print(f"  [windows_separate] Adding strict sequential constraint: {i} before {j}")
+                constraint = optimizer.model.Add(optimizer.start_vars[i] + duration_i_slots + pause_slots <= optimizer.start_vars[j])
+                return
+                
+            # Если обратный порядок невозможен из-за неправильного порядка окон
+            elif can_seq_i_j == False and info_i_j['reason'] == 'windows_separate_wrong_order':
+                # Проверяем обратный порядок
+                if can_seq_j_i and info_j_i['reason'] == 'windows_separate_c1_before_c2':
+                    # c_j должен быть строго перед c_i
+                    duration_j_slots = c_j.duration // optimizer.time_interval
+                    pause_slots = max(1, (c_j.pause_after + c_i.pause_before) // optimizer.time_interval)
+                    
+                    print(f"  [windows_separate] Adding strict sequential constraint: {j} before {i}")
+                    constraint = optimizer.model.Add(optimizer.start_vars[j] + duration_j_slots + pause_slots <= optimizer.start_vars[i])
                     return
                 
             # Оба занятия с временными окнами или оба фиксированные
@@ -230,12 +407,32 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
         
         # Продолжаем с существующей логикой для случаев без общих групп
         # или если не удалось применить особую обработку выше
-        can_seq, info = can_schedule_sequentially(c_i, c_j)
+        can_seq, info = can_schedule_sequentially(c_i, c_j, i, j, verbose=False)
+        
+        # New logging for chain & resource gap
+        if info.get("reason") == "chain_and_resource_gap":
+            start1, end1 = info["c1_interval"]
+            start2, end2 = info["c2_interval"]
+            gap = info["gap"]
+            print(f"SEQUENTIAL via chain & resource-gap: "
+                  f"{c_i.subject} {start1//60:02d}:{start1%60:02d}-{end1//60:02d}:{end1%60:02d}, "
+                  f"{c_j.subject} {start2//60:02d}:{start2%60:02d}-{end2//60:02d}:{end2%60:02d} "
+                  f"(gap {gap} min)")
 
         # Если can_seq==False, fall through к стандартному конфликтному блоку
         
         # now re-run scheduling check in reverse order
-        can_seq_rev, info_rev = can_schedule_sequentially(c_j, c_i)
+        can_seq_rev, info_rev = can_schedule_sequentially(c_j, c_i, j, i, verbose=False)
+        
+        # New logging for chain & resource gap (reverse order)
+        if info_rev.get("reason") == "chain_and_resource_gap":
+            start1, end1 = info_rev["c1_interval"]
+            start2, end2 = info_rev["c2_interval"]
+            gap = info_rev["gap"]
+            print(f"SEQUENTIAL via chain & resource-gap (reverse): "
+                  f"{c_j.subject} {start1//60:02d}:{start1%60:02d}-{end1//60:02d}:{end1%60:02d}, "
+                  f"{c_i.subject} {start2//60:02d}:{start2%60:02d}-{end2//60:02d}:{end2%60:02d} "
+                  f"(gap {gap} min)")
         if can_seq_rev:
             # fits_before_fixed для reversed: значит c_i нужно «до»
             if info_rev['reason'] == 'fits_before_fixed':
@@ -245,7 +442,7 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
                 slot_idx = optimizer._get_time_slot_index(minutes_to_time(latest_start))
 
                 print(f"  [shared_groups] Applying BEFORE-fixed (reversed) for class {i}")
-                optimizer.model.Add(optimizer.start_vars[i] <= slot_idx)
+                constraint_expr = optimizer.model.Add(optimizer.start_vars[i] <= slot_idx)
                 return
 
             # fits_after_fixed для reversed: c_i «после»
@@ -257,7 +454,7 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
                 slot_idx = optimizer._get_time_slot_index(minutes_to_time(earliest_start))
 
                 print(f"  [shared_groups] Applying AFTER-fixed (reversed) for class {i}")
-                optimizer.model.Add(optimizer.start_vars[i] >= slot_idx)
+                constraint_expr = optimizer.model.Add(optimizer.start_vars[i] >= slot_idx)
                 return
 
             else:  # both_orders_possible — НИЧЕГО
@@ -298,7 +495,7 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
     optimizer.model.AddBoolOr([same_day.Not(), time_overlap.Not()]).OnlyEnforceIf(conflict.Not())
     
     # Prevent conflicts
-    optimizer.model.Add(conflict == False)
+    constraint_expr = optimizer.model.Add(conflict == False)
     
     # Check for room conflicts (only for classes with variable room assignment)
     shared_rooms = set(c_i.possible_rooms) & set(c_j.possible_rooms)
@@ -308,23 +505,23 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
         if isinstance(optimizer.room_vars[i], int) and isinstance(optimizer.room_vars[j], int):
             # Проверяем равенство комнат и устанавливаем значение переменной same_room
             if optimizer.room_vars[i] == optimizer.room_vars[j]:
-                optimizer.model.Add(same_room == 1)
+                constraint_expr = optimizer.model.Add(same_room == 1)
             else:
-                optimizer.model.Add(same_room == 0)
+                constraint_expr = optimizer.model.Add(same_room == 0)
         elif isinstance(optimizer.room_vars[i], int):
-            optimizer.model.Add(optimizer.room_vars[j] == optimizer.room_vars[i]).OnlyEnforceIf(same_room)
-            optimizer.model.Add(optimizer.room_vars[j] != optimizer.room_vars[i]).OnlyEnforceIf(same_room.Not())
+            constraint_expr = optimizer.model.Add(optimizer.room_vars[j] == optimizer.room_vars[i]).OnlyEnforceIf(same_room)
+            constraint_expr = optimizer.model.Add(optimizer.room_vars[j] != optimizer.room_vars[i]).OnlyEnforceIf(same_room.Not())
         elif isinstance(optimizer.room_vars[j], int):
-            optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
-            optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
+            constraint_expr = optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
+            constraint_expr = optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
         else:
-            optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
-            optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
+            constraint_expr = optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
+            constraint_expr = optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
         
         # If same room, check for conflicts
         room_conflict = optimizer.model.NewBoolVar(f"room_conflict_{i}_{j}")
         optimizer.model.AddBoolAnd([same_room, conflict]).OnlyEnforceIf(room_conflict)
-        optimizer.model.Add(room_conflict == False)
+        constraint_expr = optimizer.model.Add(room_conflict == False)
 
 def times_overlap(class1, class2):
     """

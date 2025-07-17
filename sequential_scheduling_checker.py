@@ -2,6 +2,8 @@
 Модуль для проверки возможности последовательного размещения занятий.
 """
 from time_utils import time_to_minutes, minutes_to_time
+from timewindow_utils import find_slot_for_time
+from constraint_registry import ConstraintType
 
 def _check_sequential_scheduling(optimizer, fixed_idx, window_idx):
     """
@@ -26,7 +28,7 @@ def _check_sequential_scheduling(optimizer, fixed_idx, window_idx):
     can_fit_before = (latest_end_before_fixed - window_start) >= window_duration
     if can_fit_before:
         latest_start_slot = optimizer.minutes_to_slot(latest_end_before_fixed - window_duration)
-        optimizer.model.Add(optimizer.start_vars[window_idx] <= latest_start_slot)
+        constraint_expr = optimizer.model.Add(optimizer.start_vars[window_idx] <= latest_start_slot)
         print(f"SEQUENTIAL SCHEDULING: Window class {window_c.subject}"
               f" scheduled BEFORE fixed class {fixed_c.subject}"
               f" at {fixed_c.start_time}")
@@ -37,7 +39,7 @@ def _check_sequential_scheduling(optimizer, fixed_idx, window_idx):
     can_fit_after = (window_end - earliest_start_after_fixed) >= window_duration
     if can_fit_after:
         earliest_start_slot = optimizer.minutes_to_slot(earliest_start_after_fixed)
-        optimizer.model.Add(optimizer.start_vars[window_idx] >= earliest_start_slot)
+        constraint_expr = optimizer.model.Add(optimizer.start_vars[window_idx] >= earliest_start_slot)
         print(f"SEQUENTIAL SCHEDULING: Window class {window_c.subject}"
               f" scheduled AFTER fixed class {fixed_c.subject}"
               f" at {fixed_c.start_time}")
@@ -94,9 +96,7 @@ def enforce_window_chain_sequencing(optimizer):
             min_gap = b.pause_before // optimizer.time_interval
             
             # Явно обозначаем, что это ограничение связанных окон
-            constraint = optimizer.model.Add(
-                optimizer.start_vars[idx_b] >= optimizer.start_vars[idx_a] + duration_a_slots + pause_after_slots + min_gap
-            )
+            constraint = optimizer.model.Add(optimizer.start_vars[idx_b] >= optimizer.start_vars[idx_a] + duration_a_slots + pause_after_slots + min_gap)
             print(f"LINKED WINDOW SEQUENCING: {a.subject} → {b.subject} (constraint applied)")
 
             #---Debug---
@@ -140,39 +140,50 @@ def check_two_window_classes(optimizer, idx1, idx2, class1, class2):
     # Конвертация времени в минуты
     start1 = time_to_minutes(class1.start_time)
     end1 = time_to_minutes(class1.end_time)
+    duration1 = class1.duration
+    pause1_before = getattr(class1, 'pause_before', 0)
+    pause1_after = getattr(class1, 'pause_after', 0)
 
     start2 = time_to_minutes(class2.start_time)
     end2 = time_to_minutes(class2.end_time)
-
-    # Длительности в минутах
-    duration1 = class1.duration
     duration2 = class2.duration
+    pause2_before = getattr(class2, 'pause_before', 0)
+    pause2_after = getattr(class2, 'pause_after', 0)
 
-    # Возможные временные диапазоны для начала
-    earliest_start1 = start1
+    # Проверяем, можно ли class1 полностью ДО class2
     latest_start1 = end1 - duration1
-
     earliest_start2 = start2
+    can_1_before_2 = (latest_start1 + duration1 + pause1_after <= earliest_start2)
+
+    # Проверяем, можно ли class2 полностью ДО class1
     latest_start2 = end2 - duration2
+    earliest_start1 = start1
+    can_2_before_1 = (latest_start2 + duration2 + pause2_after <= earliest_start1)
 
-    # Проверяем, можем ли разместить class1 перед class2
-    can_schedule_1_before_2 = (earliest_start1 + duration1 <= latest_start2)
+    # Проверяем, можно ли class1 сразу перед class2 (встык)
+    can_1_adjacent_2 = False
+    for s1 in range(earliest_start1, latest_start1 + 1):
+        end_s1 = s1 + duration1 + pause1_after
+        for s2 in range(earliest_start2, latest_start2 + 1):
+            if end_s1 <= s2:
+                can_1_adjacent_2 = True
+                break
+        if can_1_adjacent_2:
+            break
 
-    # Проверяем, можем ли разместить class2 перед class1
-    can_schedule_2_before_1 = (earliest_start2 + duration2 <= latest_start1)
+    # Проверяем, можно ли class2 сразу перед class1 (встык)
+    can_2_adjacent_1 = False
+    for s2 in range(earliest_start2, latest_start2 + 1):
+        end_s2 = s2 + duration2 + pause2_after
+        for s1 in range(earliest_start1, latest_start1 + 1):
+            if end_s2 <= s1:
+                can_2_adjacent_1 = True
+                break
+        if can_2_adjacent_1:
+            break
 
-    # Проверяем наложение окон вообще
-    overlap_start = max(start1, start2)
-    overlap_end = min(end1, end2)
-    total_overlap_time = overlap_end - overlap_start
-
-    total_duration_needed = duration1 + duration2
-
-    # Если общее пересечение окон достаточно большое для двух занятий подряд
-    enough_overlap = total_overlap_time >= total_duration_needed
-
-    # Логика возврата
-    return can_schedule_1_before_2 or can_schedule_2_before_1 or enough_overlap
+    # Если есть хотя бы один способ непересекающегося размещения — возвращаем True
+    return can_1_before_2 or can_2_before_1 or can_1_adjacent_2 or can_2_adjacent_1
 
 def time_to_minutes(time_str):
     """Преобразует строку времени 'HH:MM' в количество минут от начала суток."""
@@ -189,36 +200,3 @@ def reset_window_checks_cache():
     global _processed_window_checks
     _processed_window_checks = set()
     print("Window checks cache has been reset.")
-
-def find_slot_for_time(time_slots, time_str):
-    """
-    Находит индекс слота времени для заданной строки времени.
-    
-    Args:
-        time_slots: Список строк времени (HH:MM)
-        time_str: Строка времени для поиска
-        
-    Returns:
-        int: Индекс слота или None, если не найден
-    """
-    target_minutes = time_to_minutes(time_str)
-    
-    # Ищем точное совпадение
-    for slot_idx, slot_time in enumerate(time_slots):
-        slot_minutes = time_to_minutes(slot_time)
-        if slot_minutes == target_minutes:
-            return slot_idx
-    
-    # Если точного совпадения нет, ищем ближайший слот
-    best_slot = None
-    min_diff = float('inf')
-    
-    for slot_idx, slot_time in enumerate(time_slots):
-        slot_minutes = time_to_minutes(slot_time)
-        diff = abs(slot_minutes - target_minutes)
-        
-        if diff < min_diff:
-            min_diff = diff
-            best_slot = slot_idx
-    
-    return best_slot

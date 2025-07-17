@@ -3,6 +3,7 @@ Module for creating optimization model variables.
 """
 from ortools.sat.python import cp_model
 from datetime import datetime, timedelta
+from constraint_registry import ConstraintType
 
 def create_variables(optimizer):
     """Create variables for each class."""
@@ -63,6 +64,27 @@ def create_variables(optimizer):
                 optimizer.start_vars[idx] = optimizer.model.NewIntVar(
                     start_slot, max_start_slot, f"start_{idx}")
                 
+                # Добавляем логирование создания переменной времени окна
+                optimizer.add_constraint(
+                    constraint_expr=optimizer.start_vars[idx] >= start_slot,
+                    constraint_type=ConstraintType.TIME_WINDOW,
+                    origin_module=__name__,
+                    origin_function="create_variables",
+                    class_i=idx,
+                    description=f"Time window constraint: class {idx} start >= {c.start_time}",
+                    variables_used=[f"start_vars[{idx}]"]
+                )
+                
+                optimizer.add_constraint(
+                    constraint_expr=optimizer.start_vars[idx] <= max_start_slot,
+                    constraint_type=ConstraintType.TIME_WINDOW,
+                    origin_module=__name__,
+                    origin_function="create_variables",
+                    class_i=idx,
+                    description=f"Time window constraint: class {idx} end <= {c.end_time}",
+                    variables_used=[f"start_vars[{idx}]"]
+                )
+                
                 # Отметим, что это занятие имеет временное окно, а не фиксированное время начала
                 c.has_time_window = True
                 c.fixed_start_time = False
@@ -79,6 +101,18 @@ def create_variables(optimizer):
                 # Если конец временного окна не указан, используем фиксированное время начала
                 start_slot = find_closest_slot(optimizer.time_slots, c.start_time)
                 optimizer.start_vars[idx] = start_slot
+                
+                # Добавляем логирование фиксированного времени
+                optimizer.add_constraint(
+                    constraint_expr=optimizer.start_vars[idx] == start_slot,
+                    constraint_type=ConstraintType.FIXED_TIME,
+                    origin_module=__name__,
+                    origin_function="create_variables",
+                    class_i=idx,
+                    description=f"Fixed time constraint: class {idx} starts at {c.start_time}",
+                    variables_used=[f"start_vars[{idx}]"]
+                )
+                
                 c.has_time_window = False
                 c.fixed_start_time = True
                 print(f"Class {c.subject} has fixed start time: {c.start_time} (slot {start_slot})")

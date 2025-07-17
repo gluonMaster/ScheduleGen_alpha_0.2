@@ -4,7 +4,9 @@
 
 from conflict_detector import check_potential_conflicts
 from time_conflict_constraints import _add_time_conflict_constraints
-from time_utils import time_to_minutes, minutes_to_time 
+from time_utils import time_to_minutes
+from sequential_scheduling import can_schedule_sequentially as can_schedule_sequentially_full, minutes_to_time 
+from constraint_registry import ConstraintType 
 
 def times_overlap(c1, c2):
     """Проверяет пересечение по времени двух занятий."""
@@ -18,90 +20,10 @@ def times_overlap(c1, c2):
     return (start1 < end2) and (start2 < end1)
 
 
-def can_schedule_sequentially(c_i, c_j):
-    """
-    Проверяет, могут ли два занятия быть запланированы последовательно.
-    
-    Args:
-        c_i: Первое занятие (ScheduleClass)
-        c_j: Второе занятие (ScheduleClass)
-        
-    Returns:
-        bool: True, если занятия могут быть запланированы последовательно, иначе False
-    """
-    # Проверка наличия общего дня
-    if c_i.day != c_j.day:
-        return False
-    
-    # Проверка временных окон
-    if c_i.start_time and not c_i.end_time and c_j.start_time and c_j.end_time:
-        # c_i фиксировано, c_j с окном
-        fixed_start = time_to_minutes(c_i.start_time)
-        fixed_end = fixed_start + c_i.duration + c_i.pause_after
-        window_start = time_to_minutes(c_j.start_time)
-        window_end = time_to_minutes(c_j.end_time)
-        
-        # Вариант: Окно после фиксированного времени
-        if window_end - fixed_end >= c_j.duration + c_j.pause_before:
-            return True
-            
-        # Вариант: Окно перед фиксированным временем
-        window_class_end = window_start + c_j.duration + c_j.pause_after
-        if fixed_start - window_class_end >= c_i.pause_before:
-            return True
-            
-        return False
-        
-    elif c_j.start_time and not c_j.end_time and c_i.start_time and c_i.end_time:
-        # c_j фиксировано, c_i с окном
-        fixed_start = time_to_minutes(c_j.start_time)
-        fixed_end = fixed_start + c_j.duration + c_j.pause_after
-        window_start = time_to_minutes(c_i.start_time)
-        window_end = time_to_minutes(c_i.end_time)
-        
-        # Вариант: Окно после фиксированного времени
-        if window_end - fixed_end >= c_i.duration + c_i.pause_before:
-            return True
-            
-        # Вариант: Окно перед фиксированным временем
-        window_class_end = window_start + c_i.duration + c_i.pause_after
-        if fixed_start - window_class_end >= c_j.pause_before:
-            return True
-            
-        return False
-        
-    elif c_i.start_time and c_i.end_time and c_j.start_time and c_j.end_time:
-        # Оба занятия с временными окнами
-        window_i_start = time_to_minutes(c_i.start_time)
-        window_i_end = time_to_minutes(c_i.end_time)
-        window_j_start = time_to_minutes(c_j.start_time)
-        window_j_end = time_to_minutes(c_j.end_time)
-        
-        # Проверяем общее временное окно
-        common_start = max(window_i_start, window_j_start)
-        common_end = min(window_i_end, window_j_end)
-        common_duration = common_end - common_start
-        
-        # Суммарное время, нужное для обоих занятий
-        total_duration = c_i.duration + c_i.pause_after + c_j.pause_before + c_j.duration
-        
-        return common_duration >= total_duration
-        
-    elif c_i.start_time and not c_i.end_time and c_j.start_time and not c_j.end_time:
-        # Оба занятия с фиксированным временем
-        start_i = time_to_minutes(c_i.start_time)
-        end_i = start_i + c_i.duration + c_i.pause_after
-        start_j = time_to_minutes(c_j.start_time)
-        end_j = start_j + c_j.duration + c_j.pause_after
-        
-        # Проверяем перекрытие времени
-        return not (start_i < end_j and start_j < end_i)
-    
-    # По умолчанию, если нет временных ограничений
-    return True
-
 def add_resource_conflict_constraints(optimizer):
     """Add constraints to prevent conflicts in resources (teachers, rooms, groups)."""
+    print("\n=== ADDING RESOURCE CONFLICT CONSTRAINTS ===")
+    
     # Напечатать подробную информацию о занятиях для отладки
     print("\nDetailed class information:")
     for idx, c in enumerate(optimizer.classes):
@@ -119,14 +41,28 @@ def add_resource_conflict_constraints(optimizer):
 
     # For each pair of classes
     num_classes = len(optimizer.classes)
+    total_pairs = 0
+    processed_pairs = 0
+    skipped_pairs = 0
+    
     for i in range(num_classes):
         c_i = optimizer.classes[i]
         
         for j in range(i + 1, num_classes):
             c_j = optimizer.classes[j]
+            total_pairs += 1
 
             # Пропускаем сравнение, если занятия в разные дни
             if c_i.day != c_j.day:
+                optimizer.skip_constraint(
+                    constraint_type=ConstraintType.RESOURCE_CONFLICT,
+                    origin_module=__name__,
+                    origin_function="add_resource_conflict_constraints",
+                    class_i=i,
+                    class_j=j,
+                    reason=f"Different days: {c_i.day} vs {c_j.day}"
+                )
+                skipped_pairs += 1
                 continue
 
             # ВАЖНОЕ ИЗМЕНЕНИЕ: Всегда проверяем возможные конфликты по комнатам,
@@ -136,21 +72,58 @@ def add_resource_conflict_constraints(optimizer):
                 print(f"Checking room conflict between classes {i} and {j} in rooms {shared_rooms}")
                 # Добавляем ограничения, чтобы предотвратить конфликты по времени в одной комнате
                 _add_time_conflict_constraints(optimizer, i, j, c_i, c_j)
+                processed_pairs += 1
                 continue  # Продолжаем со следующей парой классов
 
             # Пропускаем сравнение, если занятия не пересекаются по времени
             if not times_overlap(c_i, c_j):
+                optimizer.skip_constraint(
+                    constraint_type=ConstraintType.RESOURCE_CONFLICT,
+                    origin_module=__name__,
+                    origin_function="add_resource_conflict_constraints",
+                    class_i=i,
+                    class_j=j,
+                    reason="No time overlap"
+                )
+                skipped_pairs += 1
                 continue
             
             # Skip if classes are linked (already handled)
             if hasattr(c_i, 'linked_classes') and c_j in c_i.linked_classes:
+                optimizer.skip_constraint(
+                    constraint_type=ConstraintType.RESOURCE_CONFLICT,
+                    origin_module=__name__,
+                    origin_function="add_resource_conflict_constraints",
+                    class_i=i,
+                    class_j=j,
+                    reason="Classes are linked"
+                )
+                skipped_pairs += 1
                 continue
             if hasattr(c_j, 'linked_classes') and c_i in c_j.linked_classes:
+                optimizer.skip_constraint(
+                    constraint_type=ConstraintType.RESOURCE_CONFLICT,
+                    origin_module=__name__,
+                    origin_function="add_resource_conflict_constraints",
+                    class_i=i,
+                    class_j=j,
+                    reason="Classes are linked"
+                )
+                skipped_pairs += 1
                 continue
             
             # Skip if one class is the previous_class of the other
             if (hasattr(c_i, 'previous_class') and hasattr(c_j, 'subject') and c_i.previous_class == c_j.subject) or \
             (hasattr(c_j, 'previous_class') and hasattr(c_i, 'subject') and c_j.previous_class == c_i.subject):
+                optimizer.skip_constraint(
+                    constraint_type=ConstraintType.RESOURCE_CONFLICT,
+                    origin_module=__name__,
+                    origin_function="add_resource_conflict_constraints",
+                    class_i=i,
+                    class_j=j,
+                    reason="One class is previous_class of the other"
+                )
+                skipped_pairs += 1
                 continue
             
             # Check if both classes share resources (teacher, room, group)
@@ -167,7 +140,8 @@ def add_resource_conflict_constraints(optimizer):
                     conflict_description.append(f"teacher '{c_i.teacher}' and shared groups {shared_groups}")
                 else:
                     # Если группы разные, проверяем возможность последовательного планирования
-                    if not can_schedule_sequentially(c_i, c_j):
+                    can_schedule, _ = can_schedule_sequentially_full(c_i, c_j, i, j, verbose=False)
+                    if not can_schedule:
                         # Если последовательное планирование невозможно, отмечаем конфликт
                         resource_conflict = True
                         conflict_description.append(f"teacher '{c_i.teacher}' with different groups (cannot schedule sequentially)")
@@ -176,7 +150,8 @@ def add_resource_conflict_constraints(optimizer):
             shared_rooms = set(c_i.possible_rooms) & set(c_j.possible_rooms)
             if shared_rooms:
                 # Проверяем возможность последовательного размещения
-                if not can_schedule_sequentially(c_i, c_j):
+                can_schedule, _ = can_schedule_sequentially_full(c_i, c_j, i, j, verbose=False)
+                if not can_schedule:
                     resource_conflict = True
                     conflict_description.append(f"rooms {shared_rooms}")
             
@@ -192,6 +167,24 @@ def add_resource_conflict_constraints(optimizer):
                 print(f"Detected potential conflict between '{c_i.subject}' and '{c_j.subject}' (shared {conflict_str})")
                 
                 _add_time_conflict_constraints(optimizer, i, j, c_i, c_j)
+                processed_pairs += 1
+            else:
+                optimizer.skip_constraint(
+                    constraint_type=ConstraintType.RESOURCE_CONFLICT,
+                    origin_module=__name__,
+                    origin_function="add_resource_conflict_constraints",
+                    class_i=i,
+                    class_j=j,
+                    reason="No resource conflicts detected"
+                )
+                skipped_pairs += 1
+    
+    print(f"\n=== RESOURCE CONFLICT CONSTRAINTS SUMMARY ===")
+    print(f"Total class pairs: {total_pairs}")
+    print(f"Processed pairs: {processed_pairs}")
+    print(f"Skipped pairs: {skipped_pairs}")
+    print(f"Processing rate: {processed_pairs/total_pairs*100:.1f}%")
+    print("="*50)
                 
 def _add_room_conflict_constraints(optimizer, i, j, c_i, c_j):
     """
@@ -207,21 +200,101 @@ def _add_room_conflict_constraints(optimizer, i, j, c_i, c_j):
     if isinstance(optimizer.room_vars[i], int) and isinstance(optimizer.room_vars[j], int):
         # Оба занятия имеют фиксированные аудитории
         if optimizer.room_vars[i] == optimizer.room_vars[j]:
-            optimizer.model.Add(same_room == 1)
+            constraint_expr = optimizer.model.Add(same_room == 1)
+            optimizer.add_constraint(
+                constraint_expr=constraint_expr,
+                constraint_type=ConstraintType.ROOM_CONFLICT,
+                origin_module=__name__,
+                origin_function="_add_room_conflict_constraints",
+                class_i=i,
+                class_j=j,
+                description=f"Fixed rooms same: classes {i} and {j}",
+                variables_used=[f"same_room_{i}_{j}"]
+            )
         else:
-            optimizer.model.Add(same_room == 0)
+            constraint_expr = optimizer.model.Add(same_room == 0)
+            optimizer.add_constraint(
+                constraint_expr=constraint_expr,
+                constraint_type=ConstraintType.ROOM_CONFLICT,
+                origin_module=__name__,
+                origin_function="_add_room_conflict_constraints",
+                class_i=i,
+                class_j=j,
+                description=f"Fixed rooms different: classes {i} and {j}",
+                variables_used=[f"same_room_{i}_{j}"]
+            )
     elif isinstance(optimizer.room_vars[i], int):
         # Только занятие i имеет фиксированную аудиторию
-        optimizer.model.Add(optimizer.room_vars[j] == optimizer.room_vars[i]).OnlyEnforceIf(same_room)
-        optimizer.model.Add(optimizer.room_vars[j] != optimizer.room_vars[i]).OnlyEnforceIf(same_room.Not())
+        constraint_expr1 = optimizer.model.Add(optimizer.room_vars[j] == optimizer.room_vars[i]).OnlyEnforceIf(same_room)
+        constraint_expr2 = optimizer.model.Add(optimizer.room_vars[j] != optimizer.room_vars[i]).OnlyEnforceIf(same_room.Not())
+        optimizer.add_constraint(
+            constraint_expr=constraint_expr1,
+            constraint_type=ConstraintType.ROOM_CONFLICT,
+            origin_module=__name__,
+            origin_function="_add_room_conflict_constraints",
+            class_i=i,
+            class_j=j,
+            description=f"Room match check (fixed i): classes {i} and {j}",
+            variables_used=[f"room_vars[{j}]", f"same_room_{i}_{j}"]
+        )
+        optimizer.add_constraint(
+            constraint_expr=constraint_expr2,
+            constraint_type=ConstraintType.ROOM_CONFLICT,
+            origin_module=__name__,
+            origin_function="_add_room_conflict_constraints",
+            class_i=i,
+            class_j=j,
+            description=f"Room mismatch check (fixed i): classes {i} and {j}",
+            variables_used=[f"room_vars[{j}]", f"same_room_{i}_{j}"]
+        )
     elif isinstance(optimizer.room_vars[j], int):
         # Только занятие j имеет фиксированную аудиторию
-        optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
-        optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
+        constraint_expr1 = optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
+        constraint_expr2 = optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
+        optimizer.add_constraint(
+            constraint_expr=constraint_expr1,
+            constraint_type=ConstraintType.ROOM_CONFLICT,
+            origin_module=__name__,
+            origin_function="_add_room_conflict_constraints",
+            class_i=i,
+            class_j=j,
+            description=f"Room match check (fixed j): classes {i} and {j}",
+            variables_used=[f"room_vars[{i}]", f"same_room_{i}_{j}"]
+        )
+        optimizer.add_constraint(
+            constraint_expr=constraint_expr2,
+            constraint_type=ConstraintType.ROOM_CONFLICT,
+            origin_module=__name__,
+            origin_function="_add_room_conflict_constraints",
+            class_i=i,
+            class_j=j,
+            description=f"Room mismatch check (fixed j): classes {i} and {j}",
+            variables_used=[f"room_vars[{i}]", f"same_room_{i}_{j}"]
+        )
     else:
         # Оба занятия имеют переменные аудитории
-        optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
-        optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
+        constraint_expr1 = optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
+        constraint_expr2 = optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
+        optimizer.add_constraint(
+            constraint_expr=constraint_expr1,
+            constraint_type=ConstraintType.ROOM_CONFLICT,
+            origin_module=__name__,
+            origin_function="_add_room_conflict_constraints",
+            class_i=i,
+            class_j=j,
+            description=f"Room match check (variable): classes {i} and {j}",
+            variables_used=[f"room_vars[{i}]", f"room_vars[{j}]", f"same_room_{i}_{j}"]
+        )
+        optimizer.add_constraint(
+            constraint_expr=constraint_expr2,
+            constraint_type=ConstraintType.ROOM_CONFLICT,
+            origin_module=__name__,
+            origin_function="_add_room_conflict_constraints",
+            class_i=i,
+            class_j=j,
+            description=f"Room mismatch check (variable): classes {i} and {j}",
+            variables_used=[f"room_vars[{i}]", f"room_vars[{j}]", f"same_room_{i}_{j}"]
+        )
     
     # Создаем переменные для определения временного конфликта
     conflict, same_day, time_overlap = create_conflict_variables(optimizer, i, j, c_i, c_j)
@@ -240,6 +313,16 @@ def _add_room_conflict_constraints(optimizer, i, j, c_i, c_j):
     optimizer.model.AddBoolOr([same_room.Not(), temporal_conflict.Not()]).OnlyEnforceIf(room_conflict.Not())
     
     # Prevent room conflicts
-    optimizer.model.Add(room_conflict == False)
+    constraint_expr = optimizer.model.Add(room_conflict == False)
+    optimizer.add_constraint(
+        constraint_expr=constraint_expr,
+        constraint_type=ConstraintType.ROOM_CONFLICT,
+        origin_module=__name__,
+        origin_function="_add_room_conflict_constraints",
+        class_i=i,
+        class_j=j,
+        description=f"Prevent room conflicts: classes {i} and {j}",
+        variables_used=[f"room_conflict_{i}_{j}"]
+    )
     
     print(f"  Added room conflict constraints between classes {i} and {j}")

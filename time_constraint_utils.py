@@ -2,6 +2,7 @@
 Вспомогательные функции для обработки временных ограничений.
 """
 from time_utils import time_to_minutes, minutes_to_time
+from constraint_registry import ConstraintType
 
 def create_conflict_variables(optimizer, i, j, c_i, c_j):
     """
@@ -23,18 +24,18 @@ def create_conflict_variables(optimizer, i, j, c_i, c_j):
     if isinstance(optimizer.day_vars[i], int) and isinstance(optimizer.day_vars[j], int):
         # Проверяем равенство дней и устанавливаем значение переменной same_day
         if optimizer.day_vars[i] == optimizer.day_vars[j]:
-            optimizer.model.Add(same_day == 1)
+            constraint_expr = optimizer.model.Add(same_day == 1)
         else:
-            optimizer.model.Add(same_day == 0)
+            constraint_expr = optimizer.model.Add(same_day == 0)
     elif isinstance(optimizer.day_vars[i], int):
-        optimizer.model.Add(optimizer.day_vars[j] == optimizer.day_vars[i]).OnlyEnforceIf(same_day)
-        optimizer.model.Add(optimizer.day_vars[j] != optimizer.day_vars[i]).OnlyEnforceIf(same_day.Not())
+        constraint_expr = optimizer.model.Add(optimizer.day_vars[j] == optimizer.day_vars[i]).OnlyEnforceIf(same_day)
+        constraint_expr = optimizer.model.Add(optimizer.day_vars[j] != optimizer.day_vars[i]).OnlyEnforceIf(same_day.Not())
     elif isinstance(optimizer.day_vars[j], int):
-        optimizer.model.Add(optimizer.day_vars[i] == optimizer.day_vars[j]).OnlyEnforceIf(same_day)
-        optimizer.model.Add(optimizer.day_vars[i] != optimizer.day_vars[j]).OnlyEnforceIf(same_day.Not())
+        constraint_expr = optimizer.model.Add(optimizer.day_vars[i] == optimizer.day_vars[j]).OnlyEnforceIf(same_day)
+        constraint_expr = optimizer.model.Add(optimizer.day_vars[i] != optimizer.day_vars[j]).OnlyEnforceIf(same_day.Not())
     else:
-        optimizer.model.Add(optimizer.day_vars[i] == optimizer.day_vars[j]).OnlyEnforceIf(same_day)
-        optimizer.model.Add(optimizer.day_vars[i] != optimizer.day_vars[j]).OnlyEnforceIf(same_day.Not())
+        constraint_expr = optimizer.model.Add(optimizer.day_vars[i] == optimizer.day_vars[j]).OnlyEnforceIf(same_day)
+        constraint_expr = optimizer.model.Add(optimizer.day_vars[i] != optimizer.day_vars[j]).OnlyEnforceIf(same_day.Not())
     
     # Classes conflict if their time slots overlap
     time_overlap = optimizer.model.NewBoolVar(f"time_overlap_{i}_{j}")
@@ -81,9 +82,9 @@ def add_time_overlap_constraints(optimizer, i, j, c_i, c_j, time_overlap):
         # Присваиваем значение переменной time_overlap в зависимости от результата проверки
         if overlap_check:
             print(f"  Fixed time conflict: {c_i.subject} ({start_i}-{end_i}) and {c_j.subject} ({start_j}-{end_j})")
-            optimizer.model.Add(time_overlap == 1)
+            constraint_expr = optimizer.model.Add(time_overlap == 1)
         else:
-            optimizer.model.Add(time_overlap == 0)
+            constraint_expr = optimizer.model.Add(time_overlap == 0)
     else:
         # One of the start times is not fixed
         if isinstance(optimizer.start_vars[i], int):
@@ -94,17 +95,17 @@ def add_time_overlap_constraints(optimizer, i, j, c_i, c_j, time_overlap):
             # j имеет переменное время
             start_j = optimizer.start_vars[j]
             end_j = optimizer.model.NewIntVar(0, len(optimizer.time_slots), f"end_{j}")
-            optimizer.model.Add(end_j == start_j + duration_j_slots)
+            constraint_expr = optimizer.model.Add(end_j == start_j + duration_j_slots)
             
             # Определяем условия пересечения
             overlap1 = optimizer.model.NewBoolVar(f"overlap1_{i}_{j}")
             overlap2 = optimizer.model.NewBoolVar(f"overlap2_{i}_{j}")
             
-            optimizer.model.Add(start_i < end_j).OnlyEnforceIf(overlap1)
-            optimizer.model.Add(start_i >= end_j).OnlyEnforceIf(overlap1.Not())
+            constraint_expr = optimizer.model.Add(start_i < end_j).OnlyEnforceIf(overlap1)
+            constraint_expr = optimizer.model.Add(start_i >= end_j).OnlyEnforceIf(overlap1.Not())
             
-            optimizer.model.Add(start_j < end_i).OnlyEnforceIf(overlap2)
-            optimizer.model.Add(start_j >= end_i).OnlyEnforceIf(overlap2.Not())
+            constraint_expr = optimizer.model.Add(start_j < end_i).OnlyEnforceIf(overlap2)
+            constraint_expr = optimizer.model.Add(start_j >= end_i).OnlyEnforceIf(overlap2.Not())
             
             # Перекрытие времени есть, если оба условия выполняются
             optimizer.model.AddBoolAnd([overlap1, overlap2]).OnlyEnforceIf(time_overlap)
@@ -118,17 +119,17 @@ def add_time_overlap_constraints(optimizer, i, j, c_i, c_j, time_overlap):
             # i имеет переменное время
             start_i = optimizer.start_vars[i]
             end_i = optimizer.model.NewIntVar(0, len(optimizer.time_slots), f"end_{i}")
-            optimizer.model.Add(end_i == start_i + duration_i_slots)
+            constraint_expr = optimizer.model.Add(end_i == start_i + duration_i_slots)
             
             # Определяем условия пересечения
             overlap1 = optimizer.model.NewBoolVar(f"overlap1_{i}_{j}")
             overlap2 = optimizer.model.NewBoolVar(f"overlap2_{i}_{j}")
             
-            optimizer.model.Add(start_i < end_j).OnlyEnforceIf(overlap1)
-            optimizer.model.Add(start_i >= end_j).OnlyEnforceIf(overlap1.Not())
+            constraint_expr = optimizer.model.Add(start_i < end_j).OnlyEnforceIf(overlap1)
+            constraint_expr = optimizer.model.Add(start_i >= end_j).OnlyEnforceIf(overlap1.Not())
             
-            optimizer.model.Add(start_j < end_i).OnlyEnforceIf(overlap2)
-            optimizer.model.Add(start_j >= end_i).OnlyEnforceIf(overlap2.Not())
+            constraint_expr = optimizer.model.Add(start_j < end_i).OnlyEnforceIf(overlap2)
+            constraint_expr = optimizer.model.Add(start_j >= end_i).OnlyEnforceIf(overlap2.Not())
             
             # Перекрытие времени есть, если оба условия выполняются
             optimizer.model.AddBoolAnd([overlap1, overlap2]).OnlyEnforceIf(time_overlap)
@@ -138,21 +139,21 @@ def add_time_overlap_constraints(optimizer, i, j, c_i, c_j, time_overlap):
             # Оба времени переменные
             start_i = optimizer.start_vars[i]
             end_i = optimizer.model.NewIntVar(0, len(optimizer.time_slots), f"end_{i}")
-            optimizer.model.Add(end_i == start_i + duration_i_slots)
+            constraint_expr = optimizer.model.Add(end_i == start_i + duration_i_slots)
             
             start_j = optimizer.start_vars[j]
             end_j = optimizer.model.NewIntVar(0, len(optimizer.time_slots), f"end_{j}")
-            optimizer.model.Add(end_j == start_j + duration_j_slots)
+            constraint_expr = optimizer.model.Add(end_j == start_j + duration_j_slots)
             
             # Определяем условия пересечения
             overlap1 = optimizer.model.NewBoolVar(f"overlap1_{i}_{j}")
             overlap2 = optimizer.model.NewBoolVar(f"overlap2_{i}_{j}")
             
-            optimizer.model.Add(start_i < end_j).OnlyEnforceIf(overlap1)
-            optimizer.model.Add(start_i >= end_j).OnlyEnforceIf(overlap1.Not())
+            constraint_expr = optimizer.model.Add(start_i < end_j).OnlyEnforceIf(overlap1)
+            constraint_expr = optimizer.model.Add(start_i >= end_j).OnlyEnforceIf(overlap1.Not())
             
-            optimizer.model.Add(start_j < end_i).OnlyEnforceIf(overlap2)
-            optimizer.model.Add(start_j >= end_i).OnlyEnforceIf(overlap2.Not())
+            constraint_expr = optimizer.model.Add(start_j < end_i).OnlyEnforceIf(overlap2)
+            constraint_expr = optimizer.model.Add(start_j >= end_i).OnlyEnforceIf(overlap2.Not())
             
             # Перекрытие времени есть, если оба условия выполняются
             optimizer.model.AddBoolAnd([overlap1, overlap2]).OnlyEnforceIf(time_overlap)
