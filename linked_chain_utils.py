@@ -7,7 +7,41 @@
 
 from timewindow_utils import are_classes_transitively_linked
 
-__all__ = ['is_in_linked_chain', 'get_linked_chain_order', 'collect_full_chain']
+__all__ = ['is_in_linked_chain', 'get_linked_chain_order', 'collect_full_chain', 'build_linked_chains']
+
+
+def build_linked_chains(optimizer):
+    """
+    Формирует список связанных цепочек занятий (индексы классов).
+    
+    Перенесено из linked_constraints.py для централизации утилит работы с цепочками.
+    
+    Args:
+        optimizer: Экземпляр ScheduleOptimizer
+    """
+    chains = []
+    seen = set()
+
+    for idx, c in enumerate(optimizer.classes):
+        if hasattr(c, 'linked_classes') and c.linked_classes:
+            chain = [idx]
+            current = c
+            while hasattr(current, 'linked_classes') and current.linked_classes:
+                next_class = current.linked_classes[0]
+                try:
+                    next_idx = optimizer._find_class_index(next_class)
+                    if next_idx in chain:
+                        break
+                    chain.append(next_idx)
+                    current = next_class
+                except Exception:
+                    break
+            chain_tuple = tuple(chain)
+            if chain_tuple not in seen:
+                chains.append(chain)
+                seen.add(chain_tuple)
+
+    optimizer.linked_chains = chains
 
 
 def is_in_linked_chain(optimizer, idx):

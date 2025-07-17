@@ -94,6 +94,12 @@ def add_chain_sequence_constraints(optimizer, placement_plan):
     """
     print("Adding chain sequence constraints...")
     
+    # Инициализируем linked_chains если еще не сделано
+    if not hasattr(optimizer, 'linked_chains'):
+        print("  Initializing linked chains...")
+        from linked_chain_utils import build_linked_chains
+        build_linked_chains(optimizer)
+    
     if not placement_plan.is_valid:
         print("  Chain plan is not valid, skipping")
         return
@@ -284,6 +290,12 @@ def add_anchor_constraints(optimizer, placement_plan):
     """
     print("Adding anchor constraints...")
     
+    # Инициализируем linked_chains если еще не сделано
+    if not hasattr(optimizer, 'linked_chains'):
+        print("  Initializing linked chains...")
+        from linked_chain_utils import build_linked_chains
+        build_linked_chains(optimizer)
+    
     if not placement_plan.is_valid:
         print("  Anchor plan is not valid, skipping")
         return
@@ -345,6 +357,12 @@ def add_flexible_constraints(optimizer, placement_plan):
         placement_plan: Объект PlacementPlan с планом гибкого размещения
     """
     print("Adding flexible separation constraints...")
+    
+    # Инициализируем linked_chains если еще не сделано
+    if not hasattr(optimizer, 'linked_chains'):
+        print("  Initializing linked chains...")
+        from linked_chain_utils import build_linked_chains
+        build_linked_chains(optimizer)
     
     manager = ConstraintManager(optimizer)
     

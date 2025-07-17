@@ -1,37 +1,40 @@
 from constraint_registry import ConstraintType
 """
 Модуль для добавления ограничений для связанных занятий.
+
+⚠️  ВНИМАНИЕ: Этот модуль ОТКЛЮЧЕН для предотвращения дублирующих ограничений!
+⚠️  Все ограничения для цепочек теперь обрабатываются через chain_constraints.py
+
+Функция build_linked_chains перенесена в linked_chain_utils.py
 """
 
 def build_linked_chains(optimizer):
-    """Формирует список связанных цепочек занятий (индексы классов)."""
-    chains = []
-    seen = set()
-
-    for idx, c in enumerate(optimizer.classes):
-        if hasattr(c, 'linked_classes') and c.linked_classes:
-            chain = [idx]
-            current = c
-            while hasattr(current, 'linked_classes') and current.linked_classes:
-                next_class = current.linked_classes[0]
-                try:
-                    next_idx = optimizer._find_class_index(next_class)
-                    if next_idx in chain:
-                        break
-                    chain.append(next_idx)
-                    current = next_class
-                except Exception:
-                    break
-            chain_tuple = tuple(chain)
-            if chain_tuple not in seen:
-                chains.append(chain)
-                seen.add(chain_tuple)
-
-    optimizer.linked_chains = chains
+    """
+    УСТАРЕВШАЯ функция - перенесена в linked_chain_utils.py
+    
+    ⚠️  ПРЕДУПРЕЖДЕНИЕ: Используйте linked_chain_utils.build_linked_chains()
+    """
+    print("⚠️  WARNING: build_linked_chains is deprecated. Use linked_chain_utils.build_linked_chains() instead")
+    from linked_chain_utils import build_linked_chains as new_build_linked_chains
+    return new_build_linked_chains(optimizer)
 
 def add_linked_constraints(optimizer):
-    """Add constraints for linked classes."""
-    build_linked_chains(optimizer)
+    """
+    ⚠️  ОТКЛЮЧЕННАЯ ФУНКЦИЯ: предотвращение дублирующих ограничений
+    
+    Эта функция больше НЕ ИСПОЛЬЗУЕТСЯ для предотвращения конфликтов между
+    linked_constraints.py и chain_constraints.py
+    
+    Все ограничения для цепочек теперь обрабатываются через:
+    - chain_constraints.py (основные ограничения)
+    - linked_chain_utils.py (утилиты)
+    """
+    print("⚠️  WARNING: add_linked_constraints() is DISABLED to prevent duplicate constraints!")
+    print("   All linked class constraints are now handled by chain_constraints.py")
+    print("   This function call is being ignored.")
+    
+    # НЕ добавляем ограничения - возвращаемся сразу
+    return
     
     for idx, c in enumerate(optimizer.classes):
         if hasattr(c, 'linked_classes') and c.linked_classes:

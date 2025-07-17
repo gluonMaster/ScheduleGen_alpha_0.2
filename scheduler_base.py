@@ -338,7 +338,7 @@ class ScheduleOptimizer:
     def build_model(self):
         """Build the constraint programming model."""
         from model_variables import create_variables
-        from constraints import add_linked_constraints, add_resource_conflict_constraints
+        from constraints import add_resource_conflict_constraints
         from objective import add_objective_function
         
         self.model = cp_model.CpModel()
@@ -346,8 +346,9 @@ class ScheduleOptimizer:
         # Create variables for classes
         create_variables(self)
         
-        # Add constraints for linked classes
-        add_linked_constraints(self)
+        # ОТКЛЮЧЕНО: Add constraints for linked classes
+        # Ограничения для цепочек теперь обрабатываются через chain_constraints.py
+        # add_linked_constraints(self)
         
         # Add constraints to prevent resource conflicts
         add_resource_conflict_constraints(self)
