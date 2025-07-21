@@ -9,6 +9,10 @@ from time_utils import time_to_minutes, minutes_to_time
 from timewindow_utils import find_slot_for_time
 from separation_constraints import analyze_related_classes
 from constraint_registry import ConstraintType
+from effective_bounds_utils import (
+    initialize_effective_bounds, set_effective_bounds, get_effective_bounds,
+    update_bounds_from_constraint, print_bounds_report
+)
 
 __all__ = ['apply_timewindow_improvements', 'add_objective_weights_for_timewindows']
 
@@ -29,6 +33,9 @@ def apply_timewindow_improvements(optimizer):
     if hasattr(optimizer, 'timewindow_already_processed') and optimizer.timewindow_already_processed:
         print("WARNING: Timewindow improvements already applied, skipping to prevent constraint conflicts")
         return True
+
+    # Инициализируем систему эффективных границ
+    initialize_effective_bounds(optimizer)
 
     prefer_late_start = set()  # Индексы занятий, которым лучше начинаться позже
 
@@ -68,16 +75,11 @@ def apply_timewindow_improvements(optimizer):
             window_start_time = c_i.start_time
             window_end_time = c_i.end_time
             
-            # Находим соответствующие временные слоты
-            window_start_slot = None
-            window_end_slot = None
+            # Используем функции из effective_bounds_utils
+            from effective_bounds_utils import time_to_slot
             
-            for slot_idx, slot_time in enumerate(optimizer.time_slots):
-                if window_start_slot is None and time_to_minutes(slot_time) >= time_to_minutes(window_start_time):
-                    window_start_slot = slot_idx
-                if window_end_slot is None and time_to_minutes(slot_time) >= time_to_minutes(window_end_time):
-                    window_end_slot = slot_idx
-                    break
+            window_start_slot = time_to_slot(optimizer, window_start_time)
+            window_end_slot = time_to_slot(optimizer, window_end_time)
             
             if window_start_slot is not None and window_end_slot is not None:
                 # Рассчитываем максимальное время начала, чтобы уложиться в окно
@@ -87,6 +89,10 @@ def apply_timewindow_improvements(optimizer):
                 # Добавляем ограничения на временное окно
                 constraint1 = optimizer.model.Add(optimizer.start_vars[idx_i] >= window_start_slot)
                 constraint2 = optimizer.model.Add(optimizer.start_vars[idx_i] <= max_start_slot)
+                
+                # Устанавливаем эффективные границы
+                set_effective_bounds(optimizer, idx_i, window_start_slot, max_start_slot,
+                                   "timewindow_adapter", f"Window: {window_start_time}-{window_end_time}")
                 
                 print(f"  Added window constraints for class {idx_i}: start between slots {window_start_slot} and {max_start_slot}")
     
@@ -98,6 +104,9 @@ def apply_timewindow_improvements(optimizer):
     
     # Отмечаем, что улучшения применены
     optimizer.timewindow_already_processed = True
+    
+    # Выводим отчет по эффективным границам
+    print_bounds_report(optimizer)
     
     print(f"Timewindow improvements applied successfully. Processed {len(processed_pairs)} class pairs.")
     return True

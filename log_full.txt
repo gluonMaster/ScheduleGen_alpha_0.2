@@ -282,37 +282,20 @@ CHAIN ANALYSIS:
     Chain composition: ['Kunst', 'Russish', 'Mathe']
   Class 1 in chain: True
     Chain composition: ['Kunst', 'Russish', 'Mathe']
-TIME WINDOWS:
-  Class 0: 16:00 - 19:45 (960-1185 min)
-  Class 1: 16:00 - 19:45 (960-1185 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 0: window duration 225 min, lesson duration 45 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 1: window duration 225 min, lesson duration 75 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 225 min (16:00-19:45)
-    Total span: 225 min (from 16:00 to 19:45)
-    Sequential requirement: 125 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1185 (225 min)
-  Required time: 125 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 0: 16:00 - 19:45
+  Class 1: 16:00 - 19:45
 
 SEQUENTIAL SCHEDULING: Room V0.06 can fit both window classes sequentially:
   Class 0: Kunst - 6B - Melnikov Pavel with window 16:00-19:45 (45 min)
   Class 1: Russish - 6B - Tchoudnovskaia Anna with window 16:00-19:45 (75 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 225 min, span: 225 min
-  Required time: 125
-[CACHED] Class 0: Kunst(6B) + Class 1: Russish(6B) -> both_linked_limited_flexibility
+  Scheduling reason: sufficient_overlap_time_fallback
+[CACHED] Class 0: Kunst(6B) + Class 1: Russish(6B) -> sufficient_overlap_time_fallback
 
 SEQUENTIAL SCHEDULING: Room V2.07 can fit both window classes sequentially:
   Class 0: Kunst - 6B - Melnikov Pavel with window 16:00-19:45 (45 min)
   Class 1: Russish - 6B - Tchoudnovskaia Anna with window 16:00-19:45 (75 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 225 min, span: 225 min
-  Required time: 125
+  Scheduling reason: sufficient_overlap_time_fallback
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
 Class 0: Kunst (6B) - Teacher: Melnikov Pavel
@@ -322,29 +305,14 @@ CHAIN ANALYSIS:
     Chain composition: ['Kunst', 'Russish', 'Mathe']
   Class 2 in chain: True
     Chain composition: ['Mathe']
-TIME WINDOWS:
-  Class 0: 16:00 - 19:45 (960-1185 min)
-  Class 2: 16:00 - 19:45 (960-1185 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 0: window duration 225 min, lesson duration 45 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 2: window duration 225 min, lesson duration 45 min
-             pause_after: 0 min, pause_before: 0 min
-    Window overlap: 225 min (16:00-19:45)
-    Total span: 225 min (from 16:00 to 19:45)
-    Sequential requirement: 95 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1185 (225 min)
-  Required time: 95 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 0: 16:00 - 19:45
+  Class 2: 16:00 - 19:45
 
 SEQUENTIAL SCHEDULING: Room V2.07 can fit both window classes sequentially:
   Class 0: Kunst - 6B - Melnikov Pavel with window 16:00-19:45 (45 min)
   Class 2: Mathe - 6B - Tchoudnovskaia Anna with window 16:00-19:45 (45 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 225 min, span: 225 min
-  Required time: 95
+  Scheduling reason: sufficient_overlap_time_fallback
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
 Class 1: Russish (6B) - Teacher: Tchoudnovskaia Anna
@@ -354,29 +322,14 @@ CHAIN ANALYSIS:
     Chain composition: ['Kunst', 'Russish', 'Mathe']
   Class 2 in chain: True
     Chain composition: ['Mathe']
-TIME WINDOWS:
-  Class 1: 16:00 - 19:45 (960-1185 min)
-  Class 2: 16:00 - 19:45 (960-1185 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 1: window duration 225 min, lesson duration 75 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 2: window duration 225 min, lesson duration 45 min
-             pause_after: 0 min, pause_before: 0 min
-    Window overlap: 225 min (16:00-19:45)
-    Total span: 225 min (from 16:00 to 19:45)
-    Sequential requirement: 125 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1185 (225 min)
-  Required time: 125 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 1: 16:00 - 19:45
+  Class 2: 16:00 - 19:45
 
 SEQUENTIAL SCHEDULING: Room V2.07 can fit both window classes sequentially:
   Class 1: Russish - 6B - Tchoudnovskaia Anna with window 16:00-19:45 (75 min)
   Class 2: Mathe - 6B - Tchoudnovskaia Anna with window 16:00-19:45 (45 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 225 min, span: 225 min
-  Required time: 125
+  Scheduling reason: sufficient_overlap_time_fallback
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
 Class 2: Mathe (6B) - Teacher: Tchoudnovskaia Anna
@@ -385,29 +338,15 @@ CHAIN ANALYSIS:
   Class 2 in chain: True
     Chain composition: ['Mathe']
   Class 8 in chain: False
-TIME WINDOWS:
-  Class 2: 16:00 - 19:45 (960-1185 min)
-  Class 8: 15:00 - 17:00 (900-1020 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 2: window duration 225 min, lesson duration 45 min
-             pause_after: 0 min, pause_before: 0 min
-    Class 8: window duration 120 min, lesson duration 45 min
-             pause_after: 0 min, pause_before: 0 min
-    Window overlap: 60 min (16:00-17:00)
-    Total span: 285 min (from 15:00 to 19:45)
-    Sequential requirement: 90 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: c1 linked, c2 flexible
-  c2 can fit before c1: True
-  c2 can fit after c1: True
-RESULT: Can schedule sequentially - flexible_c2_before_linked_c1
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 2: 16:00 - 19:45
+  Class 8: 15:00 - 17:00
 
-SEQUENTIAL SCHEDULING: Room V2.03 can fit both window classes sequentially:
+POTENTIAL CONFLICT: Room V2.03 - classes cannot be scheduled sequentially:
   Class 2: Mathe - 6B - Tchoudnovskaia Anna with window 16:00-19:45 (45 min)
   Class 8: Russish - 9G - Tchoudnovskaia Anna with window 15:00-17:00 (45 min)
-  Scheduling reason: flexible_c2_before_linked_c1
-  Available time: overlap: 60 min, span: 285 min
-  Required time: 90
+  Conflict reason: insufficient_overlap_time_fallback
+  WARNING: These classes cannot be scheduled together in this room!
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
 Class 3: Schach (Schach Mi A) - Teacher: Rosov Boris
@@ -417,29 +356,14 @@ CHAIN ANALYSIS:
     Chain composition: ['Schach', 'Schach']
   Class 4 in chain: True
     Chain composition: ['Schach', 'Schach']
-TIME WINDOWS:
-  Class 3: 16:00 - 17:35 (960-1055 min)
-  Class 4: 16:00 - 17:35 (960-1055 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 3: window duration 95 min, lesson duration 45 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 4: window duration 95 min, lesson duration 45 min
-             pause_after: 0 min, pause_before: 0 min
-    Window overlap: 95 min (16:00-17:35)
-    Total span: 95 min (from 16:00 to 17:35)
-    Sequential requirement: 95 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1055 (95 min)
-  Required time: 95 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 3: 16:00 - 17:35
+  Class 4: 16:00 - 17:35
 
 SEQUENTIAL SCHEDULING: Room VK.11 can fit both window classes sequentially:
   Class 3: Schach - Schach Mi A - Rosov Boris with window 16:00-17:35 (45 min)
   Class 4: Schach - Schach Mi B - Rosov Boris with window 16:00-17:35 (45 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 95 min, span: 95 min
-  Required time: 95
+  Scheduling reason: sufficient_overlap_time_fallback
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
 Class 3: Schach (Schach Mi A) - Teacher: Rosov Boris
@@ -449,29 +373,14 @@ CHAIN ANALYSIS:
     Chain composition: ['Schach', 'Schach']
   Class 5 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
-TIME WINDOWS:
-  Class 3: 16:00 - 17:35 (960-1055 min)
-  Class 5: 16:00 - 20:00 (960-1200 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 3: window duration 95 min, lesson duration 45 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 5: window duration 240 min, lesson duration 75 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 95 min (16:00-17:35)
-    Total span: 240 min (from 16:00 to 20:00)
-    Sequential requirement: 125 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1055 (95 min)
-  Required time: 125 min
-RESULT: Cannot schedule sequentially - both_linked_limited_flexibility (insufficient overlap)
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 3: 16:00 - 17:35
+  Class 5: 16:00 - 20:00
 
 POTENTIAL CONFLICT: Room VK.11 - classes cannot be scheduled sequentially:
   Class 3: Schach - Schach Mi A - Rosov Boris with window 16:00-17:35 (45 min)
   Class 5: Nachhilfe - Bogrez Tumarov - Tatarchuk Tetiana with window 16:00-20:00 (75 min)
-  Conflict reason: both_linked_limited_flexibility
-  Available time: overlap: 95 min, span: 240 min
-  Required time: 125
+  Conflict reason: insufficient_overlap_time_fallback
   WARNING: These classes cannot be scheduled together in this room!
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
@@ -482,29 +391,14 @@ CHAIN ANALYSIS:
     Chain composition: ['Schach', 'Schach']
   Class 6 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
-TIME WINDOWS:
-  Class 3: 16:00 - 17:35 (960-1055 min)
-  Class 6: 16:00 - 20:00 (960-1200 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 3: window duration 95 min, lesson duration 45 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 6: window duration 240 min, lesson duration 90 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 95 min (16:00-17:35)
-    Total span: 240 min (from 16:00 to 20:00)
-    Sequential requirement: 140 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1055 (95 min)
-  Required time: 140 min
-RESULT: Cannot schedule sequentially - both_linked_limited_flexibility (insufficient overlap)
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 3: 16:00 - 17:35
+  Class 6: 16:00 - 20:00
 
 POTENTIAL CONFLICT: Room VK.11 - classes cannot be scheduled sequentially:
   Class 3: Schach - Schach Mi A - Rosov Boris with window 16:00-17:35 (45 min)
   Class 6: Nachhilfe - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (90 min)
-  Conflict reason: both_linked_limited_flexibility
-  Available time: overlap: 95 min, span: 240 min
-  Required time: 140
+  Conflict reason: insufficient_overlap_time_fallback
   WARNING: These classes cannot be scheduled together in this room!
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
@@ -515,29 +409,14 @@ CHAIN ANALYSIS:
     Chain composition: ['Schach', 'Schach']
   Class 7 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
-TIME WINDOWS:
-  Class 3: 16:00 - 17:35 (960-1055 min)
-  Class 7: 16:00 - 20:00 (960-1200 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 3: window duration 95 min, lesson duration 45 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 7: window duration 240 min, lesson duration 45 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 95 min (16:00-17:35)
-    Total span: 240 min (from 16:00 to 20:00)
-    Sequential requirement: 95 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1055 (95 min)
-  Required time: 95 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 3: 16:00 - 17:35
+  Class 7: 16:00 - 20:00
 
 SEQUENTIAL SCHEDULING: Room VK.11 can fit both window classes sequentially:
   Class 3: Schach - Schach Mi A - Rosov Boris with window 16:00-17:35 (45 min)
   Class 7: NH Physik - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (45 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 95 min, span: 240 min
-  Required time: 95
+  Scheduling reason: sufficient_overlap_time_fallback
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
 Class 4: Schach (Schach Mi B) - Teacher: Rosov Boris
@@ -547,29 +426,14 @@ CHAIN ANALYSIS:
     Chain composition: ['Schach', 'Schach']
   Class 5 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
-TIME WINDOWS:
-  Class 4: 16:00 - 17:35 (960-1055 min)
-  Class 5: 16:00 - 20:00 (960-1200 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 4: window duration 95 min, lesson duration 45 min
-             pause_after: 0 min, pause_before: 0 min
-    Class 5: window duration 240 min, lesson duration 75 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 95 min (16:00-17:35)
-    Total span: 240 min (from 16:00 to 20:00)
-    Sequential requirement: 120 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1055 (95 min)
-  Required time: 120 min
-RESULT: Cannot schedule sequentially - both_linked_limited_flexibility (insufficient overlap)
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 4: 16:00 - 17:35
+  Class 5: 16:00 - 20:00
 
 POTENTIAL CONFLICT: Room VK.11 - classes cannot be scheduled sequentially:
   Class 4: Schach - Schach Mi B - Rosov Boris with window 16:00-17:35 (45 min)
   Class 5: Nachhilfe - Bogrez Tumarov - Tatarchuk Tetiana with window 16:00-20:00 (75 min)
-  Conflict reason: both_linked_limited_flexibility
-  Available time: overlap: 95 min, span: 240 min
-  Required time: 120
+  Conflict reason: insufficient_overlap_time_fallback
   WARNING: These classes cannot be scheduled together in this room!
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
@@ -580,29 +444,14 @@ CHAIN ANALYSIS:
     Chain composition: ['Schach', 'Schach']
   Class 6 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
-TIME WINDOWS:
-  Class 4: 16:00 - 17:35 (960-1055 min)
-  Class 6: 16:00 - 20:00 (960-1200 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 4: window duration 95 min, lesson duration 45 min
-             pause_after: 0 min, pause_before: 0 min
-    Class 6: window duration 240 min, lesson duration 90 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 95 min (16:00-17:35)
-    Total span: 240 min (from 16:00 to 20:00)
-    Sequential requirement: 135 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1055 (95 min)
-  Required time: 135 min
-RESULT: Cannot schedule sequentially - both_linked_limited_flexibility (insufficient overlap)
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 4: 16:00 - 17:35
+  Class 6: 16:00 - 20:00
 
 POTENTIAL CONFLICT: Room VK.11 - classes cannot be scheduled sequentially:
   Class 4: Schach - Schach Mi B - Rosov Boris with window 16:00-17:35 (45 min)
   Class 6: Nachhilfe - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (90 min)
-  Conflict reason: both_linked_limited_flexibility
-  Available time: overlap: 95 min, span: 240 min
-  Required time: 135
+  Conflict reason: insufficient_overlap_time_fallback
   WARNING: These classes cannot be scheduled together in this room!
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
@@ -613,29 +462,14 @@ CHAIN ANALYSIS:
     Chain composition: ['Schach', 'Schach']
   Class 7 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
-TIME WINDOWS:
-  Class 4: 16:00 - 17:35 (960-1055 min)
-  Class 7: 16:00 - 20:00 (960-1200 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 4: window duration 95 min, lesson duration 45 min
-             pause_after: 0 min, pause_before: 0 min
-    Class 7: window duration 240 min, lesson duration 45 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 95 min (16:00-17:35)
-    Total span: 240 min (from 16:00 to 20:00)
-    Sequential requirement: 90 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1055 (95 min)
-  Required time: 90 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 4: 16:00 - 17:35
+  Class 7: 16:00 - 20:00
 
 SEQUENTIAL SCHEDULING: Room VK.11 can fit both window classes sequentially:
   Class 4: Schach - Schach Mi B - Rosov Boris with window 16:00-17:35 (45 min)
   Class 7: NH Physik - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (45 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 95 min, span: 240 min
-  Required time: 90
+  Scheduling reason: sufficient_overlap_time_fallback
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
 Class 5: Nachhilfe (Bogrez Tumarov) - Teacher: Tatarchuk Tetiana
@@ -645,29 +479,14 @@ CHAIN ANALYSIS:
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
   Class 6 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
-TIME WINDOWS:
-  Class 5: 16:00 - 20:00 (960-1200 min)
-  Class 6: 16:00 - 20:00 (960-1200 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 5: window duration 240 min, lesson duration 75 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 6: window duration 240 min, lesson duration 90 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 240 min (16:00-20:00)
-    Total span: 240 min (from 16:00 to 20:00)
-    Sequential requirement: 170 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1200 (240 min)
-  Required time: 170 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 5: 16:00 - 20:00
+  Class 6: 16:00 - 20:00
 
 SEQUENTIAL SCHEDULING: Room VK.11 can fit both window classes sequentially:
   Class 5: Nachhilfe - Bogrez Tumarov - Tatarchuk Tetiana with window 16:00-20:00 (75 min)
   Class 6: Nachhilfe - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (90 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 240 min, span: 240 min
-  Required time: 170
+  Scheduling reason: sufficient_overlap_time_fallback
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
 Class 5: Nachhilfe (Bogrez Tumarov) - Teacher: Tatarchuk Tetiana
@@ -677,29 +496,14 @@ CHAIN ANALYSIS:
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
   Class 7 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
-TIME WINDOWS:
-  Class 5: 16:00 - 20:00 (960-1200 min)
-  Class 7: 16:00 - 20:00 (960-1200 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 5: window duration 240 min, lesson duration 75 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 7: window duration 240 min, lesson duration 45 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 240 min (16:00-20:00)
-    Total span: 240 min (from 16:00 to 20:00)
-    Sequential requirement: 125 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1200 (240 min)
-  Required time: 125 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 5: 16:00 - 20:00
+  Class 7: 16:00 - 20:00
 
 SEQUENTIAL SCHEDULING: Room VK.11 can fit both window classes sequentially:
   Class 5: Nachhilfe - Bogrez Tumarov - Tatarchuk Tetiana with window 16:00-20:00 (75 min)
   Class 7: NH Physik - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (45 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 240 min, span: 240 min
-  Required time: 125
+  Scheduling reason: sufficient_overlap_time_fallback
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
 Class 6: Nachhilfe (Danilischina Mariia) - Teacher: Tatarchuk Tetiana
@@ -709,77 +513,50 @@ CHAIN ANALYSIS:
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
   Class 7 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
-TIME WINDOWS:
-  Class 6: 16:00 - 20:00 (960-1200 min)
-  Class 7: 16:00 - 20:00 (960-1200 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 6: window duration 240 min, lesson duration 90 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 7: window duration 240 min, lesson duration 45 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 240 min (16:00-20:00)
-    Total span: 240 min (from 16:00 to 20:00)
-    Sequential requirement: 140 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1200 (240 min)
-  Required time: 140 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
+WINDOW vs WINDOW ANALYSIS (fallback):
+  Class 6: 16:00 - 20:00
+  Class 7: 16:00 - 20:00
 
 SEQUENTIAL SCHEDULING: Room VK.11 can fit both window classes sequentially:
   Class 6: Nachhilfe - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (90 min)
   Class 7: NH Physik - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (45 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 240 min, span: 240 min
-  Required time: 140
-[CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 6: Nachhilfe(Danilischina Mariia) -> both_linked_limited_flexibility
+  Scheduling reason: sufficient_overlap_time_fallback
+[CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 6: Nachhilfe(Danilischina Mariia) -> sufficient_overlap_time_fallback
 
 SEQUENTIAL SCHEDULING: Room VK.07 can fit both window classes sequentially:
   Class 5: Nachhilfe - Bogrez Tumarov - Tatarchuk Tetiana with window 16:00-20:00 (75 min)
   Class 6: Nachhilfe - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (90 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 240 min, span: 240 min
-  Required time: 170
-[CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 7: NH Physik(Danilischina Mariia) -> both_linked_limited_flexibility
+  Scheduling reason: sufficient_overlap_time_fallback
+[CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 7: NH Physik(Danilischina Mariia) -> sufficient_overlap_time_fallback
 
 SEQUENTIAL SCHEDULING: Room VK.07 can fit both window classes sequentially:
   Class 5: Nachhilfe - Bogrez Tumarov - Tatarchuk Tetiana with window 16:00-20:00 (75 min)
   Class 7: NH Physik - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (45 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 240 min, span: 240 min
-  Required time: 125
-[CACHED] Class 6: Nachhilfe(Danilischina Mariia) + Class 7: NH Physik(Danilischina Mariia) -> both_linked_limited_flexibility
+  Scheduling reason: sufficient_overlap_time_fallback
+[CACHED] Class 6: Nachhilfe(Danilischina Mariia) + Class 7: NH Physik(Danilischina Mariia) -> sufficient_overlap_time_fallback
 
 SEQUENTIAL SCHEDULING: Room VK.07 can fit both window classes sequentially:
   Class 6: Nachhilfe - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (90 min)
   Class 7: NH Physik - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (45 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 240 min, span: 240 min
-  Required time: 140
-[CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 6: Nachhilfe(Danilischina Mariia) -> both_linked_limited_flexibility
+  Scheduling reason: sufficient_overlap_time_fallback
+[CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 6: Nachhilfe(Danilischina Mariia) -> sufficient_overlap_time_fallback
 
 SEQUENTIAL SCHEDULING: Room VK.08 can fit both window classes sequentially:
   Class 5: Nachhilfe - Bogrez Tumarov - Tatarchuk Tetiana with window 16:00-20:00 (75 min)
   Class 6: Nachhilfe - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (90 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 240 min, span: 240 min
-  Required time: 170
-[CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 7: NH Physik(Danilischina Mariia) -> both_linked_limited_flexibility
+  Scheduling reason: sufficient_overlap_time_fallback
+[CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 7: NH Physik(Danilischina Mariia) -> sufficient_overlap_time_fallback
 
 SEQUENTIAL SCHEDULING: Room VK.08 can fit both window classes sequentially:
   Class 5: Nachhilfe - Bogrez Tumarov - Tatarchuk Tetiana with window 16:00-20:00 (75 min)
   Class 7: NH Physik - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (45 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 240 min, span: 240 min
-  Required time: 125
-[CACHED] Class 6: Nachhilfe(Danilischina Mariia) + Class 7: NH Physik(Danilischina Mariia) -> both_linked_limited_flexibility
+  Scheduling reason: sufficient_overlap_time_fallback
+[CACHED] Class 6: Nachhilfe(Danilischina Mariia) + Class 7: NH Physik(Danilischina Mariia) -> sufficient_overlap_time_fallback
 
 SEQUENTIAL SCHEDULING: Room VK.08 can fit both window classes sequentially:
   Class 6: Nachhilfe - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (90 min)
   Class 7: NH Physik - Danilischina Mariia - Tatarchuk Tetiana with window 16:00-20:00 (45 min)
-  Scheduling reason: both_linked_limited_flexibility
-  Available time: overlap: 240 min, span: 240 min
-  Required time: 140
+  Scheduling reason: sufficient_overlap_time_fallback
 
 Conflict check completed.
 Checking room conflict between classes 0 and 1 in rooms {'V0.06', 'V2.07'}
@@ -789,6 +566,9 @@ Classes 0 and 1: Kunst vs Russish
   Shared rooms: {'V0.06', 'V2.07'}
   Shared groups: {'6B'}
   Must add constraints: True
+Initialized effective_bounds system
+  Extracting bounds from original data for class 0
+  Extracting bounds from original data for class 1
   [window-window room] Classes 0,1 have room alternatives - adding room conflict constraints
   ✓ Added constraint room_conflict_19: Room match check (variable): classes 0 and 1
   ✓ Added constraint room_conflict_20: Room mismatch check (variable): classes 0 and 1
@@ -801,17 +581,48 @@ Classes 0 and 2: Kunst vs Mathe
   Shared rooms: {'V2.07'}
   Shared groups: {'6B'}
   Must add constraints: True
+  Extracting bounds from original data for class 2
   [window-window room] Classes 0,2 have room alternatives - adding room conflict constraints
   ✓ Added constraint room_conflict_22: Room match check (variable): classes 0 and 2
   ✓ Added constraint room_conflict_23: Room mismatch check (variable): classes 0 and 2
   ✓ Added constraint room_conflict_24: Prevent room conflicts: classes 0 and 2
   Added room conflict constraints between classes 0 and 2
+  Extracting bounds from original data for class 3
+  Time overlap analysis using effective bounds:
+    Class 0: 16:00-19:00 + 45min = 960-1185
+    Class 3: 16:00-16:50 + 45min = 960-1055
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+  Extracting bounds from original data for class 4
+  Time overlap analysis using effective bounds:
+    Class 0: 16:00-19:00 + 45min = 960-1185
+    Class 4: 16:00-16:50 + 45min = 960-1055
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+  Extracting bounds from original data for class 5
+  Time overlap analysis using effective bounds:
+    Class 0: 16:00-19:00 + 45min = 960-1185
+    Class 5: 16:00-18:45 + 75min = 960-1200
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+  Extracting bounds from original data for class 6
+  Time overlap analysis using effective bounds:
+    Class 0: 16:00-19:00 + 45min = 960-1185
+    Class 6: 16:00-18:30 + 90min = 960-1200
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+  Extracting bounds from original data for class 7
+  Time overlap analysis using effective bounds:
+    Class 0: 16:00-19:00 + 45min = 960-1185
+    Class 7: 16:00-19:15 + 45min = 960-1200
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
-  ⚠️  Skipped constraint resource_conflict: No time overlap
+  Extracting bounds from original data for class 8
+  Time overlap analysis using effective bounds:
+    Class 0: 16:00-19:00 + 45min = 960-1185
+    Class 8: 15:00-16:15 + 45min = 900-1020
+    Overlap: YES
+  ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
 Checking room conflict between classes 1 and 2 in rooms {'V2.07'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
@@ -819,33 +630,69 @@ Classes 1 and 2: Russish vs Mathe
   Shared rooms: {'V2.07'}
   Shared groups: {'6B'}
   Must add constraints: True
-TIME WINDOWS:
-  Class 2: 16:00 - 19:45 (960-1185 min)
-  Class 1: 16:00 - 19:45 (960-1185 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 2: window duration 225 min, lesson duration 45 min
-             pause_after: 0 min, pause_before: 0 min
-    Class 1: window duration 225 min, lesson duration 75 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 225 min (16:00-19:45)
-    Total span: 225 min (from 16:00 to 19:45)
-    Sequential requirement: 120 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1185 (225 min)
-  Required time: 120 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
   [shared_groups] both_orders_possible (reversed) — leaving free
+  Time overlap analysis using effective bounds:
+    Class 1: 16:00-18:30 + 75min = 960-1185
+    Class 3: 16:00-16:50 + 45min = 960-1055
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+  Time overlap analysis using effective bounds:
+    Class 1: 16:00-18:30 + 75min = 960-1185
+    Class 4: 16:00-16:50 + 45min = 960-1055
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+  Time overlap analysis using effective bounds:
+    Class 1: 16:00-18:30 + 75min = 960-1185
+    Class 5: 16:00-18:45 + 75min = 960-1200
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+  Time overlap analysis using effective bounds:
+    Class 1: 16:00-18:30 + 75min = 960-1185
+    Class 6: 16:00-18:30 + 90min = 960-1200
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+  Time overlap analysis using effective bounds:
+    Class 1: 16:00-18:30 + 75min = 960-1185
+    Class 7: 16:00-19:15 + 45min = 960-1200
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
-  ⚠️  Skipped constraint resource_conflict: No time overlap
+  Time overlap analysis using effective bounds:
+    Class 1: 16:00-18:30 + 75min = 960-1185
+    Class 8: 15:00-16:15 + 45min = 900-1020
+    Overlap: YES
+Detected potential conflict between 'Russish' and 'Russish' (shared teacher 'Tchoudnovskaia Anna' with different groups (cannot schedule sequentially))
+
+=== ADDING TIME CONFLICT CONSTRAINTS ===
+Classes 1 and 8: Russish vs Russish
+  Shared rooms: set()
+  Shared groups: set()
+  Must add constraints: set()
+  Sequential scheduling not possible for these time windows
+Adding standard conflict constraints between classes 1 and 8
+  Time overlap analysis using effective bounds:
+    Class 2: 16:00-19:00 + 45min = 960-1185
+    Class 3: 16:00-16:50 + 45min = 960-1055
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+  Time overlap analysis using effective bounds:
+    Class 2: 16:00-19:00 + 45min = 960-1185
+    Class 4: 16:00-16:50 + 45min = 960-1055
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+  Time overlap analysis using effective bounds:
+    Class 2: 16:00-19:00 + 45min = 960-1185
+    Class 5: 16:00-18:45 + 75min = 960-1200
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+  Time overlap analysis using effective bounds:
+    Class 2: 16:00-19:00 + 45min = 960-1185
+    Class 6: 16:00-18:30 + 90min = 960-1200
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+  Time overlap analysis using effective bounds:
+    Class 2: 16:00-19:00 + 45min = 960-1185
+    Class 7: 16:00-19:15 + 45min = 960-1200
+    Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
 Checking room conflict between classes 2 and 8 in rooms {'V2.03'}
 
@@ -854,23 +701,8 @@ Classes 2 and 8: Mathe vs Russish
   Shared rooms: {'V2.03'}
   Shared groups: set()
   Must add constraints: True
-TIME WINDOWS:
-  Class 8: 15:00 - 17:00 (900-1020 min)
-  Class 2: 16:00 - 19:45 (960-1185 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 8: window duration 120 min, lesson duration 45 min
-             pause_after: 0 min, pause_before: 0 min
-    Class 2: window duration 225 min, lesson duration 45 min
-             pause_after: 0 min, pause_before: 0 min
-    Window overlap: 60 min (16:00-17:00)
-    Total span: 285 min (from 15:00 to 19:45)
-    Sequential requirement: 90 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: c2 linked, c1 flexible
-  c1 can fit before c2: True
-  c1 can fit after c2: True
-RESULT: Can schedule sequentially - flexible_c1_before_linked_c2
-  [shared_groups] both_orders_possible (reversed) — leaving free
+  Sequential scheduling not possible for these time windows
+Adding standard conflict constraints between classes 2 and 8
 Checking room conflict between classes 3 and 4 in rooms {'VK.11'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
@@ -878,22 +710,6 @@ Classes 3 and 4: Schach vs Schach
   Shared rooms: {'VK.11'}
   Shared groups: set()
   Must add constraints: True
-TIME WINDOWS:
-  Class 4: 16:00 - 17:35 (960-1055 min)
-  Class 3: 16:00 - 17:35 (960-1055 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 4: window duration 95 min, lesson duration 45 min
-             pause_after: 0 min, pause_before: 0 min
-    Class 3: window duration 95 min, lesson duration 45 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 95 min (16:00-17:35)
-    Total span: 95 min (from 16:00 to 17:35)
-    Sequential requirement: 90 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1055 (95 min)
-  Required time: 90 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
   [shared_groups] both_orders_possible (reversed) — leaving free
 Checking room conflict between classes 3 and 5 in rooms {'VK.11'}
 
@@ -931,7 +747,11 @@ Classes 3 and 7: Schach vs NH Physik
   ✓ Added constraint room_conflict_32: Room mismatch check (fixed i): classes 3 and 7
   ✓ Added constraint room_conflict_33: Prevent room conflicts: classes 3 and 7
   Added room conflict constraints between classes 3 and 7
-  ⚠️  Skipped constraint resource_conflict: No time overlap
+  Time overlap analysis using effective bounds:
+    Class 3: 16:00-16:50 + 45min = 960-1055
+    Class 8: 15:00-16:15 + 45min = 900-1020
+    Overlap: YES
+  ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
 Checking room conflict between classes 4 and 5 in rooms {'VK.11'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
@@ -968,88 +788,56 @@ Classes 4 and 7: Schach vs NH Physik
   ✓ Added constraint room_conflict_41: Room mismatch check (fixed i): classes 4 and 7
   ✓ Added constraint room_conflict_42: Prevent room conflicts: classes 4 and 7
   Added room conflict constraints between classes 4 and 7
-  ⚠️  Skipped constraint resource_conflict: No time overlap
-Checking room conflict between classes 5 and 6 in rooms {'VK.08', 'VK.11', 'VK.07'}
+  Time overlap analysis using effective bounds:
+    Class 4: 16:00-16:50 + 45min = 960-1055
+    Class 8: 15:00-16:15 + 45min = 900-1020
+    Overlap: YES
+  ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+Checking room conflict between classes 5 and 6 in rooms {'VK.07', 'VK.08', 'VK.11'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
 Classes 5 and 6: Nachhilfe vs Nachhilfe
-  Shared rooms: {'VK.08', 'VK.11', 'VK.07'}
+  Shared rooms: {'VK.07', 'VK.08', 'VK.11'}
   Shared groups: set()
   Must add constraints: True
-TIME WINDOWS:
-  Class 6: 16:00 - 20:00 (960-1200 min)
-  Class 5: 16:00 - 20:00 (960-1200 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 6: window duration 240 min, lesson duration 90 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 5: window duration 240 min, lesson duration 75 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 240 min (16:00-20:00)
-    Total span: 240 min (from 16:00 to 20:00)
-    Sequential requirement: 170 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1200 (240 min)
-  Required time: 170 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
   [shared_groups] both_orders_possible (reversed) — leaving free
-Checking room conflict between classes 5 and 7 in rooms {'VK.08', 'VK.11', 'VK.07'}
+Checking room conflict between classes 5 and 7 in rooms {'VK.07', 'VK.08', 'VK.11'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
 Classes 5 and 7: Nachhilfe vs NH Physik
-  Shared rooms: {'VK.08', 'VK.11', 'VK.07'}
+  Shared rooms: {'VK.07', 'VK.08', 'VK.11'}
   Shared groups: set()
   Must add constraints: True
-TIME WINDOWS:
-  Class 7: 16:00 - 20:00 (960-1200 min)
-  Class 5: 16:00 - 20:00 (960-1200 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 7: window duration 240 min, lesson duration 45 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 5: window duration 240 min, lesson duration 75 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 240 min (16:00-20:00)
-    Total span: 240 min (from 16:00 to 20:00)
-    Sequential requirement: 125 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1200 (240 min)
-  Required time: 125 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
   [shared_groups] both_orders_possible (reversed) — leaving free
-  ⚠️  Skipped constraint resource_conflict: No time overlap
-Checking room conflict between classes 6 and 7 in rooms {'VK.08', 'VK.11', 'VK.07'}
+  Time overlap analysis using effective bounds:
+    Class 5: 16:00-18:45 + 75min = 960-1200
+    Class 8: 15:00-16:15 + 45min = 900-1020
+    Overlap: YES
+  ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+Checking room conflict between classes 6 and 7 in rooms {'VK.07', 'VK.08', 'VK.11'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
 Classes 6 and 7: Nachhilfe vs NH Physik
-  Shared rooms: {'VK.08', 'VK.11', 'VK.07'}
+  Shared rooms: {'VK.07', 'VK.08', 'VK.11'}
   Shared groups: {'Danilischina Mariia'}
   Must add constraints: True
-TIME WINDOWS:
-  Class 7: 16:00 - 20:00 (960-1200 min)
-  Class 6: 16:00 - 20:00 (960-1200 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 7: window duration 240 min, lesson duration 45 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 6: window duration 240 min, lesson duration 90 min
-             pause_after: 5 min, pause_before: 0 min
-    Window overlap: 240 min (16:00-20:00)
-    Total span: 240 min (from 16:00 to 20:00)
-    Sequential requirement: 140 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: both classes linked - limited flexibility
-  Overlap window: 960-1200 (240 min)
-  Required time: 140 min
-RESULT: Can schedule sequentially - both_linked_limited_flexibility (sufficient overlap)
   [shared_groups] both_orders_possible (reversed) — leaving free
-  ⚠️  Skipped constraint resource_conflict: No time overlap
-  ⚠️  Skipped constraint resource_conflict: No time overlap
+  Time overlap analysis using effective bounds:
+    Class 6: 16:00-18:30 + 90min = 960-1200
+    Class 8: 15:00-16:15 + 45min = 900-1020
+    Overlap: YES
+  ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+  Time overlap analysis using effective bounds:
+    Class 7: 16:00-19:15 + 45min = 960-1200
+    Class 8: 15:00-16:15 + 45min = 900-1020
+    Overlap: YES
+  ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
 
 === RESOURCE CONFLICT CONSTRAINTS SUMMARY ===
 Total class pairs: 36
-Processed pairs: 14
-Skipped pairs: 22
-Processing rate: 38.9%
+Processed pairs: 15
+Skipped pairs: 21
+Processing rate: 41.7%
 ==================================================
 
 Adding objective weights for timewindow optimization...
@@ -1108,14 +896,23 @@ Applying timewindow scheduling improvements...
 Window checks cache has been reset.
 
 Found 9 classes with time windows.
+  Updated effective bounds for class 0: EffectiveBounds(slot: 96-132, time: 16:00-19:00, source: time_window)
   Added window constraints for class 0: start between slots 96 and 132
+  Updated effective bounds for class 1: EffectiveBounds(slot: 96-126, time: 16:00-18:30, source: time_window)
   Added window constraints for class 1: start between slots 96 and 126
+  Updated effective bounds for class 2: EffectiveBounds(slot: 96-132, time: 16:00-19:00, source: time_window)
   Added window constraints for class 2: start between slots 96 and 132
+  Updated effective bounds for class 3: EffectiveBounds(slot: 96-106, time: 16:00-16:50, source: time_window)
   Added window constraints for class 3: start between slots 96 and 106
+  Updated effective bounds for class 4: EffectiveBounds(slot: 96-106, time: 16:00-16:50, source: time_window)
   Added window constraints for class 4: start between slots 96 and 106
+  Updated effective bounds for class 5: EffectiveBounds(slot: 96-129, time: 16:00-18:45, source: time_window)
   Added window constraints for class 5: start between slots 96 and 129
+  Updated effective bounds for class 6: EffectiveBounds(slot: 96-126, time: 16:00-18:30, source: time_window)
   Added window constraints for class 6: start between slots 96 and 126
+  Updated effective bounds for class 7: EffectiveBounds(slot: 96-135, time: 16:00-19:15, source: time_window)
   Added window constraints for class 7: start between slots 96 and 135
+  Updated effective bounds for class 8: EffectiveBounds(slot: 84-99, time: 15:00-16:15, source: time_window)
   Added window constraints for class 8: start between slots 84 and 99
 
 === ANALYZE RELATED CLASSES (REFACTORED) ===
@@ -1154,8 +951,10 @@ Adding chain sequence constraints...
   Initializing linked chains...
   Processing chain with 3 classes
   ✓ Added constraint chain_ordering_43: Chain: class 0 -> class 1 (gap: 10 slots)
+  Updated effective bounds for class 1: EffectiveBounds(slot: 96-126, time: 16:00-18:30, source: time_window)
   Added sequential constraint: Chain: class 0 -> class 1 (gap: 10 slots)
   ✓ Added constraint chain_ordering_44: Chain: class 1 -> class 2 (gap: 16 slots)
+  Updated effective bounds for class 2: EffectiveBounds(slot: 96-132, time: 16:00-19:00, source: time_window)
   Added sequential constraint: Chain: class 1 -> class 2 (gap: 16 slots)
   Marked class 0 as having chain constraints applied
   Marked class 1 as having chain constraints applied
@@ -1202,6 +1001,7 @@ Applying placement constraints...
 Adding chain sequence constraints...
   Processing chain with 2 classes
   ✓ Added constraint chain_ordering_51: Chain: class 6 -> class 7 (gap: 19 slots)
+  Updated effective bounds for class 7: EffectiveBounds(slot: 96-135, time: 16:00-19:15, source: time_window)
   Added sequential constraint: Chain: class 6 -> class 7 (gap: 19 slots)
   Marked class 6 as having chain constraints applied
   Marked class 7 as having chain constraints applied
@@ -1228,22 +1028,6 @@ Finding independent groups for teacher 'Tchoudnovskaia Anna' on Mi
     Adding simple separation constraints for 3 classes
   ✓ Added constraint other_56: End time variable: end_1 = start_1 + 15
   ✓ Added constraint other_57: End time variable: end_8 = start_8 + 9
-TIME WINDOWS:
-  Class 1: 16:00 - 19:45 (960-1185 min)
-  Class 8: 15:00 - 17:00 (900-1020 min)
-OVERLAPPING WINDOWS: analyzing constraints
-  WINDOW DETAILS:
-    Class 1: window duration 225 min, lesson duration 75 min
-             pause_after: 5 min, pause_before: 0 min
-    Class 8: window duration 120 min, lesson duration 45 min
-             pause_after: 0 min, pause_before: 0 min
-    Window overlap: 60 min (16:00-17:00)
-    Total span: 285 min (from 15:00 to 19:45)
-    Sequential requirement: 125 min (both lessons + pauses)
-CONSTRAINT ANALYSIS: c1 linked, c2 flexible
-  c2 can fit before c1: True
-  c2 can fit after c1: True
-RESULT: Can schedule sequentially - flexible_c2_before_linked_c1
       Same teacher but non-overlapping times [16:00-17:20] vs [15:00-15:45] - no constraint needed
       Skipping constraint for classes 1 and 8 - no conflict potential
   ✓ Added constraint other_58: End time variable: end_2 = start_2 + 9
@@ -1275,6 +1059,7 @@ Applying placement constraints...
 Adding chain sequence constraints...
   Processing chain with 2 classes
   ✓ Added constraint chain_ordering_60: Chain: class 3 -> class 4 (gap: 10 slots)
+  Updated effective bounds for class 4: EffectiveBounds(slot: 96-106, time: 16:00-16:50, source: time_window)
   Added sequential constraint: Chain: class 3 -> class 4 (gap: 10 slots)
   Marked class 3 as having chain constraints applied
   Marked class 4 as having chain constraints applied
@@ -1304,8 +1089,8 @@ Class 6: Nachhilfe - Danilischina Mariia (Teacher: Tatarchuk Tetiana)
 RESOURCE CONFLICT ANALYSIS:
   Same teacher: YES (Tatarchuk Tetiana vs Tatarchuk Tetiana)
   Shared groups: NO (none)
-  Shared rooms: YES ({'VK.08', 'VK.11', 'VK.07'})
-[CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 6: Nachhilfe(Danilischina Mariia) -> both_linked_limited_flexibility
+  Shared rooms: YES ({'VK.07', 'VK.08', 'VK.11'})
+[CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 6: Nachhilfe(Danilischina Mariia) -> sufficient_overlap_time_fallback
   Skipping separation constraints for 5 and 6 - cycle prevention exception
   ✓ Added constraint other_66: End time variable: end_5 = start_5 + 15
   ✓ Added constraint other_67: End time variable: end_7 = start_7 + 9
@@ -1317,15 +1102,22 @@ Class 7: NH Physik - Danilischina Mariia (Teacher: Tatarchuk Tetiana)
 RESOURCE CONFLICT ANALYSIS:
   Same teacher: YES (Tatarchuk Tetiana vs Tatarchuk Tetiana)
   Shared groups: NO (none)
-  Shared rooms: YES ({'VK.08', 'VK.11', 'VK.07'})
-[CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 7: NH Physik(Danilischina Mariia) -> both_linked_limited_flexibility
+  Shared rooms: YES ({'VK.07', 'VK.08', 'VK.11'})
+[CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 7: NH Physik(Danilischina Mariia) -> sufficient_overlap_time_fallback
     Class i 5: Nachhilfe - Bogrez Tumarov
-      Original time window: 16:00 - 20:00
+      Effective bounds: 16:00 - 18:45 (source: time_window)
+      Type: window
+      Applied constraints:
+        - timewindow_adapter: Window: 16:00-20:00
       Variable is flexible (CP-SAT variable)
       Variable domain info not available during constraint building
       Not part of any chain
     Class j 7: NH Physik - Danilischina Mariia
-      Original time window: 16:00 - 20:00
+      Effective bounds: 16:00 - 19:15 (source: time_window)
+      Type: window
+      Applied constraints:
+        - timewindow_adapter: Window: 16:00-20:00
+        - chain_ordering: Chain constraint: must start at least 19 slots after class 6
       Variable is flexible (CP-SAT variable)
       Variable domain info not available during constraint building
       Not part of any chain
@@ -1347,12 +1139,49 @@ Total processed pairs: 7
 
 Adding objective weights for timewindow optimization...
 Added 9 timewindow objectives to the model.
+
+=== EFFECTIVE BOUNDS REPORT ===
+Total classes: 9
+Classes with effective bounds: 9
+Update count: 13
+Last updated: 2025-07-17 19:48:08.944488
+
+Bounds by source:
+  time_window: 9
+
+Confidence distribution:
+  high: 9
+
+Detailed bounds per class:
+  Class 0 (Kunst): EffectiveBounds(slot: 96-132, time: 16:00-19:00, source: time_window)
+    - timewindow_adapter: Window: 16:00-19:45
+  Class 1 (Russish): EffectiveBounds(slot: 96-126, time: 16:00-18:30, source: time_window)
+    - timewindow_adapter: Window: 16:00-19:45
+    - chain_ordering: Chain constraint: must start at least 10 slots after class 0
+  Class 2 (Mathe): EffectiveBounds(slot: 96-132, time: 16:00-19:00, source: time_window)
+    - timewindow_adapter: Window: 16:00-19:45
+    - chain_ordering: Chain constraint: must start at least 16 slots after class 1
+  Class 3 (Schach): EffectiveBounds(slot: 96-106, time: 16:00-16:50, source: time_window)
+    - timewindow_adapter: Window: 16:00-17:35
+  Class 4 (Schach): EffectiveBounds(slot: 96-106, time: 16:00-16:50, source: time_window)
+    - timewindow_adapter: Window: 16:00-17:35
+    - chain_ordering: Chain constraint: must start at least 10 slots after class 3
+  Class 5 (Nachhilfe): EffectiveBounds(slot: 96-129, time: 16:00-18:45, source: time_window)
+    - timewindow_adapter: Window: 16:00-20:00
+  Class 6 (Nachhilfe): EffectiveBounds(slot: 96-126, time: 16:00-18:30, source: time_window)
+    - timewindow_adapter: Window: 16:00-20:00
+  Class 7 (NH Physik): EffectiveBounds(slot: 96-135, time: 16:00-19:15, source: time_window)
+    - timewindow_adapter: Window: 16:00-20:00
+    - chain_ordering: Chain constraint: must start at least 19 slots after class 6
+  Class 8 (Russish): EffectiveBounds(slot: 84-99, time: 15:00-16:15, source: time_window)
+    - timewindow_adapter: Window: 15:00-17:00
+===================================
 Timewindow improvements applied successfully. Processed 7 class pairs.
 DEBUG: Applied timewindow improvements
 
 📊 MODEL STATISTICS:
   Variables: 9 assigned, 9 start, 9 room, 9 day
-  Constraints: 69 added, 22 skipped
+  Constraints: 69 added, 21 skipped
   Constraint types: time_window: 30, room_conflict: 24, chain_ordering: 6, other: 8, fixed_time: 1
 
 🚀 Starting CP-SAT solver (time limit: 300s)...
@@ -1372,7 +1201,7 @@ Detected conflicts: 0
 Constraint exceptions: 0
 
 🔥 Most constrained pairs:
-  Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna: 4 constraints (room_conflict, chain_ordering)
+  Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna: 4 constraints (chain_ordering, room_conflict)
   Kunst, 6B, Melnikov Pavel ↔ Mathe, 6B, Tchoudnovskaia Anna: 3 constraints (room_conflict)
   Schach, Schach Mi A, Rosov Boris ↔ Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana: 3 constraints (room_conflict)
 

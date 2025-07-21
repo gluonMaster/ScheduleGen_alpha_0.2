@@ -7,6 +7,7 @@ from sequential_scheduling_checker import _check_sequential_scheduling, check_tw
 from timewindow_utils import find_slot_for_time
 from sequential_scheduling import can_schedule_sequentially
 from constraint_registry import ConstraintType
+from effective_bounds_utils import get_effective_bounds, classify_bounds
 
 def add_sequential_constraints(optimizer, i, j, c_i, c_j):
     """
@@ -250,53 +251,70 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
 
     # Изменение логики проверки временного перекрытия
     # Проверяем наличие пересечения времени или общих аудиторий
-    time_overlaps = times_overlap(c_i, c_j)
+    time_overlaps = times_overlap(c_i, c_j, optimizer, i, j)
     if not time_overlaps and not shared_rooms:
         # Нет пересечения времени и нет общих аудиторий - можно пропустить проверку
         return
     
-    # 0) Спец.-случай: оба занятия имеют временные окна → проверяем check_two_window_classes
-    if c_i.start_time and c_i.end_time and c_j.start_time and c_j.end_time and not must_add_constraints:
-        # Дополнительно проверим день еще раз для уверенности
-        if c_i.day != c_j.day:
-            return
+    # 0) Проверяем типы занятий через effective_bounds
+    try:
+        bounds_i = get_effective_bounds(optimizer, i, c_i)
+        bounds_j = get_effective_bounds(optimizer, j, c_j)
         
-        # Если оба занятия оконные и имеют общие группы, всегда добавляем строгие ограничения
-        shared_groups = set(c_i.get_groups()) & set(c_j.get_groups())
-        if shared_groups:
-            print(f"  [WINDOW-WINDOW] Adding mandatory constraints for window classes with shared groups: {i},{j}")
-            add_sequential_constraints(optimizer, i, j, c_i, c_j)
-            return
-
-        # Попытаться посадить их подряд в общем окне
-        if check_two_window_classes(optimizer, i, j, c_i, c_j):
-            # Сначала проверяем общие аудитории
-            if shared_rooms:
-                # Проверяем, есть ли альтернативные аудитории для хотя бы одного из занятий
-                has_alternatives_i = len(c_i.possible_rooms) > 1
-                has_alternatives_j = len(c_j.possible_rooms) > 1
-                
-                if has_alternatives_i or has_alternatives_j:
-                    print(f"  [ROOM CONFLICT] Classes {i},{j} have shared rooms {shared_rooms}, but alternatives exist - adding room conflict constraints")
-                    # Добавляем ограничения: если они в одной аудитории И в одно время, то конфликт
-                    from resource_constraints import _add_room_conflict_constraints
-                    _add_room_conflict_constraints(optimizer, i, j, c_i, c_j)
-                    return
-                else:
-                    print(f"  [CRITICAL] Adding mandatory constraints for classes with no room alternatives: {i},{j}")
-                    add_sequential_constraints(optimizer, i, j, c_i, c_j)
-                    return
-
-            # НОВЫЙ КОД: Для занятий с общими группами всегда добавляем ограничения
-            if shared_groups:
-                print(f"  [CRITICAL] Adding mandatory constraints for classes with shared groups: {i},{j}")
-                # Создаем временные ограничения и добавляем их
-                add_sequential_constraints(optimizer, i, j, c_i, c_j)
+        type_i = classify_bounds(bounds_i)
+        type_j = classify_bounds(bounds_j)
+        
+        # Оба занятия с временными окнами
+        if type_i == 'window' and type_j == 'window' and not must_add_constraints:
+            # Дополнительно проверим день еще раз для уверенности
+            if c_i.day != c_j.day:
                 return
             
-            # Не навязываем никаких конфликтных ограничений — solver сам расставит их в любом порядке
-            print(f"  [window-window teacher] no-conflict via common window for classes {i},{j}")
-            return
+            # Если оба занятия оконные и имеют общие группы, всегда добавляем строгие ограничения
+            shared_groups = set(c_i.get_groups()) & set(c_j.get_groups())
+            if shared_groups:
+                print(f"  [WINDOW-WINDOW] Adding mandatory constraints for window classes with shared groups: {i},{j}")
+                add_sequential_constraints(optimizer, i, j, c_i, c_j)
+                return
+
+            # Попытаться посадить их подряд в общем окне
+            if check_two_window_classes(optimizer, i, j, c_i, c_j):
+                # Сначала проверяем общие аудитории
+                if shared_rooms:
+                    # Проверяем, есть ли альтернативные аудитории для хотя бы одного из занятий
+                    has_alternatives_i = len(c_i.possible_rooms) > 1
+                    has_alternatives_j = len(c_j.possible_rooms) > 1
+                    
+                    if has_alternatives_i or has_alternatives_j:
+                        print(f"  [ROOM CONFLICT] Classes {i},{j} have shared rooms {shared_rooms}, but alternatives exist - adding room conflict constraints")
+                        # Добавляем ограничения: если они в одной аудитории И в одно время, то конфликт
+                        from resource_constraints import _add_room_conflict_constraints
+                        _add_room_conflict_constraints(optimizer, i, j, c_i, c_j)
+                        return
+                    else:
+                        print(f"  [CRITICAL] Adding mandatory constraints for classes with no room alternatives: {i},{j}")
+                        add_sequential_constraints(optimizer, i, j, c_i, c_j)
+                        return
+
+                # НОВЫЙ КОД: Для занятий с общими группами всегда добавляем ограничения
+                if shared_groups:
+                    print(f"  [CRITICAL] Adding mandatory constraints for classes with shared groups: {i},{j}")
+                    # Создаем временные ограничения и добавляем их
+                    add_sequential_constraints(optimizer, i, j, c_i, c_j)
+                    return
+                
+                # Не навязываем никаких конфликтных ограничений — solver сам расставит их в любом порядке
+                print(f"  [window-window teacher] no-conflict via common window for classes {i},{j}")
+                return
+                
+    except Exception as e:
+        print(f"  Warning: Could not use effective bounds for classes {i},{j}: {e}")
+        # Fallback к оригинальной логике
+        if c_i.start_time and c_i.end_time and c_j.start_time and c_j.end_time and not must_add_constraints:
+            print(f"  [FALLBACK] Using original logic for window classes {i},{j}")
+            # Здесь можно добавить оригинальную логику если необходимо
+            pass
+
     # Проверяем возможность последовательного размещения для занятий одного преподавателя
     if c_i.teacher == c_j.teacher and c_i.teacher:
         # Проверяем наличие общих групп
@@ -305,79 +323,69 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
         # Для занятий с общими группами проверяем ОБА варианта размещения
         if shared_groups:
             # Прямой порядок (c_i, затем c_j)
-            can_seq_i_j, info_i_j = can_schedule_sequentially(c_i, c_j, i, j, verbose=False)
+            can_seq_i_j, info_i_j = can_schedule_sequentially(c_i, c_j, i, j, verbose=False, optimizer=optimizer)
             
             # Обратный порядок (c_j, затем c_i)
-            can_seq_j_i, info_j_i = can_schedule_sequentially(c_j, c_i, j, i, verbose=False)
+            can_seq_j_i, info_j_i = can_schedule_sequentially(c_j, c_i, j, i, verbose=False, optimizer=optimizer)
             
-            # Проверяем случай, когда одно занятие фиксированное, а другое оконное
-            # Если фиксированное c_i и оконное c_j
-            if c_i.start_time and not c_i.end_time and c_j.start_time and c_j.end_time:
-                if can_seq_i_j and info_i_j['reason'] == 'fits_before_fixed':
-                    # c_j можно разместить ДО c_i - предпочитаем этот вариант
-                    fixed_start = time_to_minutes(c_i.start_time)
-                    latest_end = fixed_start - c_i.pause_before
-                    latest_start = latest_end - c_j.duration
-                    latest_slot_idx = optimizer._get_time_slot_index(minutes_to_time(latest_start))
-                    
-                    print(f"  [shared_groups] PRIORITIZING window class {j} BEFORE fixed class {i}")
-                    constraint_expr = optimizer.model.Add(optimizer.start_vars[j] <= latest_slot_idx)
-                    return
-                elif can_seq_i_j and info_i_j['reason'] == 'fits_after_fixed':
-                    # c_j можно разместить ПОСЛЕ c_i
-                    fixed_start = time_to_minutes(c_i.start_time)
-                    fixed_end = fixed_start + c_i.duration + c_i.pause_after
-                    
-                    earliest_start = fixed_end + c_j.pause_before
-                    earliest_slot = optimizer._get_time_slot_index(minutes_to_time(earliest_start))
-                    
-                    # Проверяем, хватает ли времени для размещения ПОСЛЕ
-                    window_end = time_to_minutes(c_j.end_time)
-                    if (window_end - earliest_slot * optimizer.time_interval) >= c_j.duration:
-                        print(f"  [shared_groups] Applying AFTER-fixed for class {j}")
-                        constraint_expr = optimizer.model.Add(optimizer.start_vars[j] >= earliest_slot)
-                    else:
-                        print(f"  [WARNING] Not enough time to schedule {j} after {i}, but forcing BEFORE-fixed")
-                        # Принудительно размещаем ДО, даже если первоначально это не было обнаружено
-                        latest_end = fixed_start - c_i.pause_before
+            # Проверяем случай, когда одно занятие фиксированное, а другое оконное используя effective_bounds
+            try:
+                bounds_i = get_effective_bounds(optimizer, i, c_i)
+                bounds_j = get_effective_bounds(optimizer, j, c_j)
+                
+                type_i = classify_bounds(bounds_i)
+                type_j = classify_bounds(bounds_j)
+                
+                # Если фиксированное c_i и оконное c_j
+                if type_i == 'fixed' and type_j == 'window':
+                    if can_seq_i_j and info_i_j['reason'] == 'fits_before_fixed':
+                        # c_j можно разместить ДО c_i - предпочитаем этот вариант
+                        fixed_start = time_to_minutes(bounds_i.min_time)
+                        latest_end = fixed_start - getattr(c_i, 'pause_before', 0)
                         latest_start = latest_end - c_j.duration
                         latest_slot_idx = optimizer._get_time_slot_index(minutes_to_time(latest_start))
+                        
+                        print(f"  [shared_groups] PRIORITIZING window class {j} BEFORE fixed class {i}")
                         constraint_expr = optimizer.model.Add(optimizer.start_vars[j] <= latest_slot_idx)
-                    return
-                
-            # Если фиксированное c_j и оконное c_i
-            elif c_j.start_time and not c_j.end_time and c_i.start_time and c_i.end_time:
-                if can_seq_j_i and info_j_i['reason'] == 'fits_before_fixed':
-                    # c_i можно разместить ДО c_j - предпочитаем этот вариант
-                    fixed_start = time_to_minutes(c_j.start_time)
-                    latest_end = fixed_start - c_j.pause_before
-                    latest_start = latest_end - c_i.duration
-                    latest_slot_idx = optimizer._get_time_slot_index(minutes_to_time(latest_start))
-                    
-                    print(f"  [shared_groups] PRIORITIZING window class {i} BEFORE fixed class {j}")
-                    constraint_expr = optimizer.model.Add(optimizer.start_vars[i] <= latest_slot_idx)
-                    return
-                elif can_seq_j_i and info_j_i['reason'] == 'fits_after_fixed':
-                    # c_i можно разместить ПОСЛЕ c_j
-                    fixed_start = time_to_minutes(c_j.start_time)
-                    fixed_end = fixed_start + c_j.duration + c_j.pause_after
-                    
-                    earliest_start = fixed_end + c_i.pause_before
-                    earliest_slot = optimizer._get_time_slot_index(minutes_to_time(earliest_start))
-                    
-                    # Проверяем, хватает ли времени для размещения ПОСЛЕ
-                    window_end = time_to_minutes(c_i.end_time)
-                    if (window_end - earliest_slot * optimizer.time_interval) >= c_i.duration:
-                        print(f"  [shared_groups] Applying AFTER-fixed for class {i}")
-                        constraint_expr = optimizer.model.Add(optimizer.start_vars[i] >= earliest_slot)
-                    else:
-                        print(f"  [WARNING] Not enough time to schedule {i} after {j}, but forcing BEFORE-fixed")
-                        # Принудительно размещаем ДО, даже если первоначально это не было обнаружено
-                        latest_end = fixed_start - c_j.pause_before
+                        
+                        optimizer.add_constraint(
+                            constraint_expr=constraint_expr,
+                            constraint_type=ConstraintType.TIME_WINDOW,
+                            origin_module=__name__,
+                            origin_function="analyze_time_conflicts",
+                            class_i=j,
+                            description=f"Window class {j} before fixed class {i}",
+                            variables_used=[f"start_var[{j}]"]
+                        )
+                        return
+                        
+                # Если фиксированное c_j и оконное c_i
+                elif type_j == 'fixed' and type_i == 'window':
+                    if can_seq_j_i and info_j_i['reason'] == 'fits_before_fixed':
+                        # c_i можно разместить ДО c_j - предпочитаем этот вариант
+                        fixed_start = time_to_minutes(bounds_j.min_time)
+                        latest_end = fixed_start - getattr(c_j, 'pause_before', 0)
                         latest_start = latest_end - c_i.duration
                         latest_slot_idx = optimizer._get_time_slot_index(minutes_to_time(latest_start))
+                        
+                        print(f"  [shared_groups] PRIORITIZING window class {i} BEFORE fixed class {j}")
                         constraint_expr = optimizer.model.Add(optimizer.start_vars[i] <= latest_slot_idx)
-                    return
+                        
+                        optimizer.add_constraint(
+                            constraint_expr=constraint_expr,
+                            constraint_type=ConstraintType.TIME_WINDOW,
+                            origin_module=__name__,
+                            origin_function="analyze_time_conflicts",
+                            class_i=i,
+                            description=f"Window class {i} before fixed class {j}",
+                            variables_used=[f"start_var[{i}]"]
+                        )
+                        return
+                        
+            except Exception as e:
+                print(f"  Warning: Could not use effective bounds for sequential check: {e}")
+                # Fallback к оригинальным полям - завершаем блок
+                pass
                 
             # НОВОЕ: Обработка неперекрывающихся временных окон
             if can_seq_i_j and info_i_j['reason'] == 'windows_separate_c1_before_c2':
@@ -523,15 +531,79 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
         optimizer.model.AddBoolAnd([same_room, conflict]).OnlyEnforceIf(room_conflict)
         constraint_expr = optimizer.model.Add(room_conflict == False)
 
-def times_overlap(class1, class2):
+def times_overlap(class1, class2, optimizer=None, idx1=None, idx2=None):
     """
     Проверяет, пересекаются ли занятия по времени.
-    Учитывает фиксированное время и временные окна.
+    Использует effective_bounds для точного определения временных границ.
     """
     # Если занятия в разные дни — не могут пересекаться
     if class1.day != class2.day:
         return False
     
+    # Пытаемся использовать effective_bounds если доступны optimizer и индексы
+    if optimizer and idx1 is not None and idx2 is not None:
+        try:
+            bounds1 = get_effective_bounds(optimizer, idx1, class1)
+            bounds2 = get_effective_bounds(optimizer, idx2, class2)
+            
+            # Если у занятия нет определенных временных границ, считаем пересекающимся
+            if not bounds1.min_time or not bounds2.min_time:
+                return True
+                
+            type1 = classify_bounds(bounds1)
+            type2 = classify_bounds(bounds2)
+            
+            # Конвертируем в минуты для расчетов
+            if type1 == 'fixed' and type2 == 'fixed':
+                # Оба фиксированы
+                start1 = time_to_minutes(bounds1.min_time)
+                end1 = start1 + class1.duration
+                start2 = time_to_minutes(bounds2.min_time)
+                end2 = start2 + class2.duration
+                return (start1 < end2) and (start2 < end1)
+                
+            elif type1 == 'window' and type2 == 'window':
+                # Оба с временными окнами
+                window1_start = time_to_minutes(bounds1.min_time)
+                window1_end = time_to_minutes(bounds1.max_time)
+                window2_start = time_to_minutes(bounds2.min_time)
+                window2_end = time_to_minutes(bounds2.max_time)
+                
+                # Находим общее окно
+                common_start = max(window1_start, window2_start)
+                common_end = min(window1_end, window2_end)
+                
+                if common_end <= common_start:
+                    # Нет общего времени вообще
+                    return False
+                    
+                # Если есть общее окно, может быть конфликт
+                return True
+                
+            elif type1 == 'fixed' and type2 == 'window':
+                # Первое фиксировано, второе с окном
+                fixed_start = time_to_minutes(bounds1.min_time)
+                fixed_end = fixed_start + class1.duration
+                window_start = time_to_minutes(bounds2.min_time)
+                window_end = time_to_minutes(bounds2.max_time)
+                
+                return (fixed_start < window_end) and (window_start < fixed_end)
+                
+            elif type1 == 'window' and type2 == 'fixed':
+                # Первое с окном, второе фиксировано
+                window_start = time_to_minutes(bounds1.min_time)
+                window_end = time_to_minutes(bounds1.max_time)
+                fixed_start = time_to_minutes(bounds2.min_time)
+                fixed_end = fixed_start + class2.duration
+                
+                return (fixed_start < window_end) and (window_start < fixed_end)
+                
+        except Exception as e:
+            print(f"Warning: Could not use effective bounds in times_overlap: {e}")
+            # Fallback к оригинальной логике
+            pass
+    
+    # Fallback к оригинальной логике когда effective_bounds недоступны
     # Если у занятия нет времени начала, считаем пересекающимся
     if not class1.start_time or not class2.start_time:
         return True
@@ -539,7 +611,6 @@ def times_overlap(class1, class2):
     # Обрабатываем случай временных окон (когда есть end_time)
     if class1.start_time and class1.end_time and class2.start_time and class2.end_time:
         # Оба занятия с временными окнами
-        # Проверяем, может ли быть конфликт при неподходящем назначении времени
         window1_start = time_to_minutes(class1.start_time)
         window1_end = time_to_minutes(class1.end_time)
         window2_start = time_to_minutes(class2.start_time)
@@ -553,14 +624,7 @@ def times_overlap(class1, class2):
             # Нет общего времени вообще
             return False
             
-        # Если общее окно меньше суммы длительностей, возможен конфликт
-        total_duration = class1.duration + class2.duration
-        if common_end - common_start < total_duration:
-            return True
-            
-        # Здесь важное отличие: даже если общее окно больше суммы длительностей,
-        # мы всё равно возвращаем True, если нас интересует возможность конфликта
-        # Но в этом случае конфликт может быть разрешен с помощью правильного планирования
+        # Если есть общее окно, может быть конфликт
         return True
         
     # Случай, когда первое занятие имеет фиксированное время, а второе - временное окно
@@ -570,7 +634,6 @@ def times_overlap(class1, class2):
         window_start = time_to_minutes(class2.start_time)
         window_end = time_to_minutes(class2.end_time)
         
-        # Проверяем, может ли быть конфликт
         return (fixed_start < window_end) and (window_start < fixed_end)
         
     # Случай, когда второе занятие имеет фиксированное время, а первое - временное окно
@@ -580,7 +643,6 @@ def times_overlap(class1, class2):
         window_start = time_to_minutes(class1.start_time)
         window_end = time_to_minutes(class1.end_time)
         
-        # Проверяем, может ли быть конфликт
         return (fixed_start < window_end) and (window_start < fixed_end)
     
     # Оба занятия имеют фиксированное время

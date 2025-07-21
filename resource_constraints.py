@@ -6,10 +6,39 @@ from conflict_detector import check_potential_conflicts
 from time_conflict_constraints import _add_time_conflict_constraints
 from time_utils import time_to_minutes
 from sequential_scheduling import can_schedule_sequentially as can_schedule_sequentially_full, minutes_to_time 
-from constraint_registry import ConstraintType 
+from constraint_registry import ConstraintType
+from effective_bounds_utils import get_effective_bounds, EffectiveBounds
 
-def times_overlap(c1, c2):
-    """Проверяет пересечение по времени двух занятий."""
+def times_overlap(optimizer, c1, c2, idx1=None, idx2=None):
+    """
+    Проверяет пересечение по времени двух занятий с использованием эффективных границ.
+    
+    Args:
+        optimizer: Экземпляр ScheduleOptimizer
+        c1, c2: Объекты занятий
+        idx1, idx2: Индексы занятий (для получения эффективных границ)
+    """
+    # Получаем эффективные границы для более точного анализа
+    if idx1 is not None and idx2 is not None:
+        bounds1 = get_effective_bounds(optimizer, idx1, c1)
+        bounds2 = get_effective_bounds(optimizer, idx2, c2)
+        
+        # Конвертируем в минуты для сравнения
+        start1_min = time_to_minutes(bounds1.min_time)
+        end1_min = time_to_minutes(bounds1.max_time) + c1.duration
+        start2_min = time_to_minutes(bounds2.min_time)
+        end2_min = time_to_minutes(bounds2.max_time) + c2.duration
+        
+        overlap = (start1_min < end2_min) and (start2_min < end1_min)
+        
+        print(f"  Time overlap analysis using effective bounds:")
+        print(f"    Class {idx1}: {bounds1.min_time}-{bounds1.max_time} + {c1.duration}min = {start1_min}-{end1_min}")
+        print(f"    Class {idx2}: {bounds2.min_time}-{bounds2.max_time} + {c2.duration}min = {start2_min}-{end2_min}")
+        print(f"    Overlap: {'YES' if overlap else 'NO'}")
+        
+        return overlap
+    
+    # Fallback к исходной логике для обратной совместимости
     if not c1.start_time or not c2.start_time:
         # Одно из занятий не имеет фиксированного времени — считаем пересекающимся
         return True
@@ -76,14 +105,14 @@ def add_resource_conflict_constraints(optimizer):
                 continue  # Продолжаем со следующей парой классов
 
             # Пропускаем сравнение, если занятия не пересекаются по времени
-            if not times_overlap(c_i, c_j):
+            if not times_overlap(optimizer, c_i, c_j, i, j):
                 optimizer.skip_constraint(
                     constraint_type=ConstraintType.RESOURCE_CONFLICT,
                     origin_module=__name__,
                     origin_function="add_resource_conflict_constraints",
                     class_i=i,
                     class_j=j,
-                    reason="No time overlap"
+                    reason="No time overlap (effective bounds)"
                 )
                 skipped_pairs += 1
                 continue
@@ -140,7 +169,7 @@ def add_resource_conflict_constraints(optimizer):
                     conflict_description.append(f"teacher '{c_i.teacher}' and shared groups {shared_groups}")
                 else:
                     # Если группы разные, проверяем возможность последовательного планирования
-                    can_schedule, _ = can_schedule_sequentially_full(c_i, c_j, i, j, verbose=False)
+                    can_schedule, _ = can_schedule_sequentially_full(c_i, c_j, i, j, verbose=False, optimizer=optimizer)
                     if not can_schedule:
                         # Если последовательное планирование невозможно, отмечаем конфликт
                         resource_conflict = True
@@ -150,7 +179,7 @@ def add_resource_conflict_constraints(optimizer):
             shared_rooms = set(c_i.possible_rooms) & set(c_j.possible_rooms)
             if shared_rooms:
                 # Проверяем возможность последовательного размещения
-                can_schedule, _ = can_schedule_sequentially_full(c_i, c_j, i, j, verbose=False)
+                can_schedule, _ = can_schedule_sequentially_full(c_i, c_j, i, j, verbose=False, optimizer=optimizer)
                 if not can_schedule:
                     resource_conflict = True
                     conflict_description.append(f"rooms {shared_rooms}")

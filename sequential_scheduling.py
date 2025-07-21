@@ -7,6 +7,7 @@
 from time_utils import time_to_minutes, minutes_to_time
 from linked_chain_utils import collect_full_chain
 from chain_scheduler import schedule_chain, chain_busy_intervals
+from effective_bounds_utils import get_effective_bounds, classify_bounds
 
 # Глобальный кеш для результатов анализа пар
 _analysis_cache = {}
@@ -71,7 +72,7 @@ def collect_full_chain_from_any_member(schedule_class):
     # Теперь собираем цепочку от корня используя linked_classes
     return collect_full_chain(root_class)
 
-def can_schedule_sequentially(c1, c2, idx1=None, idx2=None, verbose=True):
+def can_schedule_sequentially(c1, c2, idx1=None, idx2=None, verbose=True, optimizer=None):
     """
     Проверяет, могут ли два занятия быть запланированы последовательно с учетом их временных ограничений.
     
@@ -81,6 +82,7 @@ def can_schedule_sequentially(c1, c2, idx1=None, idx2=None, verbose=True):
         idx1: Индекс первого занятия (для правильного логгирования)
         idx2: Индекс второго занятия (для правильного логгирования)
         verbose: Включить детальное логгирование (по умолчанию True)
+        optimizer: Экземпляр ScheduleOptimizer (для получения эффективных границ)
         
     Returns:
         tuple: (bool, dict) - возможно ли последовательное размещение и дополнительная информация
@@ -134,13 +136,114 @@ def can_schedule_sequentially(c1, c2, idx1=None, idx2=None, verbose=True):
             print(f"  {class1_label} day: {c1.day}, {class2_label} day: {c2.day}")
         return cache_and_return(False, info)
     
-    # Проверка наличия временных ограничений
-    if not c1.start_time or not c2.start_time:
-        info['reason'] = 'missing_time_info'
-        if verbose:
-            print(f"RESULT: Can schedule sequentially - {info['reason']}")
-            print(f"  {class1_label} start_time: {c1.start_time}, {class2_label} start_time: {c2.start_time}")
-        return cache_and_return(True, info)  # Если нет ограничений по времени, планирование возможно
+    # НОВОЕ: Используем эффективные границы, если доступен оптимизатор
+    if optimizer and idx1 is not None and idx2 is not None:
+        try:
+            bounds1 = get_effective_bounds(optimizer, idx1, c1)
+            bounds2 = get_effective_bounds(optimizer, idx2, c2)
+            
+            if verbose:
+                print(f"EFFECTIVE BOUNDS ANALYSIS:")
+                print(f"  {class1_label}: {bounds1}")
+                print(f"  {class2_label}: {bounds2}")
+            
+            # Используем эффективные границы для более точного анализа
+            window1_start = time_to_minutes(bounds1.min_time)
+            window1_end = time_to_minutes(bounds1.max_time) + c1.duration
+            window2_start = time_to_minutes(bounds2.min_time)
+            window2_end = time_to_minutes(bounds2.max_time) + c2.duration
+            
+            info['c1_start'] = bounds1.min_time
+            info['c1_end'] = minutes_to_time(window1_end)
+            info['c2_start'] = bounds2.min_time
+            info['c2_end'] = minutes_to_time(window2_end)
+            
+            # Проверяем пересечение эффективных границ
+            if window1_end <= window2_start:
+                info['reason'] = 'non_overlapping_effective_bounds_c1_before_c2'
+                if verbose:
+                    print(f"RESULT: Can schedule sequentially - {info['reason']}")
+                    print(f"  {class1_label} ends before {class2_label} starts (effective bounds)")
+                return cache_and_return(True, info)
+                    
+            elif window2_end <= window1_start:
+                info['reason'] = 'non_overlapping_effective_bounds_c2_before_c1'
+                if verbose:
+                    print(f"RESULT: Can schedule sequentially - {info['reason']}")
+                    print(f"  {class2_label} ends before {class1_label} starts (effective bounds)")
+                return cache_and_return(True, info)
+            
+            # Анализируем возможность размещения в пересекающихся эффективных границах
+            overlap_start = max(window1_start, window2_start)
+            overlap_end = min(window1_end, window2_end)
+            overlap_duration = max(0, overlap_end - overlap_start)
+            
+            # Рассчитываем необходимое время для размещения обоих занятий
+            total_duration = c1.duration + c2.duration
+            min_gap = max(getattr(c1, 'pause_after', 0), getattr(c2, 'pause_before', 0))
+            required_time = total_duration + min_gap
+            
+            if verbose:
+                print(f"  OVERLAP ANALYSIS:")
+                print(f"    Overlap: {minutes_to_time(overlap_start)}-{minutes_to_time(overlap_end)} ({overlap_duration} min)")
+                print(f"    Required time: {required_time} min (c1: {c1.duration}, gap: {min_gap}, c2: {c2.duration})")
+                print(f"    Available time: {overlap_duration} min")
+            
+            info['common_window'] = f"{minutes_to_time(overlap_start)}-{minutes_to_time(overlap_end)}"
+            info['required_time'] = required_time
+            info['available_time'] = overlap_duration
+            
+            if overlap_duration >= required_time:
+                info['reason'] = 'sufficient_time_in_effective_overlap'
+                if verbose:
+                    print(f"RESULT: Can schedule sequentially - {info['reason']}")
+                return cache_and_return(True, info)
+            else:
+                info['reason'] = 'insufficient_time_in_effective_overlap'
+                if verbose:
+                    print(f"RESULT: Cannot schedule sequentially - {info['reason']}")
+                return cache_and_return(False, info)
+        except Exception as e:
+            if verbose:
+                print(f"  Warning: Could not use effective bounds ({e}), falling back to original logic")
+    
+    # Fallback к исходной логике для обратной совместимости
+    # Проверка наличия эффективных границ через effective_bounds
+    if optimizer is not None and idx1 is not None and idx2 is not None:
+        try:
+            bounds1 = get_effective_bounds(optimizer, idx1, c1)
+            bounds2 = get_effective_bounds(optimizer, idx2, c2)
+            
+            # Проверяем, есть ли у классов временные ограничения
+            has_time_constraints = (bounds1.min_time is not None and 
+                                  bounds2.min_time is not None)
+            
+            if not has_time_constraints:
+                info['reason'] = 'no_time_constraints_in_bounds'
+                if verbose:
+                    print(f"RESULT: Can schedule sequentially - {info['reason']}")
+                    print(f"  {class1_label} bounds: {bounds1}")
+                    print(f"  {class2_label} bounds: {bounds2}")
+                return cache_and_return(True, info)
+        except Exception as e:
+            if verbose:
+                print(f"  Warning: Could not get effective bounds ({e}), checking original start_time")
+            
+            # Fallback к проверке оригинальных полей
+            if not c1.start_time or not c2.start_time:
+                info['reason'] = 'missing_time_info'
+                if verbose:
+                    print(f"RESULT: Can schedule sequentially - {info['reason']}")
+                    print(f"  {class1_label} start_time: {c1.start_time}, {class2_label} start_time: {c2.start_time}")
+                return cache_and_return(True, info)
+    else:
+        # Старая логика когда нет optimizer или индексов
+        if not c1.start_time or not c2.start_time:
+            info['reason'] = 'missing_time_info'
+            if verbose:
+                print(f"RESULT: Can schedule sequentially - {info['reason']}")
+                print(f"  {class1_label} start_time: {c1.start_time}, {class2_label} start_time: {c2.start_time}")
+            return cache_and_return(True, info)
     
     # НОВОЕ: Логгирование статуса цепочек
     c1_has_linked = is_class_in_linked_chain(c1)
@@ -166,7 +269,83 @@ def can_schedule_sequentially(c1, c2, idx1=None, idx2=None, verbose=True):
             except Exception as e:
                 print(f"    Failed to collect chain: {e}")
 
-    # Проверка случаев с фиксированным временем и временным окном
+    # Используем effective_bounds для проверки случаев с фиксированным временем и временным окном
+    if optimizer is not None and idx1 is not None and idx2 is not None:
+        try:
+            bounds1 = get_effective_bounds(optimizer, idx1, c1)
+            bounds2 = get_effective_bounds(optimizer, idx2, c2)
+            
+            type1 = classify_bounds(bounds1)
+            type2 = classify_bounds(bounds2)
+            
+            if type1 == 'fixed' and type2 == 'window':
+                # c1 фиксировано, c2 с окном
+                fixed_start = time_to_minutes(bounds1.min_time)
+                fixed_end = fixed_start + c1.duration + getattr(c1, 'pause_after', 0)
+                window_start = time_to_minutes(bounds2.min_time)
+                window_end = time_to_minutes(bounds2.max_time)
+                
+                if verbose:
+                    print(f"FIXED vs WINDOW ANALYSIS (using effective bounds):")
+                    print(f"  {class1_label} (fixed): {bounds1.min_time} duration {c1.duration} min + pause_after {getattr(c1, 'pause_after', 0)} min = ends at {minutes_to_time(fixed_end)}")
+                    print(f"  {class2_label} (window): {bounds2.min_time}-{bounds2.max_time} duration {c2.duration} min + pause_after {getattr(c2, 'pause_after', 0)} min")
+                    
+                return _analyze_fixed_vs_window(fixed_start, fixed_end, window_start, window_end, 
+                                              c2.duration, getattr(c2, 'pause_after', 0),
+                                              class1_label, class2_label, verbose, info, cache_and_return)
+            
+            elif type2 == 'fixed' and type1 == 'window':
+                # c2 фиксировано, c1 с окном
+                fixed_start = time_to_minutes(bounds2.min_time) 
+                fixed_end = fixed_start + c2.duration + getattr(c2, 'pause_after', 0)
+                window_start = time_to_minutes(bounds1.min_time)
+                window_end = time_to_minutes(bounds1.max_time)
+                
+                if verbose:
+                    print(f"WINDOW vs FIXED ANALYSIS (using effective bounds):")
+                    print(f"  {class1_label} (window): {bounds1.min_time}-{bounds1.max_time} duration {c1.duration} min + pause_after {getattr(c1, 'pause_after', 0)} min")
+                    print(f"  {class2_label} (fixed): {bounds2.min_time} duration {c2.duration} min + pause_after {getattr(c2, 'pause_after', 0)} min = ends at {minutes_to_time(fixed_end)}")
+                    
+                return _analyze_window_vs_fixed(window_start, window_end, fixed_start, fixed_end,
+                                              c1.duration, getattr(c1, 'pause_after', 0),
+                                              class1_label, class2_label, verbose, info, cache_and_return)
+            
+            elif type1 == 'window' and type2 == 'window':
+                # Оба с временными окнами
+                window1_start = time_to_minutes(bounds1.min_time)
+                window1_end = time_to_minutes(bounds1.max_time)
+                window2_start = time_to_minutes(bounds2.min_time)
+                window2_end = time_to_minutes(bounds2.max_time)
+                
+                if verbose:
+                    print(f"WINDOW vs WINDOW ANALYSIS (using effective bounds):")
+                    print(f"  {class1_label}: {bounds1.min_time} - {bounds1.max_time} ({window1_start}-{window1_end} min)")
+                    print(f"  {class2_label}: {bounds2.min_time} - {bounds2.max_time} ({window2_start}-{window2_end} min)")
+                    
+                # Используем новую логику для анализа двух окон
+                return _analyze_window_vs_window_bounds(bounds1, bounds2, c1, c2, 
+                                                      class1_label, class2_label, verbose, info, cache_and_return)
+            
+            elif type1 == 'fixed' and type2 == 'fixed':
+                # Оба фиксированы
+                start1 = time_to_minutes(bounds1.min_time)
+                end1 = start1 + c1.duration + getattr(c1, 'pause_after', 0)
+                start2 = time_to_minutes(bounds2.min_time)
+                end2 = start2 + c2.duration + getattr(c2, 'pause_after', 0)
+                
+                if verbose:
+                    print(f"FIXED vs FIXED ANALYSIS (using effective bounds):")
+                    print(f"  {class1_label}: {bounds1.min_time} ({start1} min) duration {c1.duration} min + pause_after {getattr(c1, 'pause_after', 0)} min = ends at {minutes_to_time(end1)}")
+                    print(f"  {class2_label}: {bounds2.min_time} ({start2} min) duration {c2.duration} min + pause_after {getattr(c2, 'pause_after', 0)} min = ends at {minutes_to_time(end2)}")
+                    
+                return _analyze_fixed_vs_fixed(start1, end1, start2, end2, 
+                                             class1_label, class2_label, verbose, info, cache_and_return)
+                
+        except Exception as e:
+            if verbose:
+                print(f"  Warning: Could not use effective bounds for analysis ({e}), falling back to original logic")
+        
+    # Fallback к оригинальной логике на основе start_time/end_time для обратной совместимости
     if c1.start_time and not c1.end_time and c2.start_time and c2.end_time:
         # c1 фиксировано, c2 с окном
         fixed_start   = time_to_minutes(c1.start_time)
@@ -174,9 +353,10 @@ def can_schedule_sequentially(c1, c2, idx1=None, idx2=None, verbose=True):
         window_start  = time_to_minutes(c2.start_time)
         window_end    = time_to_minutes(c2.end_time)
         
-        print(f"FIXED vs WINDOW ANALYSIS:")
-        print(f"  {class1_label} (fixed): {c1.start_time} duration {c1.duration} min + pause_after {getattr(c1, 'pause_after', 0)} min = ends at {minutes_to_time(fixed_end)}")
-        print(f"  {class2_label} (window): {c2.start_time}-{c2.end_time} duration {c2.duration} min + pause_after {getattr(c2, 'pause_after', 0)} min")
+        if verbose:
+            print(f"FIXED vs WINDOW ANALYSIS (fallback):")
+            print(f"  {class1_label} (fixed): {c1.start_time} duration {c1.duration} min + pause_after {getattr(c1, 'pause_after', 0)} min = ends at {minutes_to_time(fixed_end)}")
+            print(f"  {class2_label} (window): {c2.start_time}-{c2.end_time} duration {c2.duration} min + pause_after {getattr(c2, 'pause_after', 0)} min")
         print(f"                    needs pause_before {getattr(c2, 'pause_before', 0)} min")
     
         # Проверяем оба направления
@@ -219,343 +399,71 @@ def can_schedule_sequentially(c1, c2, idx1=None, idx2=None, verbose=True):
             info['reason'] = 'not_enough_time_around_fixed'
             info['available_time'] = f"before: {available_before_fixed} min, after: {available_after_fixed} min"
             info['required_time'] = f"before: {required_before_fixed} min, after: {required_after_fixed} min"
-            print(f"RESULT: Cannot schedule sequentially - {info['reason']}")
-            return cache_and_return(False, info)
+        return _analyze_fixed_vs_window(fixed_start, fixed_end, window_start, window_end, 
+                                       c2.duration, getattr(c2, 'pause_after', 0),
+                                       class1_label, class2_label, verbose, info, cache_and_return)
             
     elif c2.start_time and not c2.end_time and c1.start_time and c1.end_time:
-        # c2 фиксировано, c1 с окном
-        fixed_start   = time_to_minutes(c2.start_time)
-        fixed_end     = fixed_start + c2.duration + getattr(c2, 'pause_after', 0)
-        window_start  = time_to_minutes(c1.start_time)
-        window_end    = time_to_minutes(c1.end_time)
+        # c2 фиксировано, c1 с окном (fallback)
+        fixed_start = time_to_minutes(c2.start_time)
+        fixed_end = fixed_start + c2.duration + getattr(c2, 'pause_after', 0)
+        window_start = time_to_minutes(c1.start_time)
+        window_end = time_to_minutes(c1.end_time)
         
-        print(f"WINDOW vs FIXED ANALYSIS:")
-        print(f"  {class1_label} (window): {c1.start_time}-{c1.end_time} duration {c1.duration} min + pause_after {getattr(c1, 'pause_after', 0)} min")
-        print(f"                    needs pause_before {getattr(c1, 'pause_before', 0)} min")
-        print(f"  {class2_label} (fixed): {c2.start_time} duration {c2.duration} min + pause_after {getattr(c2, 'pause_after', 0)} min = ends at {minutes_to_time(fixed_end)}")
-    
-        # Проверяем оба направления
-        required_before_fixed = c1.duration + getattr(c1, 'pause_after', 0)
-        available_before_fixed = fixed_start - getattr(c2, 'pause_before', 0) - window_start
-        can_fit_before = available_before_fixed >= required_before_fixed
-        
-        required_after_fixed = c1.duration + getattr(c1, 'pause_before', 0)
-        available_after_fixed = window_end - fixed_end
-        can_fit_after = available_after_fixed >= required_after_fixed
-        
-        print(f"  CAN FIT BEFORE FIXED:")
-        print(f"    Available: {available_before_fixed} min (window_start to fixed_start - pause_before)")
-        print(f"    Required: {required_before_fixed} min (c1_duration + pause_after)")
-        print(f"    Result: {'✓' if can_fit_before else '✗'}")
-        print(f"  CAN FIT AFTER FIXED:")
-        print(f"    Available: {available_after_fixed} min (fixed_end to window_end)")
-        print(f"    Required: {required_after_fixed} min (c1_duration + pause_before)")
-        print(f"    Result: {'✓' if can_fit_after else '✗'}")
-    
-        if can_fit_before and can_fit_after:
-            info['reason'] = 'both_orders_possible'
-            info['available_time'] = f"before: {available_before_fixed} min, after: {available_after_fixed} min"
-            info['required_time'] = f"before: {required_before_fixed} min, after: {required_after_fixed} min"
-            print(f"RESULT: Can schedule sequentially - {info['reason']}")
-            return cache_and_return(True, info)
-        elif can_fit_before:
-            info['reason'] = 'fits_before_fixed'
-            info['available_time'] = f"before fixed: {available_before_fixed} min"
-            info['required_time'] = required_before_fixed
-            print(f"RESULT: Can schedule sequentially - {info['reason']}")
-            return cache_and_return(True, info)
-        elif can_fit_after:
-            info['reason'] = 'fits_after_fixed'
-            info['available_time'] = f"after fixed: {available_after_fixed} min"
-            info['required_time'] = required_after_fixed
-            print(f"RESULT: Can schedule sequentially - {info['reason']}")
-            return cache_and_return(True, info)
-        else:
-            info['reason'] = 'not_enough_time_around_fixed'
-            info['available_time'] = f"before: {available_before_fixed} min, after: {available_after_fixed} min"
-            info['required_time'] = f"before: {required_before_fixed} min, after: {required_after_fixed} min"
-            print(f"RESULT: Cannot schedule sequentially - {info['reason']}")
-            return cache_and_return(False, info)
+        if verbose:
+            print(f"WINDOW vs FIXED ANALYSIS (fallback):")
+            print(f"  {class1_label} (window): {c1.start_time}-{c1.end_time} duration {c1.duration} min")
+            print(f"  {class2_label} (fixed): {c2.start_time} duration {c2.duration} min")
+
+        return _analyze_window_vs_fixed(window_start, window_end, fixed_start, fixed_end,
+                                       c1.duration, getattr(c1, 'pause_after', 0),
+                                       class1_label, class2_label, verbose, info, cache_and_return)
     
     elif c1.start_time and c1.end_time and c2.start_time and c2.end_time:
-        # Оба занятия с временными окнами
+        # Оба занятия с временными окнами (fallback)
+        if verbose:
+            print(f"WINDOW vs WINDOW ANALYSIS (fallback):")
+            print(f"  {class1_label}: {c1.start_time} - {c1.end_time}")
+            print(f"  {class2_label}: {c2.start_time} - {c2.end_time}")
+        
+        # Используем упрощенную версию анализа окон
         window1_start = time_to_minutes(c1.start_time)
         window1_end = time_to_minutes(c1.end_time)
         window2_start = time_to_minutes(c2.start_time)
         window2_end = time_to_minutes(c2.end_time)
         
-        print(f"TIME WINDOWS:")
-        print(f"  {class1_label}: {c1.start_time} - {c1.end_time} ({window1_start}-{window1_end} min)")
-        print(f"  {class2_label}: {c2.start_time} - {c2.end_time} ({window2_start}-{window2_end} min)")
-        
-        info['c1_start'] = c1.start_time
-        info['c1_end'] = c1.end_time
-        info['c2_start'] = c2.start_time
-        info['c2_end'] = c2.end_time
-        
-        # ИСПРАВЛЕНИЕ: Сначала проверяем неперекрывающиеся окна
-        if window1_end <= window2_start:
-            # Окно c1 полностью перед окном c2
-            gap_time = window2_start - window1_end
-            print(f"NON-OVERLAPPING WINDOWS: c1 before c2 (gap: {gap_time} min)")
-            
-            window1_available = window1_end - window1_start
-            window2_available = window2_end - window2_start
-            c1_needs_in_window = c1.duration + c1.pause_after
-            c2_needs_in_window = c2.pause_before + c2.duration
-            
-            print(f"  Window 1 available: {window1_available} min, needs: {c1_needs_in_window} min")
-            print(f"  Window 2 available: {window2_available} min, needs: {c2_needs_in_window} min")
-            
-            if window1_available >= c1_needs_in_window and window2_available >= c2_needs_in_window:
-                info['reason'] = 'windows_separate_c1_before_c2'
-                info['available_time'] = f"window1: {window1_available} min, window2: {window2_available} min, gap: {gap_time} min"
-                info['required_time'] = f"window1: {c1_needs_in_window} min, window2: {c2_needs_in_window} min"
-                info['gap_sufficient'] = True
-                if verbose:
-                    print(f"RESULT: Can schedule sequentially - {info['reason']}")
-                return cache_and_return(True, info)
-            else:
-                info['reason'] = 'windows_separate_insufficient_space_in_windows'
-                info['available_time'] = f"window1: {window1_available} min, window2: {window2_available} min"
-                info['required_time'] = f"window1: {c1_needs_in_window} min, window2: {c2_needs_in_window} min"
-                print(f"RESULT: Cannot schedule sequentially - {info['reason']}")
-                return cache_and_return(False, info)
-                
-        elif window2_end <= window1_start:
-            # Окно c2 полностью перед окном c1
-            gap_time = window1_start - window2_end
-            print(f"NON-OVERLAPPING WINDOWS: c2 before c1 (gap: {gap_time} min)")
-            
-            window1_available = window1_end - window1_start
-            window2_available = window2_end - window2_start
-            c2_needs_in_window = c2.duration + c2.pause_after
-            c1_needs_in_window = c1.pause_before + c1.duration
-            
-            print(f"  Window 2 available: {window2_available} min, needs: {c2_needs_in_window} min")
-            print(f"  Window 1 available: {window1_available} min, needs: {c1_needs_in_window} min")
-            
-            info['reason'] = 'windows_separate_wrong_order'
-            info['available_time'] = f"window2: {window2_available} min, window1: {window1_available} min, gap: {gap_time} min"
-            info['required_time'] = f"window2: {c2_needs_in_window} min, window1: {c1_needs_in_window} min"
-            info['gap_between_windows'] = gap_time
-            info['reverse_order_possible'] = (window2_available >= c2_needs_in_window and 
-                                            window1_available >= c1_needs_in_window)
-            if verbose:
-                print(f"RESULT: Cannot schedule sequentially - {info['reason']} (reverse order possible: {info['reverse_order_possible']})")
-            return cache_and_return(False, info)
-        
-        print(f"OVERLAPPING WINDOWS: analyzing constraints")
-        
-        # Детальное логгирование окон
-        window1_duration = window1_end - window1_start
-        window2_duration = window2_end - window2_start
-        
-        # Рассчитываем пересечение окон
+        # Проверяем перекрытие
         overlap_start = max(window1_start, window2_start)
         overlap_end = min(window1_end, window2_end)
-        overlap_duration = max(0, overlap_end - overlap_start)
         
-        # Рассчитываем общий span (от начала раннего до конца позднего окна)
-        combined_start = min(window1_start, window2_start)
-        combined_end = max(window1_end, window2_end)
-        combined_span = combined_end - combined_start
+        if overlap_start >= overlap_end:
+            info['reason'] = 'no_time_overlap_fallback'
+            return cache_and_return(True, info)
         
-        print(f"  WINDOW DETAILS:")
-        print(f"    {class1_label}: window duration {window1_duration} min, lesson duration {c1.duration} min")
-        print(f"             pause_after: {getattr(c1, 'pause_after', 0)} min, pause_before: {getattr(c1, 'pause_before', 0)} min")
-        print(f"    {class2_label}: window duration {window2_duration} min, lesson duration {c2.duration} min")
-        print(f"             pause_after: {getattr(c2, 'pause_after', 0)} min, pause_before: {getattr(c2, 'pause_before', 0)} min")
-        print(f"    Window overlap: {overlap_duration} min ({minutes_to_time(overlap_start)}-{minutes_to_time(overlap_end)})")
-        print(f"    Total span: {combined_span} min (from {minutes_to_time(combined_start)} to {minutes_to_time(combined_end)})")
+        overlap_duration = overlap_end - overlap_start
+        total_required = c1.duration + c2.duration + getattr(c1, 'pause_after', 0) + getattr(c2, 'pause_before', 0)
         
-        total_required_time = c1.duration + c2.duration + c1.pause_after + c2.pause_before
-        print(f"    Sequential requirement: {total_required_time} min (both lessons + pauses)")
-        
-        # Сохраняем реалистичные значения для info
-        info['available_time'] = f"overlap: {overlap_duration} min, span: {combined_span} min"
-        info['required_time'] = total_required_time
-        info['window_overlap'] = overlap_duration
-        
-        # Сценарий: Временные окна пересекаются - анализируем ограничения связанных занятий
-        
-        if c1_has_linked and not c2_has_linked:
-            # c1 связанное (менее гибкое), c2 независимое (более гибкое)
-            print(f"CONSTRAINT ANALYSIS: c1 linked, c2 flexible")
-            
-            c2_can_fit_before_c1 = (window2_start + c2.duration + c2.pause_after <= window1_start)
-            c2_can_fit_after_c1 = (window1_end >= window2_start + c2.duration and 
-                                   window1_end - c1.duration - c1.pause_after >= c2.duration + c2.pause_before)
-            
-            print(f"  c2 can fit before c1: {c2_can_fit_before_c1}")
-            print(f"  c2 can fit after c1: {c2_can_fit_after_c1}")
-            
-            if c2_can_fit_before_c1:
-                info['reason'] = 'flexible_c2_before_linked_c1'
-                print(f"RESULT: Can schedule sequentially - {info['reason']}")
-                return cache_and_return(True, info)
-            elif c2_can_fit_after_c1:
-                info['reason'] = 'flexible_c2_after_linked_c1'
-                print(f"RESULT: Can schedule sequentially - {info['reason']}")
-                return cache_and_return(True, info)
-            else:
-                info['reason'] = 'linked_c1_blocks_flexible_c2'
-                print(f"RESULT: Cannot schedule sequentially - {info['reason']}")
-                return cache_and_return(False, info)
-                
-        elif c2_has_linked and not c1_has_linked:
-            # c2 связанное (менее гибкое), c1 независимое (более гибкое)
-            print(f"CONSTRAINT ANALYSIS: c2 linked, c1 flexible")
-            
-            c1_can_fit_before_c2 = (window1_start + c1.duration + c1.pause_after <= window2_start)
-            c1_can_fit_after_c2 = (window2_end >= window1_start + c1.duration and 
-                                   window2_end - c2.duration - c2.pause_after >= c1.duration + c1.pause_before)
-            
-            print(f"  c1 can fit before c2: {c1_can_fit_before_c2}")
-            print(f"  c1 can fit after c2: {c1_can_fit_after_c2}")
-            
-            if c1_can_fit_before_c2:
-                info['reason'] = 'flexible_c1_before_linked_c2'
-                print(f"RESULT: Can schedule sequentially - {info['reason']}")
-                return cache_and_return(True, info)
-            elif c1_can_fit_after_c2:
-                info['reason'] = 'flexible_c1_after_linked_c2'
-                print(f"RESULT: Can schedule sequentially - {info['reason']}")
-                return cache_and_return(True, info)
-            else:
-                info['reason'] = 'linked_c2_blocks_flexible_c1'
-                print(f"RESULT: Cannot schedule sequentially - {info['reason']}")
-                return cache_and_return(False, info)
-        
-        elif c1_has_linked and c2_has_linked:
-            # Оба занятия связанные - очень ограниченная гибкость
-            print(f"CONSTRAINT ANALYSIS: both classes linked - limited flexibility")
-            
-            info['reason'] = 'both_linked_limited_flexibility'
-            overlap_start = max(window1_start, window2_start)
-            overlap_end = min(window1_end, window2_end)
-            
-            print(f"  Overlap window: {overlap_start}-{overlap_end} ({overlap_end - overlap_start} min)")
-            print(f"  Required time: {total_required_time} min")
-            
-            if overlap_end > overlap_start and overlap_end - overlap_start >= total_required_time:
-                print(f"RESULT: Can schedule sequentially - {info['reason']} (sufficient overlap)")
-                return cache_and_return(True, info)
-            else:
-                print(f"RESULT: Cannot schedule sequentially - {info['reason']} (insufficient overlap)")
-                return cache_and_return(False, info)
-        
+        if overlap_duration >= total_required:
+            info['reason'] = 'sufficient_overlap_time_fallback'
+            return cache_and_return(True, info)
         else:
-            # Оба занятия независимые - максимальная гибкость
-            print(f"CONSTRAINT ANALYSIS: both classes independent - analyzing chain scheduling")
-            
-            try:
-                # Собираем полную цепочку для c1, если он является частью цепочки
-                if c1_has_linked:
-                    chain = collect_full_chain_from_any_member(c1)
-                    print(f"  Using c1 chain: {[cls.subject for cls in chain]}")
-                else:
-                    chain = [c1]  # Если c1 не в цепочке, цепочка состоит только из него
-                    print(f"  Using single c1: {c1.subject}")
-                
-                # Создаем объект окна для c1
-                class TimeWindow:
-                    def __init__(self, start_min, end_min):
-                        self.start = start_min
-                        self.end = end_min
-                
-                c1_window = TimeWindow(
-                    time_to_minutes(c1.start_time),
-                    time_to_minutes(c1.end_time)
-                )
-                
-                sched = schedule_chain(chain, c1_window)
-                print(f"  Chain scheduled successfully: {[(cls.subject, sched[cls]) for cls in chain]}")
-                
-            except ValueError as e:
-                info['reason'] = 'chain_overflows_window'
-                print(f"RESULT: Cannot schedule sequentially - {info['reason']} ({e})")
-                return cache_and_return(False, info)
-
-            # построить busy для общего ресурса (teacher или room)
-            busy = []
-            if c1.teacher == c2.teacher:
-                busy = chain_busy_intervals(sched)
-                print(f"  Common teacher busy intervals: {busy}")
-
-            # вычесть занятое время из окна c2
-            ws = time_to_minutes(c2.start_time)
-            we = time_to_minutes(c2.end_time)
-            free = subtract_intervals(ws, we, busy)
-            
-            print(f"  RESOURCE GAP ANALYSIS (chain_and_resource_gap logic):")
-            print(f"    c1 chain scheduled in: {[(cls.subject, f'{sched[cls][0]}-{sched[cls][1]}') for cls in chain]}")
-            print(f"    c2 window: {ws}-{we} min ({minutes_to_time(ws)}-{minutes_to_time(we)})")
-            print(f"    Free intervals in c2 window after subtracting busy: {free}")
-            print(f"    c2 needs: {c2.duration} min + pause_after: {getattr(c2, 'pause_after', 0)} min = {c2.duration + getattr(c2, 'pause_after', 0)} min total")
-            
-            for fs, fe in free:
-                available_in_slot = fe - fs
-                required_for_c2 = c2.duration + getattr(c2, 'pause_after', 0)
-                
-                print(f"    Checking free slot {fs}-{fe} ({available_in_slot} min available vs {required_for_c2} min required)")
-                
-                if available_in_slot >= required_for_c2:
-                    info['reason'] = 'chain_and_resource_gap'
-                    info['c1_interval'] = sched[c1]
-                    info['c2_interval'] = (fs, fs + c2.duration)
-                    info['gap'] = fs - sched[c1][1]
-                    
-                    print(f"RESULT: Can schedule sequentially - {info['reason']}")
-                    print(f"  ✓ c1 scheduled: {info['c1_interval']} ({minutes_to_time(info['c1_interval'][0])}-{minutes_to_time(info['c1_interval'][1])})")
-                    print(f"  ✓ c2 can fit: {info['c2_interval']} ({minutes_to_time(info['c2_interval'][0])}-{minutes_to_time(info['c2_interval'][1])})")
-                    print(f"  ✓ Gap between: {info['gap']} min")
-                    print(f"  ✓ Available in slot: {available_in_slot} min, required: {required_for_c2} min")
-                    return cache_and_return(True, info)
-                else:
-                    print(f"    ✗ Insufficient space in this slot")
-            
-            info['reason'] = 'no_free_slot'
-            print(f"RESULT: Cannot schedule sequentially - {info['reason']}")
-            print(f"  No free slot found that can accommodate c2 ({c2.duration} + {getattr(c2, 'pause_after', 0)} = {required_for_c2} min)")
+            info['reason'] = 'insufficient_overlap_time_fallback'
             return cache_and_return(False, info)
-            
+    
     elif c1.start_time and not c1.end_time and c2.start_time and not c2.end_time:
-        # Оба занятия с фиксированным временем
+        # Оба занятия с фиксированным временем (fallback)
         start1 = time_to_minutes(c1.start_time)
         end1 = start1 + c1.duration + getattr(c1, 'pause_after', 0)
         start2 = time_to_minutes(c2.start_time)
         end2 = start2 + c2.duration + getattr(c2, 'pause_after', 0)
         
-        print(f"BOTH FIXED TIMES ANALYSIS:")
-        print(f"  {class1_label}: {c1.start_time} ({start1} min) duration {c1.duration} min + pause_after {getattr(c1, 'pause_after', 0)} min = ends at {minutes_to_time(end1)}")
-        print(f"  {class2_label}: {c2.start_time} ({start2} min) duration {c2.duration} min + pause_after {getattr(c2, 'pause_after', 0)} min = ends at {minutes_to_time(end2)}")
-        
-        info['c1_start'] = c1.start_time
-        info['c1_end'] = minutes_to_time(end1)
-        info['c2_start'] = c2.start_time
-        info['c2_end'] = minutes_to_time(end2)
-        
-        # Проверяем, пересекаются ли занятия
-        overlap = start1 < end2 and start2 < end1
-        if overlap:
-            overlap_start = max(start1, start2)
-            overlap_end = min(end1, end2)
-            overlap_duration = overlap_end - overlap_start
-            print(f"  OVERLAP DETECTED: {overlap_duration} min overlap ({minutes_to_time(overlap_start)}-{minutes_to_time(overlap_end)})")
+        if verbose:
+            print(f"BOTH FIXED TIMES ANALYSIS (fallback):")
+            print(f"  {class1_label}: {c1.start_time} duration {c1.duration} min")
+            print(f"  {class2_label}: {c2.start_time} duration {c2.duration} min")
             
-            info['reason'] = 'fixed_times_overlap'
-            info['overlap_duration'] = overlap_duration
-            print(f"RESULT: Cannot schedule sequentially - {info['reason']}")
-            return cache_and_return(False, info)
-        else:
-            gap_time = min(start2 - end1, start1 - end2) if start2 >= end1 or start1 >= end2 else 0
-            print(f"  NO OVERLAP: Gap between classes: {gap_time} min")
-            
-            info['reason'] = 'fixed_times_no_overlap'
-            info['gap_time'] = gap_time
-            print(f"RESULT: Can schedule sequentially - {info['reason']}")
-            return cache_and_return(True, info)
+        return _analyze_fixed_vs_fixed(start1, end1, start2, end2, 
+                                     class1_label, class2_label, verbose, info, cache_and_return)
     
     # Если достигли этой точки, значит не все случаи обработаны
     info['reason'] = 'unknown_time_configuration'
@@ -686,3 +594,167 @@ def _cache_and_return(cache_key, result, verbose=True):
         print(f"RESULT: {status} schedule sequentially - {reason}")
     
     return result
+
+
+def _analyze_fixed_vs_window(fixed_start, fixed_end, window_start, window_end, 
+                           window_duration, window_pause_after, class1_label, class2_label, 
+                           verbose, info, cache_and_return):
+    """Анализирует случай: первое занятие фиксировано, второе с временным окном."""
+    # Проверяем оба направления
+    required_before_fixed = window_duration + window_pause_after
+    available_before_fixed = fixed_start - window_start
+    can_fit_before = available_before_fixed >= required_before_fixed
+    
+    required_after_fixed = window_duration
+    available_after_fixed = window_end - fixed_end
+    can_fit_after = available_after_fixed >= required_after_fixed
+    
+    if verbose:
+        print(f"  CAN FIT BEFORE FIXED:")
+        print(f"    Available: {available_before_fixed} min (window_start to fixed_start)")
+        print(f"    Required: {required_before_fixed} min (window_duration + pause_after)")
+        print(f"    Result: {'✓' if can_fit_before else '✗'}")
+        print(f"  CAN FIT AFTER FIXED:")
+        print(f"    Available: {available_after_fixed} min (fixed_end to window_end)")
+        print(f"    Required: {required_after_fixed} min (window_duration)")
+        print(f"    Result: {'✓' if can_fit_after else '✗'}")
+
+    if can_fit_before and can_fit_after:
+        info['reason'] = 'both_orders_possible'
+        info['available_time'] = f"before: {available_before_fixed} min, after: {available_after_fixed} min"
+        info['required_time'] = f"before: {required_before_fixed} min, after: {required_after_fixed} min"
+        return cache_and_return(True, info)
+    elif can_fit_before:
+        info['reason'] = 'fits_before_fixed'
+        info['available_time'] = f"before fixed: {available_before_fixed} min"
+        info['required_time'] = required_before_fixed
+        return cache_and_return(True, info)
+    elif can_fit_after:
+        info['reason'] = 'fits_after_fixed'
+        info['available_time'] = f"after fixed: {available_after_fixed} min"
+        info['required_time'] = required_after_fixed
+        return cache_and_return(True, info)
+    else:
+        info['reason'] = 'not_enough_time_around_fixed'
+        info['available_time'] = f"before: {available_before_fixed} min, after: {available_after_fixed} min"
+        info['required_time'] = f"before: {required_before_fixed} min, after: {required_after_fixed} min"
+        return cache_and_return(False, info)
+
+
+def _analyze_window_vs_fixed(window_start, window_end, fixed_start, fixed_end,
+                           window_duration, window_pause_after, class1_label, class2_label, 
+                           verbose, info, cache_and_return):
+    """Анализирует случай: первое занятие с временным окном, второе фиксировано."""
+    # Проверяем оба направления
+    required_before_fixed = window_duration + window_pause_after
+    available_before_fixed = fixed_start - window_start
+    can_fit_before = available_before_fixed >= required_before_fixed
+    
+    required_after_fixed = window_duration
+    available_after_fixed = window_end - fixed_end
+    can_fit_after = available_after_fixed >= required_after_fixed
+    
+    if verbose:
+        print(f"  CAN FIT BEFORE FIXED:")
+        print(f"    Available: {available_before_fixed} min (window_start to fixed_start)")
+        print(f"    Required: {required_before_fixed} min (window_duration + pause_after)")
+        print(f"    Result: {'✓' if can_fit_before else '✗'}")
+        print(f"  CAN FIT AFTER FIXED:")
+        print(f"    Available: {available_after_fixed} min (fixed_end to window_end)")
+        print(f"    Required: {required_after_fixed} min (window_duration)")
+        print(f"    Result: {'✓' if can_fit_after else '✗'}")
+
+    if can_fit_before and can_fit_after:
+        info['reason'] = 'both_orders_possible_window_first'
+        return cache_and_return(True, info)
+    elif can_fit_before:
+        info['reason'] = 'window_fits_before_fixed'
+        return cache_and_return(True, info)
+    elif can_fit_after:
+        info['reason'] = 'window_fits_after_fixed'
+        return cache_and_return(True, info)
+    else:
+        info['reason'] = 'window_no_fit_around_fixed'
+        return cache_and_return(False, info)
+
+
+def _analyze_window_vs_window_bounds(bounds1, bounds2, c1, c2, class1_label, class2_label, 
+                                   verbose, info, cache_and_return):
+    """Анализирует случай: оба занятия с временными окнами используя effective bounds."""
+    window1_start = time_to_minutes(bounds1.min_time)
+    window1_end = time_to_minutes(bounds1.max_time)
+    window2_start = time_to_minutes(bounds2.min_time)
+    window2_end = time_to_minutes(bounds2.max_time)
+    
+    info['c1_start'] = bounds1.min_time
+    info['c1_end'] = bounds1.max_time
+    info['c2_start'] = bounds2.min_time
+    info['c2_end'] = bounds2.max_time
+    
+    # Анализируем пересечения окон
+    overlap_start = max(window1_start, window2_start)
+    overlap_end = min(window1_end, window2_end)
+    
+    if overlap_start >= overlap_end:
+        info['reason'] = 'no_time_overlap'
+        if verbose:
+            print(f"    No time overlap between windows")
+        return cache_and_return(True, info)  # Нет пересечения - можно планировать
+    
+    overlap_duration = overlap_end - overlap_start
+    total_required = c1.duration + c2.duration + getattr(c1, 'pause_after', 0) + getattr(c2, 'pause_before', 0)
+    
+    if verbose:
+        print(f"    Overlap: {overlap_start}-{overlap_end} min ({overlap_duration} min)")
+        print(f"    Total required: {total_required} min")
+        print(f"    Overlap sufficient: {'✓' if overlap_duration >= total_required else '✗'}")
+    
+    if overlap_duration >= total_required:
+        info['reason'] = 'sufficient_overlap_time'
+        info['overlap_duration'] = overlap_duration
+        info['required_time'] = total_required
+        return cache_and_return(True, info)
+    else:
+        info['reason'] = 'insufficient_overlap_time'
+        info['overlap_duration'] = overlap_duration
+        info['required_time'] = total_required
+        return cache_and_return(False, info)
+
+
+def _analyze_fixed_vs_fixed(start1, end1, start2, end2, class1_label, class2_label, 
+                          verbose, info, cache_and_return):
+    """Анализирует случай: оба занятия фиксированы по времени."""
+    if verbose:
+        print(f"  Analyzing sequential placement:")
+        print(f"    {class1_label} ends at {minutes_to_time(end1)}")
+        print(f"    {class2_label} starts at {minutes_to_time(start2)}")
+    
+    # Проверяем порядок c1 -> c2
+    gap_1_to_2 = start2 - end1
+    can_c1_then_c2 = gap_1_to_2 >= 0
+    
+    # Проверяем порядок c2 -> c1  
+    gap_2_to_1 = start1 - end2
+    can_c2_then_c1 = gap_2_to_1 >= 0
+    
+    if verbose:
+        print(f"    Gap {class1_label} -> {class2_label}: {gap_1_to_2} min ({'✓' if can_c1_then_c2 else '✗'})")
+        print(f"    Gap {class2_label} -> {class1_label}: {gap_2_to_1} min ({'✓' if can_c2_then_c1 else '✗'})")
+    
+    if can_c1_then_c2 and can_c2_then_c1:
+        info['reason'] = 'both_fixed_orders_possible'
+        info['gap_1_to_2'] = gap_1_to_2
+        info['gap_2_to_1'] = gap_2_to_1
+        return cache_and_return(True, info)
+    elif can_c1_then_c2:
+        info['reason'] = 'fixed_order_c1_then_c2'
+        info['gap'] = gap_1_to_2
+        return cache_and_return(True, info)
+    elif can_c2_then_c1:
+        info['reason'] = 'fixed_order_c2_then_c1'
+        info['gap'] = gap_2_to_1
+        return cache_and_return(True, info)
+    else:
+        info['reason'] = 'fixed_times_conflict'
+        info['overlap'] = max(end1 - start2, end2 - start1)
+        return cache_and_return(False, info)

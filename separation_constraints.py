@@ -11,6 +11,7 @@ from timewindow_utils import find_slot_for_time, build_transitive_links
 from linked_chain_utils import get_linked_chain_order, is_in_linked_chain
 from sequential_scheduling import can_schedule_sequentially
 from constraint_registry import ConstraintType
+from effective_bounds_utils import get_effective_bounds, classify_bounds
 
 # НОВЫЕ ИМПОРТЫ: Специализированные модули после рефакторинга
 from timeline_manager import create_timeline
@@ -561,23 +562,52 @@ def _classes_need_separation_constraint(optimizer, idx_c1, c1, idx_c2, c2):
                     variables_used=[f"start_var[{idx}]", f"end_var[{idx}]"]
                 )
                 
-                # Для отображения используем временные окна класса
-                if class_obj.start_time:
-                    start_minutes = time_to_minutes(class_obj.start_time)
-                    end_minutes = start_minutes + class_obj.duration
-                else:
-                    start_minutes = None
-                    end_minutes = None
+                # Используем effective_bounds для получения временных границ
+                try:
+                    bounds = get_effective_bounds(optimizer, idx, class_obj)
+                    
+                    if classify_bounds(bounds) == 'fixed':
+                        # Занятие фиксировано
+                        start_minutes = time_to_minutes(bounds.min_time)
+                        end_minutes = start_minutes + class_obj.duration
+                    else:
+                        # Занятие с временным окном
+                        start_minutes = time_to_minutes(bounds.min_time)  # Начало окна для отображения
+                        end_minutes = start_minutes + class_obj.duration
+                except Exception as e:
+                    print(f"Warning: Could not get effective bounds for class {idx}: {e}")
+                    # Fallback к оригинальной логике
+                    if class_obj.start_time:
+                        start_minutes = time_to_minutes(class_obj.start_time)
+                        end_minutes = start_minutes + class_obj.duration
+                    else:
+                        start_minutes = None
+                        end_minutes = None
                     
             return start_var, end_var, start_minutes, end_minutes
         else:
-            # Fallback к статическим значениям если CP-SAT переменные недоступны
-            if class_obj.start_time:
-                start_minutes = time_to_minutes(class_obj.start_time)
-                end_minutes = start_minutes + class_obj.duration
+            # Fallback к effective_bounds если CP-SAT переменные недоступны
+            try:
+                bounds = get_effective_bounds(optimizer, idx, class_obj)
+                
+                if classify_bounds(bounds) == 'fixed':
+                    start_minutes = time_to_minutes(bounds.min_time)
+                    end_minutes = start_minutes + class_obj.duration
+                else:
+                    # Используем начало окна для fallback
+                    start_minutes = time_to_minutes(bounds.min_time)
+                    end_minutes = start_minutes + class_obj.duration
+                    
                 return None, None, start_minutes, end_minutes
-            else:
-                return None, None, None, None
+            except Exception as e:
+                print(f"Warning: Could not get effective bounds for class {idx}: {e}")
+                # Последний fallback к оригинальным полям
+                if class_obj.start_time:
+                    start_minutes = time_to_minutes(class_obj.start_time)
+                    end_minutes = start_minutes + class_obj.duration
+                    return None, None, start_minutes, end_minutes
+                else:
+                    return None, None, None, None
     
     # Классы с одним преподавателем нуждаются в ограничениях только если пересекаются по времени
     if c1.teacher == c2.teacher:
@@ -688,13 +718,26 @@ def _log_class_time_window_info(optimizer, idx, c, label):
     """
     print(f"    {label} {idx}: {c.subject} - {c.group}")
     
-    # Информация о временных окнах из исходных данных
-    if c.start_time and c.end_time:
-        print(f"      Original time window: {c.start_time} - {c.end_time}")
-    elif c.start_time:
-        print(f"      Fixed start time: {c.start_time}")
-    else:
-        print(f"      No fixed time")
+    # Информация об effective bounds
+    try:
+        bounds = get_effective_bounds(optimizer, idx, c)
+        print(f"      Effective bounds: {bounds.min_time} - {bounds.max_time} (source: {bounds.source})")
+        print(f"      Type: {classify_bounds(bounds)}")
+        
+        if bounds.applied_constraints:
+            print(f"      Applied constraints:")
+            for constraint in bounds.applied_constraints:
+                print(f"        - {constraint['type']}: {constraint['description']}")
+    except Exception as e:
+        print(f"      Warning: Could not get effective bounds: {e}")
+        
+        # Fallback к оригинальным полям
+        if c.start_time and c.end_time:
+            print(f"      Original time window: {c.start_time} - {c.end_time}")
+        elif c.start_time:
+            print(f"      Fixed start time: {c.start_time}")
+        else:
+            print(f"      No fixed time")
     
     # Информация о текущих ограничениях переменной
     if hasattr(optimizer, 'start_vars') and idx < len(optimizer.start_vars):

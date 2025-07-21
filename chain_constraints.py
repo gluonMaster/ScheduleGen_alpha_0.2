@@ -8,6 +8,10 @@
 from time_utils import time_to_minutes, minutes_to_time
 from timewindow_utils import find_slot_for_time
 from linked_chain_utils import get_linked_chain_order
+from effective_bounds_utils import (
+    set_effective_bounds, get_effective_bounds, update_bounds_from_constraint,
+    time_to_slot, slot_to_time
+)
 
 
 class ConstraintManager:
@@ -132,11 +136,10 @@ def add_chain_sequence_constraints(optimizer, placement_plan):
         pause_before_slots = next_class.pause_before // optimizer.time_interval
         min_gap = duration_slots + pause_after_slots + pause_before_slots
         
-        # Добавляем ограничение последовательности
-        constraint_expr = optimizer.model.Add(optimizer.start_vars[next_idx] >= optimizer.start_vars[current_idx] + min_gap)
-        
         # Используем централизованное логирование
         from constraint_registry import ConstraintType
+        constraint_expr = optimizer.model.Add(optimizer.start_vars[next_idx] >= optimizer.start_vars[current_idx] + min_gap)
+        
         optimizer.add_constraint(
             constraint_expr=constraint_expr,
             constraint_type=ConstraintType.CHAIN_ORDERING,
@@ -146,6 +149,13 @@ def add_chain_sequence_constraints(optimizer, placement_plan):
             class_j=next_idx,
             description=f"Chain: class {current_idx} -> class {next_idx} (gap: {min_gap} slots)",
             variables_used=[f"start_var[{current_idx}]", f"start_var[{next_idx}]"]
+        )
+        
+        # Обновляем эффективные границы для следующего класса
+        update_bounds_from_constraint(
+            optimizer, next_idx, "chain_ordering",
+            min_slot=min_gap,  # Минимальное смещение относительно предыдущего
+            description=f"Chain constraint: must start at least {min_gap} slots after class {current_idx}"
         )
         
         pair_key = (current_idx, next_idx)
@@ -503,25 +513,24 @@ def add_window_bounds_constraints(optimizer, class_idx, manager=None):
     
     # Проверяем, что это класс с временным окном
     if not (c.start_time and c.end_time):
+        print(f"  Class {class_idx} has no time window, skipping")
         return
     
     # Проверяем, что переменная не зафиксирована
     if isinstance(optimizer.start_vars[class_idx], int):
+        print(f"  Class {class_idx} start time is fixed, updating effective bounds only")
+        # Обновляем эффективные границы для фиксированного времени
+        fixed_slot = optimizer.start_vars[class_idx]
+        set_effective_bounds(optimizer, class_idx, fixed_slot, fixed_slot, 
+                           "fixed_assignment", f"Fixed to slot {fixed_slot}")
         return
     
     window_start_time = c.start_time
     window_end_time = c.end_time
     
     # Находим соответствующие временные слоты
-    window_start_slot = None
-    window_end_slot = None
-    
-    for slot_idx, slot_time in enumerate(optimizer.time_slots):
-        if window_start_slot is None and time_to_minutes(slot_time) >= time_to_minutes(window_start_time):
-            window_start_slot = slot_idx
-        if window_end_slot is None and time_to_minutes(slot_time) >= time_to_minutes(window_end_time):
-            window_end_slot = slot_idx
-            break
+    window_start_slot = time_to_slot(optimizer, window_start_time)
+    window_end_slot = time_to_slot(optimizer, window_end_time)
     
     if window_start_slot is not None and window_end_slot is not None:
         # Рассчитываем максимальное время начала, чтобы уложиться в окно
@@ -551,10 +560,19 @@ def add_window_bounds_constraints(optimizer, class_idx, manager=None):
             variables_used=[f"start_vars[{class_idx}]"]
         )
         
+        # Устанавливаем эффективные границы
+        set_effective_bounds(optimizer, class_idx, window_start_slot, max_start_slot,
+                           "time_window", f"Window constraints: {window_start_time}-{window_end_time}")
+        
         manager.add_constraint('window_bounds', constraint1, None,
                              f"Window lower bound: class {class_idx} >= slot {window_start_slot}")
         manager.add_constraint('window_bounds', constraint2, None,
                              f"Window upper bound: class {class_idx} <= slot {max_start_slot}")
+        
+        print(f"  Added window constraints for class {class_idx}: start between slots {window_start_slot} and {max_start_slot}")
+        print(f"  Effective bounds: {slot_to_time(optimizer, window_start_slot)} - {slot_to_time(optimizer, max_start_slot)}")
+    else:
+        print(f"  Could not determine time slots for class {class_idx} window {window_start_time}-{window_end_time}")
 
 
 def apply_placement_constraints(optimizer, placement_plan):

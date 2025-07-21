@@ -3,7 +3,7 @@ CONSTRAINT REGISTRY - INFEASIBLE ANALYSIS
 
 📊 CONSTRAINT STATISTICS:
 Total added: 69
-Total skipped: 22
+Total skipped: 21
 Total exceptions: 0
 Total conflicts: 0
 
@@ -12,7 +12,7 @@ Total conflicts: 0
 ❌ Potentially redundant constraints for 1 class pairs:
   - Classes 0 ↔ 1: 4 constraints
     👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna
-    📋 Types: room_conflict, chain_ordering
+    📋 Types: chain_ordering, room_conflict
 
 ⚡ Ordering constraints: 0 sequential, 6 chain
 
@@ -21,7 +21,7 @@ Total conflicts: 0
 🔥 Most constrained class pairs:
   - Classes 0 ↔ 1: 4 constraints
     👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna
-    📋 Types: room_conflict, chain_ordering
+    📋 Types: chain_ordering, room_conflict
   - Classes 0 ↔ 2: 3 constraints
     👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Mathe, 6B, Tchoudnovskaia Anna
     📋 Types: room_conflict
