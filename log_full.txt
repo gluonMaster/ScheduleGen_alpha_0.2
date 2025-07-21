@@ -18,7 +18,7 @@ All classes to be processed:
   5: Nachhilfe - Bogrez Tumarov - Tatarchuk Tetiana - Mi 16:00-20:00
   6: Nachhilfe - Danilischina Mariia - Tatarchuk Tetiana - Mi 16:00-20:00
   7: NH Physik - Danilischina Mariia - Tatarchuk Tetiana - Mi 16:00-20:00
-  8: Russish - 9G - Tchoudnovskaia Anna - Mi 15:00-17:00
+  8: Russish - 9G - Tchoudnovskaia Anna - Mi 15:00-19:45
 
 Class Kunst - 6B - Melnikov Pavel - Mi 16:00-19:45 has linked classes:
   - Russish - 6B - Tchoudnovskaia Anna - Mi 16:00-19:45
@@ -55,7 +55,8 @@ Created class_map with 9 entries.
 Created object_index_map with 9 entries.
 Classes list has 9 elements.
 Solving schedule optimization problem (time limit: 300 seconds)...
-Analysis cache cleared for new optimization
+Chain windows cache cleared
+Analysis cache and chain windows cache cleared for new optimization
 Available time slots:
   Slot 0: 08:00
   Slot 4: 08:20
@@ -223,21 +224,21 @@ DEBUG: Creating variable for window class 7 'NH Physik':
   - Duration: 45 min
   - Slot range: 96-135 (16:00-19:15)
 
-Processing class Russish with time window 15:00-17:00:
+Processing class Russish with time window 15:00-19:45:
   Start minutes: 900
-  End minutes: 1020
+  End minutes: 1185
   Class duration: 45 min
-  Available time for class: 120 min
-  Class fits in window. Latest possible start: 16:15 (slot 99)
-  Start slot range: 84-99
-  Time slot values: 15:00-16:15
+  Available time for class: 285 min
+  Class fits in window. Latest possible start: 19:00 (slot 132)
+  Start slot range: 84-132
+  Time slot values: 15:00-19:00
   ✓ Added constraint time_window_17: Time window constraint: class 8 start >= 15:00
-  ✓ Added constraint time_window_18: Time window constraint: class 8 end <= 17:00
-Class Russish has time window: 15:00-17:00
+  ✓ Added constraint time_window_18: Time window constraint: class 8 end <= 19:45
+Class Russish has time window: 15:00-19:45
 DEBUG: Creating variable for window class 8 'Russish':
-  - Window: 15:00-17:00
+  - Window: 15:00-19:45
   - Duration: 45 min
-  - Slot range: 84-99 (15:00-16:15)
+  - Slot range: 84-132 (15:00-19:00)
 
 === ADDING RESOURCE CONFLICT CONSTRAINTS ===
 
@@ -266,7 +267,7 @@ Class 6: Nachhilfe - Danilischina Mariia - Tatarchuk Tetiana - Mi 16:00-20:00
 Class 7: NH Physik - Danilischina Mariia - Tatarchuk Tetiana - Mi 16:00-20:00
   Duration: 45 min, Pause before: 0 min, Pause after: 5 min
   Room(s): VK.07, VK.08, VK.11
-Class 8: Russish - 9G - Tchoudnovskaia Anna - Mi 15:00-17:00
+Class 8: Russish - 9G - Tchoudnovskaia Anna - Mi 15:00-19:45
   Duration: 45 min, Pause before: 0 min, Pause after: 0 min
   Room(s): V2.03
 
@@ -340,13 +341,12 @@ CHAIN ANALYSIS:
   Class 8 in chain: False
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 2: 16:00 - 19:45
-  Class 8: 15:00 - 17:00
+  Class 8: 15:00 - 19:45
 
-POTENTIAL CONFLICT: Room V2.03 - classes cannot be scheduled sequentially:
+SEQUENTIAL SCHEDULING: Room V2.03 can fit both window classes sequentially:
   Class 2: Mathe - 6B - Tchoudnovskaia Anna with window 16:00-19:45 (45 min)
-  Class 8: Russish - 9G - Tchoudnovskaia Anna with window 15:00-17:00 (45 min)
-  Conflict reason: insufficient_overlap_time_fallback
-  WARNING: These classes cannot be scheduled together in this room!
+  Class 8: Russish - 9G - Tchoudnovskaia Anna with window 15:00-19:45 (45 min)
+  Scheduling reason: sufficient_overlap_time_fallback
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
 Class 3: Schach (Schach Mi A) - Teacher: Rosov Boris
@@ -620,7 +620,7 @@ Classes 0 and 2: Kunst vs Mathe
   Extracting bounds from original data for class 8
   Time overlap analysis using effective bounds:
     Class 0: 16:00-19:00 + 45min = 960-1185
-    Class 8: 15:00-16:15 + 45min = 900-1020
+    Class 8: 15:00-19:00 + 45min = 900-1185
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
 Checking room conflict between classes 1 and 2 in rooms {'V2.07'}
@@ -658,17 +658,9 @@ Classes 1 and 2: Russish vs Mathe
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
   Time overlap analysis using effective bounds:
     Class 1: 16:00-18:30 + 75min = 960-1185
-    Class 8: 15:00-16:15 + 45min = 900-1020
+    Class 8: 15:00-19:00 + 45min = 900-1185
     Overlap: YES
-Detected potential conflict between 'Russish' and 'Russish' (shared teacher 'Tchoudnovskaia Anna' with different groups (cannot schedule sequentially))
-
-=== ADDING TIME CONFLICT CONSTRAINTS ===
-Classes 1 and 8: Russish vs Russish
-  Shared rooms: set()
-  Shared groups: set()
-  Must add constraints: set()
-  Sequential scheduling not possible for these time windows
-Adding standard conflict constraints between classes 1 and 8
+  ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
   Time overlap analysis using effective bounds:
     Class 2: 16:00-19:00 + 45min = 960-1185
     Class 3: 16:00-16:50 + 45min = 960-1055
@@ -701,8 +693,7 @@ Classes 2 and 8: Mathe vs Russish
   Shared rooms: {'V2.03'}
   Shared groups: set()
   Must add constraints: True
-  Sequential scheduling not possible for these time windows
-Adding standard conflict constraints between classes 2 and 8
+  [shared_groups] both_orders_possible (reversed) — leaving free
 Checking room conflict between classes 3 and 4 in rooms {'VK.11'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
@@ -749,7 +740,7 @@ Classes 3 and 7: Schach vs NH Physik
   Added room conflict constraints between classes 3 and 7
   Time overlap analysis using effective bounds:
     Class 3: 16:00-16:50 + 45min = 960-1055
-    Class 8: 15:00-16:15 + 45min = 900-1020
+    Class 8: 15:00-19:00 + 45min = 900-1185
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
 Checking room conflict between classes 4 and 5 in rooms {'VK.11'}
@@ -790,7 +781,7 @@ Classes 4 and 7: Schach vs NH Physik
   Added room conflict constraints between classes 4 and 7
   Time overlap analysis using effective bounds:
     Class 4: 16:00-16:50 + 45min = 960-1055
-    Class 8: 15:00-16:15 + 45min = 900-1020
+    Class 8: 15:00-19:00 + 45min = 900-1185
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
 Checking room conflict between classes 5 and 6 in rooms {'VK.07', 'VK.08', 'VK.11'}
@@ -811,7 +802,7 @@ Classes 5 and 7: Nachhilfe vs NH Physik
   [shared_groups] both_orders_possible (reversed) — leaving free
   Time overlap analysis using effective bounds:
     Class 5: 16:00-18:45 + 75min = 960-1200
-    Class 8: 15:00-16:15 + 45min = 900-1020
+    Class 8: 15:00-19:00 + 45min = 900-1185
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
 Checking room conflict between classes 6 and 7 in rooms {'VK.07', 'VK.08', 'VK.11'}
@@ -824,20 +815,20 @@ Classes 6 and 7: Nachhilfe vs NH Physik
   [shared_groups] both_orders_possible (reversed) — leaving free
   Time overlap analysis using effective bounds:
     Class 6: 16:00-18:30 + 90min = 960-1200
-    Class 8: 15:00-16:15 + 45min = 900-1020
+    Class 8: 15:00-19:00 + 45min = 900-1185
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
   Time overlap analysis using effective bounds:
     Class 7: 16:00-19:15 + 45min = 960-1200
-    Class 8: 15:00-16:15 + 45min = 900-1020
+    Class 8: 15:00-19:00 + 45min = 900-1185
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
 
 === RESOURCE CONFLICT CONSTRAINTS SUMMARY ===
 Total class pairs: 36
-Processed pairs: 15
-Skipped pairs: 21
-Processing rate: 41.7%
+Processed pairs: 14
+Skipped pairs: 22
+Processing rate: 38.9%
 ==================================================
 
 Adding objective weights for timewindow optimization...
@@ -912,8 +903,8 @@ Found 9 classes with time windows.
   Added window constraints for class 6: start between slots 96 and 126
   Updated effective bounds for class 7: EffectiveBounds(slot: 96-135, time: 16:00-19:15, source: time_window)
   Added window constraints for class 7: start between slots 96 and 135
-  Updated effective bounds for class 8: EffectiveBounds(slot: 84-99, time: 15:00-16:15, source: time_window)
-  Added window constraints for class 8: start between slots 84 and 99
+  Updated effective bounds for class 8: EffectiveBounds(slot: 84-132, time: 15:00-19:00, source: time_window)
+  Added window constraints for class 8: start between slots 84 and 132
 
 === ANALYZE RELATED CLASSES (REFACTORED) ===
 Using specialized modules for timeline, grouping, scheduling and constraints
@@ -1144,7 +1135,7 @@ Added 9 timewindow objectives to the model.
 Total classes: 9
 Classes with effective bounds: 9
 Update count: 13
-Last updated: 2025-07-17 19:48:08.944488
+Last updated: 2025-07-21 19:15:20.836973
 
 Bounds by source:
   time_window: 9
@@ -1173,51 +1164,58 @@ Detailed bounds per class:
   Class 7 (NH Physik): EffectiveBounds(slot: 96-135, time: 16:00-19:15, source: time_window)
     - timewindow_adapter: Window: 16:00-20:00
     - chain_ordering: Chain constraint: must start at least 19 slots after class 6
-  Class 8 (Russish): EffectiveBounds(slot: 84-99, time: 15:00-16:15, source: time_window)
-    - timewindow_adapter: Window: 15:00-17:00
+  Class 8 (Russish): EffectiveBounds(slot: 84-132, time: 15:00-19:00, source: time_window)
+    - timewindow_adapter: Window: 15:00-19:45
 ===================================
 Timewindow improvements applied successfully. Processed 7 class pairs.
 DEBUG: Applied timewindow improvements
 
 📊 MODEL STATISTICS:
   Variables: 9 assigned, 9 start, 9 room, 9 day
-  Constraints: 69 added, 21 skipped
+  Constraints: 69 added, 22 skipped
   Constraint types: time_window: 30, room_conflict: 24, chain_ordering: 6, other: 8, fixed_time: 1
 
 🚀 Starting CP-SAT solver (time limit: 300s)...
-❌ No solution found: INFEASIBLE
+✅ Solution found: OPTIMAL
 
 📋 Generating constraint reports...
 
 📋 Exporting constraint registry to constraint_registry_full.txt...
 ✅ Constraint registry exported to constraint_registry_full.txt
-
-📋 Exporting constraint registry to constraint_registry_infeasible.txt...
-
-🔍 INFEASIBLE ANALYSIS:
-==================================================
-Total constraints: 69
-Detected conflicts: 0
-Constraint exceptions: 0
-
-🔥 Most constrained pairs:
-  Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna: 4 constraints (chain_ordering, room_conflict)
-  Kunst, 6B, Melnikov Pavel ↔ Mathe, 6B, Tchoudnovskaia Anna: 3 constraints (room_conflict)
-  Schach, Schach Mi A, Rosov Boris ↔ Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana: 3 constraints (room_conflict)
-
-Detailed report saved to: constraint_registry_infeasible.txt
-==================================================
-✅ Constraint registry exported to constraint_registry_infeasible.txt
 ✅ Brief error summary saved to log_Err.txt
 ✅ All constraint reports generated successfully
 
-No solution found within the time limit (0.04 seconds).
+Solution found in 0.07 seconds!
 
-❌ PROBLEM IS INFEASIBLE - No valid solution exists with current constraints.
+=== Solution Summary ===
+Total scheduled classes: 9
 
-💡 Possible solutions:
-  1. Relax some time constraints
-  2. Add more rooms or increase room capacity
-  3. Adjust teacher availability
-  4. Reduce required classes or increase time slots
-  5. Review constraint_registry_infeasible.txt for detailed analysis
+Scheduled classes by day:
+  Mi: 9 classes
+
+Teacher load (top 5):
+  Tchoudnovskaia Anna: 3 classes
+  Tatarchuk Tetiana: 3 classes
+  Rosov Boris: 2 classes
+  Melnikov Pavel: 1 classes
+
+Room utilization (top 5):
+  VK.08: 3 classes
+  V0.06: 2 classes
+  V2.03: 2 classes
+  VK.11: 2 classes
+
+Class start time distribution:
+  16:00 - 17:00: 5 classes
+  17:00 - 18:00: 1 classes
+  18:00 - 19:00: 1 classes
+  19:00 - 20:00: 2 classes
+
+Exporting schedule to 'optimized_schedule.xlsx'...
+Export completed successfully.
+
+📋 Exporting constraint registry to constraint_registry_full.txt...
+✅ Constraint registry exported to constraint_registry_full.txt
+
+Schedule generation complete.
+Generated schedule saved to: c:\Konst\2025\Kolibri\Alla\Schedule\ScheduleGen_alpha_0.2\optimized_schedule.xlsx

@@ -8,17 +8,49 @@ from time_utils import time_to_minutes
 from sequential_scheduling import can_schedule_sequentially as can_schedule_sequentially_full, minutes_to_time 
 from constraint_registry import ConstraintType
 from effective_bounds_utils import get_effective_bounds, EffectiveBounds
+from linked_chain_utils import are_classes_in_same_chain, get_chain_window
 
 def times_overlap(optimizer, c1, c2, idx1=None, idx2=None):
     """
     Проверяет пересечение по времени двух занятий с использованием эффективных границ.
+    Для занятий внутри одной цепочки использует окно цепочки вместо individual effective_bounds.
     
     Args:
         optimizer: Экземпляр ScheduleOptimizer
         c1, c2: Объекты занятий
         idx1, idx2: Индексы занятий (для получения эффективных границ)
     """
-    # Получаем эффективные границы для более точного анализа
+    # НОВОЕ: Проверяем, принадлежат ли занятия одной цепочке
+    if idx1 is not None and idx2 is not None and are_classes_in_same_chain(optimizer, idx1, idx2):
+        from linked_chain_utils import find_chain_containing_classes
+        
+        chain_indices = find_chain_containing_classes(optimizer, idx1, idx2)
+        chain_window = get_chain_window(optimizer, chain_indices)
+        
+        if chain_window is not None:
+            # Для занятий внутри одной цепочки используем окно цепочки
+            window_start = chain_window['min_minutes']
+            window_end = chain_window['max_minutes']
+            
+            # Рассчитываем общее время, необходимое для обоих занятий
+            total_duration = c1.duration + c2.duration
+            min_gap = max(getattr(c1, 'pause_after', 0), getattr(c2, 'pause_before', 0))
+            required_time = total_duration + min_gap
+            available_time = window_end - window_start
+            
+            # Занятия пересекаются по времени, если они не могут поместиться последовательно в окне цепочки
+            overlap = available_time < required_time
+            
+            print(f"  Time overlap analysis using chain window:")
+            print(f"    Chain window: {chain_window['min_time']}-{chain_window['max_time']}")
+            print(f"    Available time: {available_time} min, Required time: {required_time} min")
+            print(f"    Overlap (cannot fit sequentially): {'YES' if overlap else 'NO'}")
+            
+            return overlap
+        else:
+            print(f"  WARNING: Could not determine chain window for classes {idx1}, {idx2}")
+    
+    # Получаем эффективные границы для более точного анализа (для занятий не в одной цепочке)
     if idx1 is not None and idx2 is not None:
         bounds1 = get_effective_bounds(optimizer, idx1, c1)
         bounds2 = get_effective_bounds(optimizer, idx2, c2)

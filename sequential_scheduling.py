@@ -5,7 +5,10 @@
 """
 
 from time_utils import time_to_minutes, minutes_to_time
-from linked_chain_utils import collect_full_chain
+from linked_chain_utils import (
+    collect_full_chain, find_chain_containing_classes, get_chain_window, 
+    are_classes_in_same_chain, get_original_time_bounds, clear_chain_windows_cache
+)
 from chain_scheduler import schedule_chain, chain_busy_intervals
 from effective_bounds_utils import get_effective_bounds, classify_bounds
 
@@ -16,7 +19,8 @@ def clear_analysis_cache():
     """Очистить кеш анализа для новой оптимизации."""
     global _analysis_cache
     _analysis_cache = {}
-    print("Analysis cache cleared for new optimization")
+    clear_chain_windows_cache()
+    print("Analysis cache and chain windows cache cleared for new optimization")
 
 def is_class_in_linked_chain(schedule_class):
     """
@@ -40,6 +44,89 @@ def is_class_in_linked_chain(schedule_class):
         return True
     
     return False
+
+def analyze_same_chain_classes(optimizer, c1, c2, idx1, idx2, chain_indices, verbose=True):
+    """
+    Анализирует возможность последовательного размещения двух занятий внутри одной цепочки.
+    Использует общее окно цепочки вместо индивидуальных effective_bounds.
+    
+    Args:
+        optimizer: Экземпляр ScheduleOptimizer
+        c1, c2: Объекты занятий
+        idx1, idx2: Индексы занятий
+        chain_indices: Список индексов цепочки
+        verbose: Включить детальное логгирование
+        
+    Returns:
+        tuple: (bool, dict) - возможно ли размещение и дополнительная информация
+    """
+    class1_label = f"Class {idx1}"
+    class2_label = f"Class {idx2}"
+    
+    info = {
+        'reason': '',
+        'c1_start': None,
+        'c1_end': None,
+        'c2_start': None,
+        'c2_end': None,
+        'chain_window': None,
+        'required_time': None,
+        'available_time': None
+    }
+    
+    # Получаем окно цепочки
+    chain_window = get_chain_window(optimizer, chain_indices)
+    
+    if chain_window is None:
+        info['reason'] = 'no_chain_window_intersection'
+        if verbose:
+            print(f"  SAME CHAIN ANALYSIS: Cannot determine chain window for classes {idx1}, {idx2}")
+            print(f"  Original bounds do not intersect across chain members")
+        return False, info
+    
+    if verbose:
+        print(f"  SAME CHAIN ANALYSIS:")
+        print(f"    Chain indices: {chain_indices}")
+        print(f"    Chain window: {chain_window['min_time']}-{chain_window['max_time']}")
+    
+    # Для занятий внутри одной цепочки используем окно цепочки
+    window_start = chain_window['min_minutes']
+    window_end = chain_window['max_minutes']
+    
+    info['c1_start'] = chain_window['min_time']
+    info['c1_end'] = chain_window['max_time']
+    info['c2_start'] = chain_window['min_time'] 
+    info['c2_end'] = chain_window['max_time']
+    info['chain_window'] = f"{chain_window['min_time']}-{chain_window['max_time']}"
+    
+    # Рассчитываем необходимое время для размещения обоих занятий последовательно
+    total_duration = c1.duration + c2.duration
+    min_gap = max(getattr(c1, 'pause_after', 0), getattr(c2, 'pause_before', 0))
+    required_time = total_duration + min_gap
+    
+    # Доступное время в окне цепочки
+    available_time = window_end - window_start
+    
+    info['required_time'] = required_time
+    info['available_time'] = available_time
+    
+    if verbose:
+        print(f"    Available time in chain window: {available_time} min")
+        print(f"    Required time for both classes: {required_time} min")
+        print(f"      {class1_label}: {c1.duration} min + pause_after: {getattr(c1, 'pause_after', 0)} min")
+        print(f"      Gap: {min_gap} min")
+        print(f"      {class2_label}: {c2.duration} min")
+    
+    if available_time >= required_time:
+        info['reason'] = 'sufficient_time_in_chain_window'
+        if verbose:
+            print(f"    RESULT: Can schedule sequentially within chain - {info['reason']}")
+        return True, info
+    else:
+        info['reason'] = 'insufficient_time_in_chain_window'
+        if verbose:
+            print(f"    RESULT: Cannot schedule sequentially within chain - {info['reason']}")
+        return False, info
 
 def collect_full_chain_from_any_member(schedule_class):
     """
@@ -135,6 +222,17 @@ def can_schedule_sequentially(c1, c2, idx1=None, idx2=None, verbose=True, optimi
             print(f"RESULT: Cannot schedule sequentially - {info['reason']}")
             print(f"  {class1_label} day: {c1.day}, {class2_label} day: {c2.day}")
         return cache_and_return(False, info)
+    
+    # НОВОЕ: Проверяем, принадлежат ли оба занятия одной цепочке
+    if optimizer and idx1 is not None and idx2 is not None:
+        chain_indices = find_chain_containing_classes(optimizer, idx1, idx2)
+        if chain_indices is not None:
+            if verbose:
+                print(f"Classes {idx1} and {idx2} are in the same chain: {chain_indices}")
+            # Используем специальную логику для занятий внутри одной цепочки
+            return cache_and_return(*analyze_same_chain_classes(
+                optimizer, c1, c2, idx1, idx2, chain_indices, verbose
+            ))
     
     # НОВОЕ: Используем эффективные границы, если доступен оптимизатор
     if optimizer and idx1 is not None and idx2 is not None:

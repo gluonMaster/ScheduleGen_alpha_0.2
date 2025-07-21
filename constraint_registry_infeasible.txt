@@ -2,29 +2,16 @@ CONSTRAINT REGISTRY - INFEASIBLE ANALYSIS
 ============================================================
 
 📊 CONSTRAINT STATISTICS:
-Total added: 69
-Total skipped: 21
+Total added: 63
+Total skipped: 22
 Total exceptions: 0
 Total conflicts: 0
 
 🔍 POTENTIAL ISSUES ANALYSIS:
 --------------------------------------------------
-❌ Potentially redundant constraints for 1 class pairs:
-  - Classes 0 ↔ 1: 4 constraints
-    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna
-    📋 Types: chain_ordering, room_conflict
-
-⚡ Ordering constraints: 0 sequential, 6 chain
-
-⏰ Fixed time constraints: 1
+⚡ Ordering constraints: 0 sequential, 5 chain
 
 🔥 Most constrained class pairs:
-  - Classes 0 ↔ 1: 4 constraints
-    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna
-    📋 Types: chain_ordering, room_conflict
-  - Classes 0 ↔ 2: 3 constraints
-    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Mathe, 6B, Tchoudnovskaia Anna
-    📋 Types: room_conflict
   - Classes 3 ↔ 5: 3 constraints
     👨‍🏫 Schach, Schach Mi A, Rosov Boris ↔ Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
     📋 Types: room_conflict
@@ -34,80 +21,41 @@ Total conflicts: 0
   - Classes 3 ↔ 7: 3 constraints
     👨‍🏫 Schach, Schach Mi A, Rosov Boris ↔ NH Physik, Danilischina Mariia, Tatarchuk Tetiana
     📋 Types: room_conflict
+  - Classes 4 ↔ 5: 3 constraints
+    👨‍🏫 Schach, Schach Mi B, Rosov Boris ↔ Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+    📋 Types: room_conflict
+  - Classes 4 ↔ 6: 3 constraints
+    👨‍🏫 Schach, Schach Mi B, Rosov Boris ↔ Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+    📋 Types: room_conflict
 
 📈 Constraint type distribution:
-  time_window: 30
-  room_conflict: 24
-  other: 8
-  chain_ordering: 6
-  fixed_time: 1
+  time_window: 26
+  room_conflict: 18
+  other: 10
+  chain_ordering: 5
+  separation: 4
 
 📁 Constraint origin distribution:
-  resource_constraints: 24
   model_variables: 18
-  chain_constraints: 17
-  separation_constraints: 10
+  resource_constraints: 18
+  chain_constraints: 15
+  separation_constraints: 12
 
 🔢 Variable usage analysis:
   Most used variables:
+    start_vars[2]: 6 constraints
     start_var[7]: 6 constraints
-    start_var[1]: 5 constraints
-    room_vars[0]: 4 constraints
+    start_vars[0]: 5 constraints
+    start_vars[1]: 5 constraints
     room_vars[5]: 4 constraints
     room_vars[6]: 4 constraints
     room_vars[7]: 4 constraints
-    start_var[2]: 4 constraints
     start_var[6]: 4 constraints
     start_var[5]: 4 constraints
-    start_var[0]: 3 constraints
+    start_var[3]: 3 constraints
 
 🔍 DETAILED CONSTRAINT ANALYSIS:
 --------------------------------------------------
-Class Pair: 0 ↔ 1
-👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
-👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
-📊 Total constraints: 4
-📋 By type:
-  - room_conflict: 3
-  - chain_ordering: 1
-🔗 Detailed constraints:
-  1. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room match check (variable): classes 0 and 1
-     🔢 Variables: room_vars[0], room_vars[1], same_room_0_1
-  2. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room mismatch check (variable): classes 0 and 1
-     🔢 Variables: room_vars[0], room_vars[1], same_room_0_1
-  3. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Prevent room conflicts: classes 0 and 1
-     🔢 Variables: room_conflict_0_1
-  4. chain_ordering
-     📍 chain_constraints:add_chain_sequence_constraints
-     📄 Chain: class 0 -> class 1 (gap: 10 slots)
-     🔢 Variables: start_var[0], start_var[1]
-
-Class Pair: 0 ↔ 2
-👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
-👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
-📊 Total constraints: 3
-📋 By type:
-  - room_conflict: 3
-🔗 Detailed constraints:
-  1. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room match check (variable): classes 0 and 2
-     🔢 Variables: room_vars[0], room_vars[2], same_room_0_2
-  2. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room mismatch check (variable): classes 0 and 2
-     🔢 Variables: room_vars[0], room_vars[2], same_room_0_2
-  3. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Prevent room conflicts: classes 0 and 2
-     🔢 Variables: room_conflict_0_2
-
 Class Pair: 3 ↔ 5
 👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
@@ -227,6 +175,38 @@ Class Pair: 4 ↔ 7
      📍 resource_constraints:_add_room_conflict_constraints
      📄 Prevent room conflicts: classes 4 and 7
      🔢 Variables: room_conflict_4_7
+
+Class Pair: 0 ↔ 2
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+📊 Total constraints: 2
+📋 By type:
+  - separation: 2
+🔗 Detailed constraints:
+  1. separation
+     📍 chain_constraints:add_bidirectional_constraint
+     📄 Bidirectional separation (i→j): class 0 → class 2
+     🔢 Variables: start_vars[0], start_vars[2], i_before_j_0_2
+  2. separation
+     📍 chain_constraints:add_bidirectional_constraint
+     📄 Bidirectional separation (j→i): class 2 → class 0
+     🔢 Variables: start_vars[0], start_vars[2], i_before_j_0_2
+
+Class Pair: 1 ↔ 2
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+📊 Total constraints: 2
+📋 By type:
+  - separation: 2
+🔗 Detailed constraints:
+  1. separation
+     📍 chain_constraints:add_bidirectional_constraint
+     📄 Bidirectional separation (i→j): class 1 → class 2
+     🔢 Variables: start_vars[1], start_vars[2], i_before_j_1_2
+  2. separation
+     📍 chain_constraints:add_bidirectional_constraint
+     📄 Bidirectional separation (j→i): class 2 → class 1
+     🔢 Variables: start_vars[1], start_vars[2], i_before_j_1_2
 
 Class Pair: 5 ↔ 7
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
