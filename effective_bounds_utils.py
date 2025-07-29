@@ -199,8 +199,8 @@ def extract_bounds_from_original_data(optimizer, class_obj, class_idx: int) -> E
         return EffectiveBounds(
             min_slot=0,
             max_slot=len(optimizer.time_slots) - 1,
-            min_time=optimizer.time_slots[0],
-            max_time=optimizer.time_slots[-1],
+            min_time=optimizer.time_slots[0] if optimizer.time_slots else "08:00",
+            max_time=optimizer.time_slots[-1] if optimizer.time_slots else "18:00",
             source="no_constraints",
             confidence="low"
         )

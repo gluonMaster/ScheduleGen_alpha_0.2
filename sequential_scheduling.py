@@ -118,7 +118,15 @@ def analyze_same_chain_classes(optimizer, c1, c2, idx1, idx2, chain_indices, ver
         print(f"      {class2_label}: {c2.duration} min")
     
     if available_time >= required_time:
-        info['reason'] = 'sufficient_time_in_chain_window'
+        # Для занятий внутри одной цепочки используем специальный код chain_and_resource_gap
+        info['reason'] = 'chain_and_resource_gap'
+        
+        # Добавляем информацию об интервалах и разрыве для separation_constraints
+        info['c1_interval'] = (window_start, window_start + c1.duration + getattr(c1, 'pause_after', 0))
+        info['c2_interval'] = (window_start + c1.duration + getattr(c1, 'pause_after', 0) + min_gap, 
+                               window_start + c1.duration + getattr(c1, 'pause_after', 0) + min_gap + c2.duration)
+        info['gap'] = min_gap
+        
         if verbose:
             print(f"    RESULT: Can schedule sequentially within chain - {info['reason']}")
         return True, info
@@ -131,7 +139,7 @@ def analyze_same_chain_classes(optimizer, c1, c2, idx1, idx2, chain_indices, ver
 def collect_full_chain_from_any_member(schedule_class):
     """
     Собирает полную цепочку занятий, начиная с любого элемента цепочки.
-    Сначала находит начало цепочки, затем собирает всю цепочку.
+    Использует функцию collect_full_chain из linked_chain_utils.
     
     Args:
         schedule_class: Любой элемент цепочки
@@ -139,25 +147,8 @@ def collect_full_chain_from_any_member(schedule_class):
     Returns:
         list: Полная цепочка занятий в правильном порядке
     """
-    # Находим начало цепочки (элемент без previous_class)
-    root_class = schedule_class
-    while hasattr(root_class, 'previous_class') and root_class.previous_class:
-        # Находим объект предыдущего класса по его subject
-        # Это упрощенная версия - в реальной системе может потребоваться более сложный поиск
-        found_previous = False
-        if hasattr(schedule_class, '__dict__'):
-            for attr_name, attr_value in schedule_class.__dict__.items():
-                if (hasattr(attr_value, 'subject') and 
-                    attr_value.subject == root_class.previous_class):
-                    root_class = attr_value
-                    found_previous = True
-                    break
-        
-        if not found_previous:
-            break  # Не можем найти предыдущий класс, останавливаемся
-    
-    # Теперь собираем цепочку от корня используя linked_classes
-    return collect_full_chain(root_class)
+    from linked_chain_utils import collect_full_chain
+    return collect_full_chain(schedule_class)
 
 def can_schedule_sequentially(c1, c2, idx1=None, idx2=None, verbose=True, optimizer=None):
     """

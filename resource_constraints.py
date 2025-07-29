@@ -85,6 +85,12 @@ def add_resource_conflict_constraints(optimizer):
     """Add constraints to prevent conflicts in resources (teachers, rooms, groups)."""
     print("\n=== ADDING RESOURCE CONFLICT CONSTRAINTS ===")
     
+    # ИСПРАВЛЕНО: Гарантируем инициализацию linked_chains до проверок
+    if not hasattr(optimizer, 'linked_chains'):
+        from linked_chain_utils import build_linked_chains
+        build_linked_chains(optimizer)
+        print(f"  Initialized linked chains: {len(optimizer.linked_chains)} chains found")
+    
     # Напечатать подробную информацию о занятиях для отладки
     print("\nDetailed class information:")
     for idx, c in enumerate(optimizer.classes):
@@ -174,8 +180,9 @@ def add_resource_conflict_constraints(optimizer):
                 continue
             
             # Skip if one class is the previous_class of the other
-            if (hasattr(c_i, 'previous_class') and hasattr(c_j, 'subject') and c_i.previous_class == c_j.subject) or \
-            (hasattr(c_j, 'previous_class') and hasattr(c_i, 'subject') and c_j.previous_class == c_i.subject):
+            # ИСПРАВЛЕНО: previous_class теперь ссылка на объект, а не строка
+            if (hasattr(c_i, 'previous_class') and c_i.previous_class and c_i.previous_class == c_j) or \
+               (hasattr(c_j, 'previous_class') and c_j.previous_class and c_j.previous_class == c_i):
                 optimizer.skip_constraint(
                     constraint_type=ConstraintType.RESOURCE_CONFLICT,
                     origin_module=__name__,

@@ -268,13 +268,15 @@ class ScheduleReader:
                 main_class.linked_classes = []  # Initialize empty list
                 
                 if 'C' in section:
-                    section['C'].previous_class = main_class.subject
-                    main_class.next_class = section['C'].subject
+                    # ИСПРАВЛЕНО: previous_class теперь ссылка на объект, а не строка
+                    section['C'].previous_class = main_class
+                    main_class.next_class = section['C']
                     main_class.linked_classes.append(section['C'])
                     
                     if 'D' in section:
-                        section['D'].previous_class = section['C'].subject
-                        section['C'].next_class = section['D'].subject
+                        # ИСПРАВЛЕНО: previous_class теперь ссылка на объект, а не строка
+                        section['D'].previous_class = section['C']
+                        section['C'].next_class = section['D']
                         main_class.linked_classes.append(section['D'])
         
         # Collect all classes including linked ones

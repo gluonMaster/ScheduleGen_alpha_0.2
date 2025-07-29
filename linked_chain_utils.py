@@ -9,7 +9,7 @@ from timewindow_utils import are_classes_transitively_linked
 from time_utils import time_to_minutes, minutes_to_time
 
 __all__ = ['is_in_linked_chain', 'get_linked_chain_order', 'collect_full_chain', 'build_linked_chains',
-           'find_chain_containing_classes', 'get_chain_window', 'are_classes_in_same_chain']
+           'find_chain_containing_classes', 'get_chain_window', 'are_classes_in_same_chain', 'pick_best_anchor']
 
 # Кеш для окон цепочек
 _chain_windows_cache = {}
@@ -236,6 +236,104 @@ def get_chain_window(optimizer, chain_indices):
     
     _chain_windows_cache[cache_key] = result
     return result
+
+
+def pick_best_anchor(flex_class, chain_classes, direction="before", optimizer=None):
+    """
+    Выбирает лучший якорный урок в цепочке для размещения flex_class.
+    
+    Args:
+        flex_class: Гибкое занятие, которое нужно разместить
+        chain_classes: Список занятий в цепочке (объекты ScheduleClass)
+        direction: Направление размещения ("before" или "after")
+        optimizer: Экземпляр ScheduleOptimizer для получения эффективных границ
+        
+    Returns:
+        ScheduleClass: Лучший якорный урок в цепочке
+    """
+    if not chain_classes:
+        return None
+    
+    # Веса для оценки кандидатов
+    w_T = 5    # Общий учитель
+    w_G = 3    # Общие группы
+    w_R = 1    # Общие кабинеты
+    w_D = 0.1  # Время ожидания (1 балл штрафа за каждые 10 мин)
+    
+    best_anchor = None
+    best_score = float('inf')
+    
+    print(f"\n=== SELECTING BEST ANCHOR ===")
+    print(f"Flex class: {flex_class.subject} (teacher: {flex_class.teacher})")
+    print(f"Chain has {len(chain_classes)} classes")
+    print(f"Direction: {direction}")
+    
+    for anchor in chain_classes:
+        # Вычисляем компоненты оценки
+        
+        # T: общий учитель (0 если есть, 1 если нет)
+        T = 0 if (flex_class.teacher and anchor.teacher and 
+                  flex_class.teacher == anchor.teacher) else 1
+        
+        # G: общие группы (0 если есть пересечение, 1 если нет)
+        flex_groups = set(flex_class.get_groups()) if hasattr(flex_class, 'get_groups') else set()
+        anchor_groups = set(anchor.get_groups()) if hasattr(anchor, 'get_groups') else set()
+        shared_groups = flex_groups & anchor_groups
+        G = 0 if shared_groups else 1
+        
+        # R: общие кабинеты (0 если есть пересечение, 1 если нет)
+        flex_rooms = set(flex_class.possible_rooms) if flex_class.possible_rooms else set()
+        anchor_rooms = set(anchor.possible_rooms) if anchor.possible_rooms else set()
+        shared_rooms = flex_rooms & anchor_rooms
+        R = 0 if shared_rooms else 1
+        
+        # D: время ожидания
+        idle = 0
+        if optimizer:
+            try:
+                from effective_bounds_utils import get_effective_bounds
+                
+                # Находим индексы занятий
+                flex_idx = optimizer.classes.index(flex_class)
+                anchor_idx = optimizer.classes.index(anchor)
+                
+                # Получаем эффективные границы
+                flex_bounds = get_effective_bounds(optimizer, flex_idx, flex_class)
+                anchor_bounds = get_effective_bounds(optimizer, anchor_idx, anchor)
+                
+                # Конвертируем в минуты
+                if direction == "before":
+                    # flex_class должен закончиться до начала anchor
+                    flex_end = time_to_minutes(flex_bounds.max_time) + flex_class.duration
+                    anchor_start = time_to_minutes(anchor_bounds.min_time)
+                    pause_after_flex = getattr(flex_class, 'pause_after', 0)
+                    idle = max(0, anchor_start - (flex_end + pause_after_flex))
+                else:  # direction == "after"
+                    # anchor должен закончиться до начала flex_class
+                    anchor_end = time_to_minutes(anchor_bounds.max_time) + anchor.duration
+                    flex_start = time_to_minutes(flex_bounds.min_time)
+                    pause_after_anchor = getattr(anchor, 'pause_after', 0)
+                    idle = max(0, flex_start - (anchor_end + pause_after_anchor))
+                    
+            except Exception as e:
+                print(f"    Warning: Could not calculate idle time for anchor {anchor.subject}: {e}")
+                idle = 0
+        
+        # Общая оценка (чем меньше, тем лучше)
+        score = w_T * T + w_G * G + w_R * R + w_D * idle
+        
+        print(f"  Candidate: {anchor.subject}")
+        print(f"    T={T} (teacher: {anchor.teacher}), G={G} (groups: {len(shared_groups)}), R={R} (rooms: {len(shared_rooms)}), idle={idle:.1f}min")
+        print(f"    Score: {w_T}*{T} + {w_G}*{G} + {w_R}*{R} + {w_D:.1f}*{idle:.1f} = {score:.2f}")
+        
+        if score < best_score:
+            best_score = score
+            best_anchor = anchor
+    
+    print(f"  ✓ Best anchor: {best_anchor.subject if best_anchor else 'None'} (score: {best_score:.2f})")
+    print("=" * 35)
+    
+    return best_anchor
 
 
 def clear_chain_windows_cache():

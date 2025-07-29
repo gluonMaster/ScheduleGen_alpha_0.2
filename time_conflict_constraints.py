@@ -8,13 +8,139 @@ from timewindow_utils import find_slot_for_time
 from sequential_scheduling import can_schedule_sequentially
 from constraint_registry import ConstraintType
 from effective_bounds_utils import get_effective_bounds, classify_bounds
+from linked_chain_utils import collect_full_chain, pick_best_anchor
+
+def add_anchor_based_constraint(optimizer, flex_class_idx, flex_class, target_class_idx, target_class):
+    """
+    Добавляет ограничение между гибким классом и якорным классом в цепочке.
+    Заменяет прямое ограничение на умный выбор якорного урока внутри цепочки.
+    
+    Args:
+        optimizer: Экземпляр ScheduleOptimizer
+        flex_class_idx: Индекс гибкого класса
+        flex_class: Объект гибкого класса
+        target_class_idx: Индекс целевого класса (принадлежащего цепочке)
+        target_class: Объект целевого класса
+        
+    Returns:
+        bool: True если ограничение было добавлено, False если цепочка не найдена
+    """
+    print(f"\n=== ANCHOR-BASED CONSTRAINT PROCESSING ===")
+    print(f"Flex class {flex_class_idx}: {flex_class.subject}")
+    print(f"Target class {target_class_idx}: {target_class.subject}")
+    
+    # ИСПРАВЛЕНО: Используем более надежную стратегию поиска цепочек
+    chain_classes = []
+    
+    # Приоритет 1: Проверяем через optimizer.linked_chains (наиболее надежно)
+    if hasattr(optimizer, 'linked_chains'):
+        for chain_indices in optimizer.linked_chains:
+            if target_class_idx in chain_indices:
+                chain_classes = [optimizer.classes[idx] for idx in chain_indices]
+                print(f"  Found chain via optimizer.linked_chains: {len(chain_classes)} classes")
+                break
+    
+    # Приоритет 2: Пытаемся найти цепочку через linked_classes
+    if not chain_classes and hasattr(target_class, 'linked_classes') and target_class.linked_classes:
+        # target_class - начало цепочки
+        try:
+            chain_classes = collect_full_chain(target_class)
+            print(f"  Found chain starting from target class: {len(chain_classes)} classes")
+        except Exception as e:
+            print(f"  Warning: Failed to collect chain from target class: {e}")
+    
+    # Приоритет 3: target_class - продолжение цепочки, найдем начало
+    if not chain_classes and hasattr(target_class, 'previous_class') and target_class.previous_class:
+        try:
+            root_class = target_class
+            while hasattr(root_class, 'previous_class') and root_class.previous_class:
+                root_class = root_class.previous_class
+            chain_classes = collect_full_chain(root_class)
+            print(f"  Found chain from root class: {len(chain_classes)} classes")
+        except Exception as e:
+            print(f"  Warning: Failed to collect chain from root class: {e}")
+    
+    if not chain_classes:
+        print(f"  No chain found for target class {target_class_idx}")
+        return False
+    
+    # Выбираем лучший якорный урок
+    anchor = pick_best_anchor(flex_class, chain_classes, direction="before", optimizer=optimizer)
+    
+    if anchor is None:
+        print(f"  No suitable anchor found in chain")
+        return False
+    
+    # Находим индекс якорного урока
+    try:
+        anchor_idx = optimizer.classes.index(anchor)
+    except ValueError:
+        print(f"  Error: anchor class not found in optimizer.classes")
+        return False
+    
+    print(f"  Selected anchor: {anchor.subject} (index {anchor_idx})")
+    
+    # Создаем ограничение: flex_class должен закончиться до начала anchor
+    duration_slots = flex_class.duration // optimizer.time_interval
+    pause_slots = max(1, (getattr(flex_class, 'pause_after', 0) + 
+                         getattr(anchor, 'pause_before', 0)) // optimizer.time_interval)
+    
+    constraint_expr = optimizer.model.Add(
+        optimizer.start_vars[flex_class_idx] + duration_slots + pause_slots <= optimizer.start_vars[anchor_idx]
+    )
+    
+    optimizer.add_constraint(
+        constraint_expr=constraint_expr,
+        constraint_type=ConstraintType.SEQUENTIAL,
+        origin_module=__name__,
+        origin_function="add_anchor_based_constraint",
+        class_i=flex_class_idx,
+        class_j=anchor_idx,
+        description=f"Anchor-based sequential: {flex_class.subject} before {anchor.subject}",
+        variables_used=[f"start_var[{flex_class_idx}]", f"start_var[{anchor_idx}]"]
+    )
+    
+    print(f"  ✓ Added anchor-based constraint: class {flex_class_idx} + {duration_slots} + {pause_slots} <= class {anchor_idx}")
+    print("=" * 50)
+    
+    return True
+
 
 def add_sequential_constraints(optimizer, i, j, c_i, c_j):
     """
-    Добавляет строгие ограничения для последовательного размещения занятий
+    Добавляет строгие ограничения для последовательного размещения занятий.
+    Теперь с проверкой на цепочки и использованием якорных уроков.
     """
     print(f"\n=== ADDING SEQUENTIAL CONSTRAINTS ===")
     print(f"Classes {i} and {j}: {c_i.subject} vs {c_j.subject}")
+    
+    # НОВОЕ: Проверяем, принадлежат ли занятия цепочкам
+    from sequential_scheduling import is_class_in_linked_chain
+    
+    c_i_in_chain = is_class_in_linked_chain(c_i)
+    c_j_in_chain = is_class_in_linked_chain(c_j)
+    
+    print(f"  Class {i} ({c_i.subject}) in chain: {c_i_in_chain}")
+    print(f"  Class {j} ({c_j.subject}) in chain: {c_j_in_chain}")
+    
+    # Якорная логика применяется только когда одно занятие в цепочке, а другое - нет
+    if c_j_in_chain and not c_i_in_chain:
+        # c_j в цепочке, c_i свободное - привязываем c_i к якорю в цепочке c_j
+        if add_anchor_based_constraint(optimizer, i, c_i, j, c_j):
+            print(f"  ✓ Used anchor-based constraint: free class {i} anchored to chain containing class {j}")
+            return
+    elif c_i_in_chain and not c_j_in_chain:
+        # c_i в цепочке, c_j свободное - привязываем c_j к якорю в цепочке c_i
+        if add_anchor_based_constraint(optimizer, j, c_j, i, c_i):
+            print(f"  ✓ Used anchor-based constraint: free class {j} anchored to chain containing class {i}")
+            return
+    elif c_i_in_chain and c_j_in_chain:
+        print(f"  Both classes are in chains - using standard sequential constraints")
+    else:
+        print(f"  Neither class is in a chain - using standard sequential constraints")
+    
+    # Оригинальная логика для случаев без якорной привязки
+    print(f"  Applying direct sequential constraints")
     
     # Создаем булеву переменную для определения порядка занятий
     i_before_j = optimizer.model.NewBoolVar(f"seq_strict_{i}_{j}")
@@ -315,221 +441,32 @@ def _add_time_conflict_constraints(optimizer, i, j, c_i, c_j):
             # Здесь можно добавить оригинальную логику если необходимо
             pass
 
-    # Проверяем возможность последовательного размещения для занятий одного преподавателя
+    # ИСПРАВЛЕНО: Проверяем возможность последовательного размещения для любых конфликтующих ресурсов
+    # Убираем ограничение только на общие группы - теперь обрабатываем любой общий ресурс
     if c_i.teacher == c_j.teacher and c_i.teacher:
-        # Проверяем наличие общих групп
-        shared_groups = set(c_i.get_groups()) & set(c_j.get_groups())
+        print(f"  Classes share teacher: {c_i.teacher}")
         
-        # Для занятий с общими группами проверяем ОБА варианта размещения
-        if shared_groups:
-            # Прямой порядок (c_i, затем c_j)
-            can_seq_i_j, info_i_j = can_schedule_sequentially(c_i, c_j, i, j, verbose=False, optimizer=optimizer)
-            
-            # Обратный порядок (c_j, затем c_i)
-            can_seq_j_i, info_j_i = can_schedule_sequentially(c_j, c_i, j, i, verbose=False, optimizer=optimizer)
-            
-            # Проверяем случай, когда одно занятие фиксированное, а другое оконное используя effective_bounds
-            try:
-                bounds_i = get_effective_bounds(optimizer, i, c_i)
-                bounds_j = get_effective_bounds(optimizer, j, c_j)
-                
-                type_i = classify_bounds(bounds_i)
-                type_j = classify_bounds(bounds_j)
-                
-                # Если фиксированное c_i и оконное c_j
-                if type_i == 'fixed' and type_j == 'window':
-                    if can_seq_i_j and info_i_j['reason'] == 'fits_before_fixed':
-                        # c_j можно разместить ДО c_i - предпочитаем этот вариант
-                        fixed_start = time_to_minutes(bounds_i.min_time)
-                        latest_end = fixed_start - getattr(c_i, 'pause_before', 0)
-                        latest_start = latest_end - c_j.duration
-                        latest_slot_idx = optimizer._get_time_slot_index(minutes_to_time(latest_start))
-                        
-                        print(f"  [shared_groups] PRIORITIZING window class {j} BEFORE fixed class {i}")
-                        constraint_expr = optimizer.model.Add(optimizer.start_vars[j] <= latest_slot_idx)
-                        
-                        optimizer.add_constraint(
-                            constraint_expr=constraint_expr,
-                            constraint_type=ConstraintType.TIME_WINDOW,
-                            origin_module=__name__,
-                            origin_function="analyze_time_conflicts",
-                            class_i=j,
-                            description=f"Window class {j} before fixed class {i}",
-                            variables_used=[f"start_var[{j}]"]
-                        )
-                        return
-                        
-                # Если фиксированное c_j и оконное c_i
-                elif type_j == 'fixed' and type_i == 'window':
-                    if can_seq_j_i and info_j_i['reason'] == 'fits_before_fixed':
-                        # c_i можно разместить ДО c_j - предпочитаем этот вариант
-                        fixed_start = time_to_minutes(bounds_j.min_time)
-                        latest_end = fixed_start - getattr(c_j, 'pause_before', 0)
-                        latest_start = latest_end - c_i.duration
-                        latest_slot_idx = optimizer._get_time_slot_index(minutes_to_time(latest_start))
-                        
-                        print(f"  [shared_groups] PRIORITIZING window class {i} BEFORE fixed class {j}")
-                        constraint_expr = optimizer.model.Add(optimizer.start_vars[i] <= latest_slot_idx)
-                        
-                        optimizer.add_constraint(
-                            constraint_expr=constraint_expr,
-                            constraint_type=ConstraintType.TIME_WINDOW,
-                            origin_module=__name__,
-                            origin_function="analyze_time_conflicts",
-                            class_i=i,
-                            description=f"Window class {i} before fixed class {j}",
-                            variables_used=[f"start_var[{i}]"]
-                        )
-                        return
-                        
-            except Exception as e:
-                print(f"  Warning: Could not use effective bounds for sequential check: {e}")
-                # Fallback к оригинальным полям - завершаем блок
-                pass
-                
-            # НОВОЕ: Обработка неперекрывающихся временных окон
-            if can_seq_i_j and info_i_j['reason'] == 'windows_separate_c1_before_c2':
-                # c_i должен быть строго перед c_j (неперекрывающиеся окна)
-                # Добавляем ограничение: c_i + duration + pause <= start_c_j
-                duration_i_slots = c_i.duration // optimizer.time_interval
-                pause_slots = max(1, (c_i.pause_after + c_j.pause_before) // optimizer.time_interval)
-                
-                print(f"  [windows_separate] Adding strict sequential constraint: {i} before {j}")
-                constraint = optimizer.model.Add(optimizer.start_vars[i] + duration_i_slots + pause_slots <= optimizer.start_vars[j])
-                return
-                
-            # Если обратный порядок невозможен из-за неправильного порядка окон
-            elif can_seq_i_j == False and info_i_j['reason'] == 'windows_separate_wrong_order':
-                # Проверяем обратный порядок
-                if can_seq_j_i and info_j_i['reason'] == 'windows_separate_c1_before_c2':
-                    # c_j должен быть строго перед c_i
-                    duration_j_slots = c_j.duration // optimizer.time_interval
-                    pause_slots = max(1, (c_j.pause_after + c_i.pause_before) // optimizer.time_interval)
-                    
-                    print(f"  [windows_separate] Adding strict sequential constraint: {j} before {i}")
-                    constraint = optimizer.model.Add(optimizer.start_vars[j] + duration_j_slots + pause_slots <= optimizer.start_vars[i])
-                    return
-                
-            # Оба занятия с временными окнами или оба фиксированные
-            # Стандартная обработка
+        # НОВОЕ: Всегда используем sequential_constraints для общего учителя
+        # независимо от наличия общих групп
+        add_sequential_constraints(optimizer, i, j, c_i, c_j)
+        return
         
-        # Продолжаем с существующей логикой для случаев без общих групп
-        # или если не удалось применить особую обработку выше
-        can_seq, info = can_schedule_sequentially(c_i, c_j, i, j, verbose=False)
+    # Дополнительная проверка для общих ресурсов (группы, кабинеты)
+    shared_groups = set(c_i.get_groups()) & set(c_j.get_groups())
+    if shared_groups:
+        print(f"  Classes share groups: {shared_groups}")
+        add_sequential_constraints(optimizer, i, j, c_i, c_j)
+        return
         
-        # New logging for chain & resource gap
-        if info.get("reason") == "chain_and_resource_gap":
-            start1, end1 = info["c1_interval"]
-            start2, end2 = info["c2_interval"]
-            gap = info["gap"]
-            print(f"SEQUENTIAL via chain & resource-gap: "
-                  f"{c_i.subject} {start1//60:02d}:{start1%60:02d}-{end1//60:02d}:{end1%60:02d}, "
-                  f"{c_j.subject} {start2//60:02d}:{start2%60:02d}-{end2//60:02d}:{end2%60:02d} "
-                  f"(gap {gap} min)")
-
-        # Если can_seq==False, fall through к стандартному конфликтному блоку
-        
-        # now re-run scheduling check in reverse order
-        can_seq_rev, info_rev = can_schedule_sequentially(c_j, c_i, j, i, verbose=False)
-        
-        # New logging for chain & resource gap (reverse order)
-        if info_rev.get("reason") == "chain_and_resource_gap":
-            start1, end1 = info_rev["c1_interval"]
-            start2, end2 = info_rev["c2_interval"]
-            gap = info_rev["gap"]
-            print(f"SEQUENTIAL via chain & resource-gap (reverse): "
-                  f"{c_j.subject} {start1//60:02d}:{start1%60:02d}-{end1//60:02d}:{end1%60:02d}, "
-                  f"{c_i.subject} {start2//60:02d}:{start2%60:02d}-{end2//60:02d}:{end2%60:02d} "
-                  f"(gap {gap} min)")
-        if can_seq_rev:
-            # fits_before_fixed для reversed: значит c_i нужно «до»
-            if info_rev['reason'] == 'fits_before_fixed':
-                fixed_start = time_to_minutes(c_j.start_time)
-                latest_end  = fixed_start - c_i.pause_before
-                latest_start = latest_end - c_i.duration
-                slot_idx = optimizer._get_time_slot_index(minutes_to_time(latest_start))
-
-                print(f"  [shared_groups] Applying BEFORE-fixed (reversed) for class {i}")
-                constraint_expr = optimizer.model.Add(optimizer.start_vars[i] <= slot_idx)
-                return
-
-            # fits_after_fixed для reversed: c_i «после»
-            elif info_rev['reason'] == 'fits_after_fixed':
-                fixed_start = time_to_minutes(c_j.start_time)
-                fixed_end   = fixed_start + c_j.duration + c_j.pause_after
-
-                earliest_start = fixed_end + c_i.pause_before
-                slot_idx = optimizer._get_time_slot_index(minutes_to_time(earliest_start))
-
-                print(f"  [shared_groups] Applying AFTER-fixed (reversed) for class {i}")
-                constraint_expr = optimizer.model.Add(optimizer.start_vars[i] >= slot_idx)
-                return
-
-            else:  # both_orders_possible — НИЧЕГО
-                print(f"  [shared_groups] both_orders_possible (reversed) — leaving free")
-                return
-    
-    # 0-2) Оба занятия в одной комнате и оба с окнами → проверяем альтернативы
-    if set(c_i.possible_rooms) & set(c_j.possible_rooms):
-        if c_i.start_time and c_i.end_time and c_j.start_time and c_j.end_time:
-            if check_two_window_classes(optimizer, i, j, c_i, c_j):
-                # Проверяем, есть ли альтернативные аудитории
-                has_alternatives_i = len(c_i.possible_rooms) > 1
-                has_alternatives_j = len(c_j.possible_rooms) > 1
-                
-                if has_alternatives_i or has_alternatives_j:
-                    print(f"  [window-window room] Classes {i},{j} have room alternatives - adding room conflict constraints")
-                    from resource_constraints import _add_room_conflict_constraints
-                    _add_room_conflict_constraints(optimizer, i, j, c_i, c_j)
-                    return
-                else:
-                    print(f"  [window-window room] Adding sequential constraints for shared room classes {i},{j}")
-                    add_sequential_constraints(optimizer, i, j, c_i, c_j)
-                    return
-    # Если ни один вариант не возможен
-    print(f"  Sequential scheduling not possible for these time windows")
-    
-    # Стандартная обработка конфликтов (для случаев, когда последовательное размещение невозможно)
-    print(f"Adding standard conflict constraints between classes {i} and {j}")
-    
-    # Создаем переменные для конфликта
-    conflict, same_day, time_overlap = create_conflict_variables(optimizer, i, j, c_i, c_j)
-    
-    # Добавляем ограничения для определения перекрытия времени
-    add_time_overlap_constraints(optimizer, i, j, c_i, c_j, time_overlap)
-    
-    # Conflict if same day and time overlap
-    optimizer.model.AddBoolAnd([same_day, time_overlap]).OnlyEnforceIf(conflict)
-    optimizer.model.AddBoolOr([same_day.Not(), time_overlap.Not()]).OnlyEnforceIf(conflict.Not())
-    
-    # Prevent conflicts
-    constraint_expr = optimizer.model.Add(conflict == False)
-    
-    # Check for room conflicts (only for classes with variable room assignment)
-    shared_rooms = set(c_i.possible_rooms) & set(c_j.possible_rooms)
+    # Проверяем общие комнаты - тоже требуют последовательного размещения
     if shared_rooms:
-        # Add constraints to ensure different rooms if conflict potential exists
-        same_room = optimizer.model.NewBoolVar(f"same_room_{i}_{j}")
-        if isinstance(optimizer.room_vars[i], int) and isinstance(optimizer.room_vars[j], int):
-            # Проверяем равенство комнат и устанавливаем значение переменной same_room
-            if optimizer.room_vars[i] == optimizer.room_vars[j]:
-                constraint_expr = optimizer.model.Add(same_room == 1)
-            else:
-                constraint_expr = optimizer.model.Add(same_room == 0)
-        elif isinstance(optimizer.room_vars[i], int):
-            constraint_expr = optimizer.model.Add(optimizer.room_vars[j] == optimizer.room_vars[i]).OnlyEnforceIf(same_room)
-            constraint_expr = optimizer.model.Add(optimizer.room_vars[j] != optimizer.room_vars[i]).OnlyEnforceIf(same_room.Not())
-        elif isinstance(optimizer.room_vars[j], int):
-            constraint_expr = optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
-            constraint_expr = optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
-        else:
-            constraint_expr = optimizer.model.Add(optimizer.room_vars[i] == optimizer.room_vars[j]).OnlyEnforceIf(same_room)
-            constraint_expr = optimizer.model.Add(optimizer.room_vars[i] != optimizer.room_vars[j]).OnlyEnforceIf(same_room.Not())
-        
-        # If same room, check for conflicts
-        room_conflict = optimizer.model.NewBoolVar(f"room_conflict_{i}_{j}")
-        optimizer.model.AddBoolAnd([same_room, conflict]).OnlyEnforceIf(room_conflict)
-        constraint_expr = optimizer.model.Add(room_conflict == False)
+        print(f"  Classes share rooms: {shared_rooms}")
+        add_sequential_constraints(optimizer, i, j, c_i, c_j)
+        return
+
+    # Если нет общих ресурсов, ограничения не нужны
+    print(f"  No shared resources detected - no constraints needed")
+    return
 
 def times_overlap(class1, class2, optimizer=None, idx1=None, idx2=None):
     """

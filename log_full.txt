@@ -18,7 +18,7 @@ All classes to be processed:
   5: Nachhilfe - Bogrez Tumarov - Tatarchuk Tetiana - Mi 16:00-20:00
   6: Nachhilfe - Danilischina Mariia - Tatarchuk Tetiana - Mi 16:00-20:00
   7: NH Physik - Danilischina Mariia - Tatarchuk Tetiana - Mi 16:00-20:00
-  8: Russish - 9G - Tchoudnovskaia Anna - Mi 15:00-19:45
+  8: Russish - 9G - Tchoudnovskaia Anna - Mi 15:00-17:00
 
 Class Kunst - 6B - Melnikov Pavel - Mi 16:00-19:45 has linked classes:
   - Russish - 6B - Tchoudnovskaia Anna - Mi 16:00-19:45
@@ -224,23 +224,24 @@ DEBUG: Creating variable for window class 7 'NH Physik':
   - Duration: 45 min
   - Slot range: 96-135 (16:00-19:15)
 
-Processing class Russish with time window 15:00-19:45:
+Processing class Russish with time window 15:00-17:00:
   Start minutes: 900
-  End minutes: 1185
+  End minutes: 1020
   Class duration: 45 min
-  Available time for class: 285 min
-  Class fits in window. Latest possible start: 19:00 (slot 132)
-  Start slot range: 84-132
-  Time slot values: 15:00-19:00
+  Available time for class: 120 min
+  Class fits in window. Latest possible start: 16:15 (slot 99)
+  Start slot range: 84-99
+  Time slot values: 15:00-16:15
   ✓ Added constraint time_window_17: Time window constraint: class 8 start >= 15:00
-  ✓ Added constraint time_window_18: Time window constraint: class 8 end <= 19:45
-Class Russish has time window: 15:00-19:45
+  ✓ Added constraint time_window_18: Time window constraint: class 8 end <= 17:00
+Class Russish has time window: 15:00-17:00
 DEBUG: Creating variable for window class 8 'Russish':
-  - Window: 15:00-19:45
+  - Window: 15:00-17:00
   - Duration: 45 min
-  - Slot range: 84-132 (15:00-19:00)
+  - Slot range: 84-99 (15:00-16:15)
 
 === ADDING RESOURCE CONFLICT CONSTRAINTS ===
+  Initialized linked chains: 3 chains found
 
 Detailed class information:
 Class 0: Kunst - 6B - Melnikov Pavel - Mi 16:00-19:45
@@ -267,7 +268,7 @@ Class 6: Nachhilfe - Danilischina Mariia - Tatarchuk Tetiana - Mi 16:00-20:00
 Class 7: NH Physik - Danilischina Mariia - Tatarchuk Tetiana - Mi 16:00-20:00
   Duration: 45 min, Pause before: 0 min, Pause after: 5 min
   Room(s): VK.07, VK.08, VK.11
-Class 8: Russish - 9G - Tchoudnovskaia Anna - Mi 15:00-19:45
+Class 8: Russish - 9G - Tchoudnovskaia Anna - Mi 15:00-17:00
   Duration: 45 min, Pause before: 0 min, Pause after: 0 min
   Room(s): V2.03
 
@@ -282,7 +283,7 @@ CHAIN ANALYSIS:
   Class 0 in chain: True
     Chain composition: ['Kunst', 'Russish', 'Mathe']
   Class 1 in chain: True
-    Chain composition: ['Kunst', 'Russish', 'Mathe']
+    Chain composition: ['Russish']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 0: 16:00 - 19:45
   Class 1: 16:00 - 19:45
@@ -320,7 +321,7 @@ Class 1: Russish (6B) - Teacher: Tchoudnovskaia Anna
 Class 2: Mathe (6B) - Teacher: Tchoudnovskaia Anna
 CHAIN ANALYSIS:
   Class 1 in chain: True
-    Chain composition: ['Kunst', 'Russish', 'Mathe']
+    Chain composition: ['Russish']
   Class 2 in chain: True
     Chain composition: ['Mathe']
 WINDOW vs WINDOW ANALYSIS (fallback):
@@ -341,12 +342,13 @@ CHAIN ANALYSIS:
   Class 8 in chain: False
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 2: 16:00 - 19:45
-  Class 8: 15:00 - 19:45
+  Class 8: 15:00 - 17:00
 
-SEQUENTIAL SCHEDULING: Room V2.03 can fit both window classes sequentially:
+POTENTIAL CONFLICT: Room V2.03 - classes cannot be scheduled sequentially:
   Class 2: Mathe - 6B - Tchoudnovskaia Anna with window 16:00-19:45 (45 min)
-  Class 8: Russish - 9G - Tchoudnovskaia Anna with window 15:00-19:45 (45 min)
-  Scheduling reason: sufficient_overlap_time_fallback
+  Class 8: Russish - 9G - Tchoudnovskaia Anna with window 15:00-17:00 (45 min)
+  Conflict reason: insufficient_overlap_time_fallback
+  WARNING: These classes cannot be scheduled together in this room!
 
 === ANALYZING SEQUENTIAL SCHEDULING ===
 Class 3: Schach (Schach Mi A) - Teacher: Rosov Boris
@@ -355,7 +357,7 @@ CHAIN ANALYSIS:
   Class 3 in chain: True
     Chain composition: ['Schach', 'Schach']
   Class 4 in chain: True
-    Chain composition: ['Schach', 'Schach']
+    Chain composition: ['Schach']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 3: 16:00 - 17:35
   Class 4: 16:00 - 17:35
@@ -390,7 +392,7 @@ CHAIN ANALYSIS:
   Class 3 in chain: True
     Chain composition: ['Schach', 'Schach']
   Class 6 in chain: True
-    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
+    Chain composition: ['Nachhilfe']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 3: 16:00 - 17:35
   Class 6: 16:00 - 20:00
@@ -408,7 +410,7 @@ CHAIN ANALYSIS:
   Class 3 in chain: True
     Chain composition: ['Schach', 'Schach']
   Class 7 in chain: True
-    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
+    Chain composition: ['NH Physik']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 3: 16:00 - 17:35
   Class 7: 16:00 - 20:00
@@ -423,7 +425,7 @@ Class 4: Schach (Schach Mi B) - Teacher: Rosov Boris
 Class 5: Nachhilfe (Bogrez Tumarov) - Teacher: Tatarchuk Tetiana
 CHAIN ANALYSIS:
   Class 4 in chain: True
-    Chain composition: ['Schach', 'Schach']
+    Chain composition: ['Schach']
   Class 5 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
 WINDOW vs WINDOW ANALYSIS (fallback):
@@ -441,9 +443,9 @@ Class 4: Schach (Schach Mi B) - Teacher: Rosov Boris
 Class 6: Nachhilfe (Danilischina Mariia) - Teacher: Tatarchuk Tetiana
 CHAIN ANALYSIS:
   Class 4 in chain: True
-    Chain composition: ['Schach', 'Schach']
+    Chain composition: ['Schach']
   Class 6 in chain: True
-    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
+    Chain composition: ['Nachhilfe']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 4: 16:00 - 17:35
   Class 6: 16:00 - 20:00
@@ -459,9 +461,9 @@ Class 4: Schach (Schach Mi B) - Teacher: Rosov Boris
 Class 7: NH Physik (Danilischina Mariia) - Teacher: Tatarchuk Tetiana
 CHAIN ANALYSIS:
   Class 4 in chain: True
-    Chain composition: ['Schach', 'Schach']
+    Chain composition: ['Schach']
   Class 7 in chain: True
-    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
+    Chain composition: ['NH Physik']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 4: 16:00 - 17:35
   Class 7: 16:00 - 20:00
@@ -478,7 +480,7 @@ CHAIN ANALYSIS:
   Class 5 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
   Class 6 in chain: True
-    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
+    Chain composition: ['Nachhilfe']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 5: 16:00 - 20:00
   Class 6: 16:00 - 20:00
@@ -495,7 +497,7 @@ CHAIN ANALYSIS:
   Class 5 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
   Class 7 in chain: True
-    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
+    Chain composition: ['NH Physik']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 5: 16:00 - 20:00
   Class 7: 16:00 - 20:00
@@ -510,9 +512,9 @@ Class 6: Nachhilfe (Danilischina Mariia) - Teacher: Tatarchuk Tetiana
 Class 7: NH Physik (Danilischina Mariia) - Teacher: Tatarchuk Tetiana
 CHAIN ANALYSIS:
   Class 6 in chain: True
-    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
+    Chain composition: ['Nachhilfe']
   Class 7 in chain: True
-    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
+    Chain composition: ['NH Physik']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 6: 16:00 - 20:00
   Class 7: 16:00 - 20:00
@@ -569,11 +571,19 @@ Classes 0 and 1: Kunst vs Russish
 Initialized effective_bounds system
   Extracting bounds from original data for class 0
   Extracting bounds from original data for class 1
-  [window-window room] Classes 0,1 have room alternatives - adding room conflict constraints
-  ✓ Added constraint room_conflict_19: Room match check (variable): classes 0 and 1
-  ✓ Added constraint room_conflict_20: Room mismatch check (variable): classes 0 and 1
-  ✓ Added constraint room_conflict_21: Prevent room conflicts: classes 0 and 1
-  Added room conflict constraints between classes 0 and 1
+  Classes share groups: {'6B'}
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 0 and 1: Kunst vs Russish
+  Class 0 (Kunst) in chain: True
+  Class 1 (Russish) in chain: True
+  Both classes are in chains - using standard sequential constraints
+  Applying direct sequential constraints
+  ✓ Added constraint sequential_19: End time calculation for class 0
+  ✓ Added constraint sequential_20: End time calculation for class 1
+  ✓ Added constraint sequential_21: Sequential ordering (i→j): class 0 before class 1
+  ✓ Added constraint sequential_22: Sequential ordering (j→i): class 1 before class 0
+  ✓ Added STRICT sequential constraints between classes 0 and 1 with min pause 1 slots
 Checking room conflict between classes 0 and 2 in rooms {'V2.07'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
@@ -582,11 +592,19 @@ Classes 0 and 2: Kunst vs Mathe
   Shared groups: {'6B'}
   Must add constraints: True
   Extracting bounds from original data for class 2
-  [window-window room] Classes 0,2 have room alternatives - adding room conflict constraints
-  ✓ Added constraint room_conflict_22: Room match check (variable): classes 0 and 2
-  ✓ Added constraint room_conflict_23: Room mismatch check (variable): classes 0 and 2
-  ✓ Added constraint room_conflict_24: Prevent room conflicts: classes 0 and 2
-  Added room conflict constraints between classes 0 and 2
+  Classes share groups: {'6B'}
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 0 and 2: Kunst vs Mathe
+  Class 0 (Kunst) in chain: True
+  Class 2 (Mathe) in chain: True
+  Both classes are in chains - using standard sequential constraints
+  Applying direct sequential constraints
+  ✓ Added constraint sequential_23: End time calculation for class 0
+  ✓ Added constraint sequential_24: End time calculation for class 2
+  ✓ Added constraint sequential_25: Sequential ordering (i→j): class 0 before class 2
+  ✓ Added constraint sequential_26: Sequential ordering (j→i): class 2 before class 0
+  ✓ Added STRICT sequential constraints between classes 0 and 2 with min pause 1 slots
   Extracting bounds from original data for class 3
   Time overlap analysis using effective bounds:
     Class 0: 16:00-19:00 + 45min = 960-1185
@@ -620,7 +638,7 @@ Classes 0 and 2: Kunst vs Mathe
   Extracting bounds from original data for class 8
   Time overlap analysis using effective bounds:
     Class 0: 16:00-19:00 + 45min = 960-1185
-    Class 8: 15:00-19:00 + 45min = 900-1185
+    Class 8: 15:00-16:15 + 45min = 900-1020
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
 Checking room conflict between classes 1 and 2 in rooms {'V2.07'}
@@ -630,7 +648,19 @@ Classes 1 and 2: Russish vs Mathe
   Shared rooms: {'V2.07'}
   Shared groups: {'6B'}
   Must add constraints: True
-  [shared_groups] both_orders_possible (reversed) — leaving free
+  Classes share teacher: Tchoudnovskaia Anna
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 1 and 2: Russish vs Mathe
+  Class 1 (Russish) in chain: True
+  Class 2 (Mathe) in chain: True
+  Both classes are in chains - using standard sequential constraints
+  Applying direct sequential constraints
+  ✓ Added constraint sequential_27: End time calculation for class 1
+  ✓ Added constraint sequential_28: End time calculation for class 2
+  ✓ Added constraint sequential_29: Sequential ordering (i→j): class 1 before class 2
+  ✓ Added constraint sequential_30: Sequential ordering (j→i): class 2 before class 1
+  ✓ Added STRICT sequential constraints between classes 1 and 2 with min pause 1 slots
   Time overlap analysis using effective bounds:
     Class 1: 16:00-18:30 + 75min = 960-1185
     Class 3: 16:00-16:50 + 45min = 960-1055
@@ -658,9 +688,44 @@ Classes 1 and 2: Russish vs Mathe
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
   Time overlap analysis using effective bounds:
     Class 1: 16:00-18:30 + 75min = 960-1185
-    Class 8: 15:00-19:00 + 45min = 900-1185
+    Class 8: 15:00-16:15 + 45min = 900-1020
     Overlap: YES
-  ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
+Detected potential conflict between 'Russish' and 'Russish' (shared teacher 'Tchoudnovskaia Anna' with different groups (cannot schedule sequentially))
+
+=== ADDING TIME CONFLICT CONSTRAINTS ===
+Classes 1 and 8: Russish vs Russish
+  Shared rooms: set()
+  Shared groups: set()
+  Must add constraints: set()
+  Classes share teacher: Tchoudnovskaia Anna
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 1 and 8: Russish vs Russish
+  Class 1 (Russish) in chain: True
+  Class 8 (Russish) in chain: False
+
+=== ANCHOR-BASED CONSTRAINT PROCESSING ===
+Flex class 8: Russish
+Target class 1: Russish
+  Found chain via optimizer.linked_chains: 2 classes
+
+=== SELECTING BEST ANCHOR ===
+Flex class: Russish (teacher: Tchoudnovskaia Anna)
+Chain has 2 classes
+Direction: before
+  Candidate: Kunst
+    T=1 (teacher: Melnikov Pavel), G=1 (groups: 0), R=1 (rooms: 0), idle=0.0min
+    Score: 5*1 + 3*1 + 1*1 + 0.1*0.0 = 9.00
+  Candidate: Russish
+    T=0 (teacher: Tchoudnovskaia Anna), G=1 (groups: 0), R=1 (rooms: 0), idle=0.0min
+    Score: 5*0 + 3*1 + 1*1 + 0.1*0.0 = 4.00
+  ✓ Best anchor: Russish (score: 4.00)
+===================================
+  Selected anchor: Russish (index 1)
+  ✓ Added constraint sequential_31: Anchor-based sequential: Russish before Russish
+  ✓ Added anchor-based constraint: class 8 + 9 + 1 <= class 1
+==================================================
+  ✓ Used anchor-based constraint: free class 8 anchored to chain containing class 1
   Time overlap analysis using effective bounds:
     Class 2: 16:00-19:00 + 45min = 960-1185
     Class 3: 16:00-16:50 + 45min = 960-1055
@@ -693,7 +758,38 @@ Classes 2 and 8: Mathe vs Russish
   Shared rooms: {'V2.03'}
   Shared groups: set()
   Must add constraints: True
-  [shared_groups] both_orders_possible (reversed) — leaving free
+  Classes share teacher: Tchoudnovskaia Anna
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 2 and 8: Mathe vs Russish
+  Class 2 (Mathe) in chain: True
+  Class 8 (Russish) in chain: False
+
+=== ANCHOR-BASED CONSTRAINT PROCESSING ===
+Flex class 8: Russish
+Target class 2: Mathe
+  Found chain from root class: 3 classes
+
+=== SELECTING BEST ANCHOR ===
+Flex class: Russish (teacher: Tchoudnovskaia Anna)
+Chain has 3 classes
+Direction: before
+  Candidate: Kunst
+    T=1 (teacher: Melnikov Pavel), G=1 (groups: 0), R=1 (rooms: 0), idle=0.0min
+    Score: 5*1 + 3*1 + 1*1 + 0.1*0.0 = 9.00
+  Candidate: Russish
+    T=0 (teacher: Tchoudnovskaia Anna), G=1 (groups: 0), R=1 (rooms: 0), idle=0.0min
+    Score: 5*0 + 3*1 + 1*1 + 0.1*0.0 = 4.00
+  Candidate: Mathe
+    T=0 (teacher: Tchoudnovskaia Anna), G=1 (groups: 0), R=0 (rooms: 1), idle=0.0min
+    Score: 5*0 + 3*1 + 1*0 + 0.1*0.0 = 3.00
+  ✓ Best anchor: Mathe (score: 3.00)
+===================================
+  Selected anchor: Mathe (index 2)
+  ✓ Added constraint sequential_32: Anchor-based sequential: Russish before Mathe
+  ✓ Added anchor-based constraint: class 8 + 9 + 1 <= class 2
+==================================================
+  ✓ Used anchor-based constraint: free class 8 anchored to chain containing class 2
 Checking room conflict between classes 3 and 4 in rooms {'VK.11'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
@@ -701,7 +797,19 @@ Classes 3 and 4: Schach vs Schach
   Shared rooms: {'VK.11'}
   Shared groups: set()
   Must add constraints: True
-  [shared_groups] both_orders_possible (reversed) — leaving free
+  Classes share teacher: Rosov Boris
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 3 and 4: Schach vs Schach
+  Class 3 (Schach) in chain: True
+  Class 4 (Schach) in chain: True
+  Both classes are in chains - using standard sequential constraints
+  Applying direct sequential constraints
+  ✓ Added constraint sequential_33: End time calculation for class 3
+  ✓ Added constraint sequential_34: End time calculation for class 4
+  ✓ Added constraint sequential_35: Sequential ordering (i→j): class 3 before class 4
+  ✓ Added constraint sequential_36: Sequential ordering (j→i): class 4 before class 3
+  ✓ Added STRICT sequential constraints between classes 3 and 4 with min pause 1 slots
 Checking room conflict between classes 3 and 5 in rooms {'VK.11'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
@@ -709,11 +817,19 @@ Classes 3 and 5: Schach vs Nachhilfe
   Shared rooms: {'VK.11'}
   Shared groups: set()
   Must add constraints: True
-  [window-window room] Classes 3,5 have room alternatives - adding room conflict constraints
-  ✓ Added constraint room_conflict_25: Room match check (fixed i): classes 3 and 5
-  ✓ Added constraint room_conflict_26: Room mismatch check (fixed i): classes 3 and 5
-  ✓ Added constraint room_conflict_27: Prevent room conflicts: classes 3 and 5
-  Added room conflict constraints between classes 3 and 5
+  Classes share rooms: {'VK.11'}
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 3 and 5: Schach vs Nachhilfe
+  Class 3 (Schach) in chain: True
+  Class 5 (Nachhilfe) in chain: True
+  Both classes are in chains - using standard sequential constraints
+  Applying direct sequential constraints
+  ✓ Added constraint sequential_37: End time calculation for class 3
+  ✓ Added constraint sequential_38: End time calculation for class 5
+  ✓ Added constraint sequential_39: Sequential ordering (i→j): class 3 before class 5
+  ✓ Added constraint sequential_40: Sequential ordering (j→i): class 5 before class 3
+  ✓ Added STRICT sequential constraints between classes 3 and 5 with min pause 1 slots
 Checking room conflict between classes 3 and 6 in rooms {'VK.11'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
@@ -721,11 +837,19 @@ Classes 3 and 6: Schach vs Nachhilfe
   Shared rooms: {'VK.11'}
   Shared groups: set()
   Must add constraints: True
-  [window-window room] Classes 3,6 have room alternatives - adding room conflict constraints
-  ✓ Added constraint room_conflict_28: Room match check (fixed i): classes 3 and 6
-  ✓ Added constraint room_conflict_29: Room mismatch check (fixed i): classes 3 and 6
-  ✓ Added constraint room_conflict_30: Prevent room conflicts: classes 3 and 6
-  Added room conflict constraints between classes 3 and 6
+  Classes share rooms: {'VK.11'}
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 3 and 6: Schach vs Nachhilfe
+  Class 3 (Schach) in chain: True
+  Class 6 (Nachhilfe) in chain: True
+  Both classes are in chains - using standard sequential constraints
+  Applying direct sequential constraints
+  ✓ Added constraint sequential_41: End time calculation for class 3
+  ✓ Added constraint sequential_42: End time calculation for class 6
+  ✓ Added constraint sequential_43: Sequential ordering (i→j): class 3 before class 6
+  ✓ Added constraint sequential_44: Sequential ordering (j→i): class 6 before class 3
+  ✓ Added STRICT sequential constraints between classes 3 and 6 with min pause 1 slots
 Checking room conflict between classes 3 and 7 in rooms {'VK.11'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
@@ -733,14 +857,22 @@ Classes 3 and 7: Schach vs NH Physik
   Shared rooms: {'VK.11'}
   Shared groups: set()
   Must add constraints: True
-  [window-window room] Classes 3,7 have room alternatives - adding room conflict constraints
-  ✓ Added constraint room_conflict_31: Room match check (fixed i): classes 3 and 7
-  ✓ Added constraint room_conflict_32: Room mismatch check (fixed i): classes 3 and 7
-  ✓ Added constraint room_conflict_33: Prevent room conflicts: classes 3 and 7
-  Added room conflict constraints between classes 3 and 7
+  Classes share rooms: {'VK.11'}
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 3 and 7: Schach vs NH Physik
+  Class 3 (Schach) in chain: True
+  Class 7 (NH Physik) in chain: True
+  Both classes are in chains - using standard sequential constraints
+  Applying direct sequential constraints
+  ✓ Added constraint sequential_45: End time calculation for class 3
+  ✓ Added constraint sequential_46: End time calculation for class 7
+  ✓ Added constraint sequential_47: Sequential ordering (i→j): class 3 before class 7
+  ✓ Added constraint sequential_48: Sequential ordering (j→i): class 7 before class 3
+  ✓ Added STRICT sequential constraints between classes 3 and 7 with min pause 1 slots
   Time overlap analysis using effective bounds:
     Class 3: 16:00-16:50 + 45min = 960-1055
-    Class 8: 15:00-19:00 + 45min = 900-1185
+    Class 8: 15:00-16:15 + 45min = 900-1020
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
 Checking room conflict between classes 4 and 5 in rooms {'VK.11'}
@@ -750,11 +882,19 @@ Classes 4 and 5: Schach vs Nachhilfe
   Shared rooms: {'VK.11'}
   Shared groups: set()
   Must add constraints: True
-  [window-window room] Classes 4,5 have room alternatives - adding room conflict constraints
-  ✓ Added constraint room_conflict_34: Room match check (fixed i): classes 4 and 5
-  ✓ Added constraint room_conflict_35: Room mismatch check (fixed i): classes 4 and 5
-  ✓ Added constraint room_conflict_36: Prevent room conflicts: classes 4 and 5
-  Added room conflict constraints between classes 4 and 5
+  Classes share rooms: {'VK.11'}
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 4 and 5: Schach vs Nachhilfe
+  Class 4 (Schach) in chain: True
+  Class 5 (Nachhilfe) in chain: True
+  Both classes are in chains - using standard sequential constraints
+  Applying direct sequential constraints
+  ✓ Added constraint sequential_49: End time calculation for class 4
+  ✓ Added constraint sequential_50: End time calculation for class 5
+  ✓ Added constraint sequential_51: Sequential ordering (i→j): class 4 before class 5
+  ✓ Added constraint sequential_52: Sequential ordering (j→i): class 5 before class 4
+  ✓ Added STRICT sequential constraints between classes 4 and 5 with min pause 0 slots
 Checking room conflict between classes 4 and 6 in rooms {'VK.11'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
@@ -762,11 +902,19 @@ Classes 4 and 6: Schach vs Nachhilfe
   Shared rooms: {'VK.11'}
   Shared groups: set()
   Must add constraints: True
-  [window-window room] Classes 4,6 have room alternatives - adding room conflict constraints
-  ✓ Added constraint room_conflict_37: Room match check (fixed i): classes 4 and 6
-  ✓ Added constraint room_conflict_38: Room mismatch check (fixed i): classes 4 and 6
-  ✓ Added constraint room_conflict_39: Prevent room conflicts: classes 4 and 6
-  Added room conflict constraints between classes 4 and 6
+  Classes share rooms: {'VK.11'}
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 4 and 6: Schach vs Nachhilfe
+  Class 4 (Schach) in chain: True
+  Class 6 (Nachhilfe) in chain: True
+  Both classes are in chains - using standard sequential constraints
+  Applying direct sequential constraints
+  ✓ Added constraint sequential_53: End time calculation for class 4
+  ✓ Added constraint sequential_54: End time calculation for class 6
+  ✓ Added constraint sequential_55: Sequential ordering (i→j): class 4 before class 6
+  ✓ Added constraint sequential_56: Sequential ordering (j→i): class 6 before class 4
+  ✓ Added STRICT sequential constraints between classes 4 and 6 with min pause 0 slots
 Checking room conflict between classes 4 and 7 in rooms {'VK.11'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
@@ -774,61 +922,105 @@ Classes 4 and 7: Schach vs NH Physik
   Shared rooms: {'VK.11'}
   Shared groups: set()
   Must add constraints: True
-  [window-window room] Classes 4,7 have room alternatives - adding room conflict constraints
-  ✓ Added constraint room_conflict_40: Room match check (fixed i): classes 4 and 7
-  ✓ Added constraint room_conflict_41: Room mismatch check (fixed i): classes 4 and 7
-  ✓ Added constraint room_conflict_42: Prevent room conflicts: classes 4 and 7
-  Added room conflict constraints between classes 4 and 7
+  Classes share rooms: {'VK.11'}
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 4 and 7: Schach vs NH Physik
+  Class 4 (Schach) in chain: True
+  Class 7 (NH Physik) in chain: True
+  Both classes are in chains - using standard sequential constraints
+  Applying direct sequential constraints
+  ✓ Added constraint sequential_57: End time calculation for class 4
+  ✓ Added constraint sequential_58: End time calculation for class 7
+  ✓ Added constraint sequential_59: Sequential ordering (i→j): class 4 before class 7
+  ✓ Added constraint sequential_60: Sequential ordering (j→i): class 7 before class 4
+  ✓ Added STRICT sequential constraints between classes 4 and 7 with min pause 0 slots
   Time overlap analysis using effective bounds:
     Class 4: 16:00-16:50 + 45min = 960-1055
-    Class 8: 15:00-19:00 + 45min = 900-1185
+    Class 8: 15:00-16:15 + 45min = 900-1020
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
-Checking room conflict between classes 5 and 6 in rooms {'VK.07', 'VK.08', 'VK.11'}
+Checking room conflict between classes 5 and 6 in rooms {'VK.11', 'VK.08', 'VK.07'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
 Classes 5 and 6: Nachhilfe vs Nachhilfe
-  Shared rooms: {'VK.07', 'VK.08', 'VK.11'}
+  Shared rooms: {'VK.11', 'VK.08', 'VK.07'}
   Shared groups: set()
   Must add constraints: True
-  [shared_groups] both_orders_possible (reversed) — leaving free
-Checking room conflict between classes 5 and 7 in rooms {'VK.07', 'VK.08', 'VK.11'}
+  Classes share teacher: Tatarchuk Tetiana
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 5 and 6: Nachhilfe vs Nachhilfe
+  Class 5 (Nachhilfe) in chain: True
+  Class 6 (Nachhilfe) in chain: True
+  Both classes are in chains - using standard sequential constraints
+  Applying direct sequential constraints
+  ✓ Added constraint sequential_61: End time calculation for class 5
+  ✓ Added constraint sequential_62: End time calculation for class 6
+  ✓ Added constraint sequential_63: Sequential ordering (i→j): class 5 before class 6
+  ✓ Added constraint sequential_64: Sequential ordering (j→i): class 6 before class 5
+  ✓ Added STRICT sequential constraints between classes 5 and 6 with min pause 1 slots
+Checking room conflict between classes 5 and 7 in rooms {'VK.11', 'VK.08', 'VK.07'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
 Classes 5 and 7: Nachhilfe vs NH Physik
-  Shared rooms: {'VK.07', 'VK.08', 'VK.11'}
+  Shared rooms: {'VK.11', 'VK.08', 'VK.07'}
   Shared groups: set()
   Must add constraints: True
-  [shared_groups] both_orders_possible (reversed) — leaving free
+  Classes share teacher: Tatarchuk Tetiana
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 5 and 7: Nachhilfe vs NH Physik
+  Class 5 (Nachhilfe) in chain: True
+  Class 7 (NH Physik) in chain: True
+  Both classes are in chains - using standard sequential constraints
+  Applying direct sequential constraints
+  ✓ Added constraint sequential_65: End time calculation for class 5
+  ✓ Added constraint sequential_66: End time calculation for class 7
+  ✓ Added constraint sequential_67: Sequential ordering (i→j): class 5 before class 7
+  ✓ Added constraint sequential_68: Sequential ordering (j→i): class 7 before class 5
+  ✓ Added STRICT sequential constraints between classes 5 and 7 with min pause 1 slots
   Time overlap analysis using effective bounds:
     Class 5: 16:00-18:45 + 75min = 960-1200
-    Class 8: 15:00-19:00 + 45min = 900-1185
+    Class 8: 15:00-16:15 + 45min = 900-1020
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
-Checking room conflict between classes 6 and 7 in rooms {'VK.07', 'VK.08', 'VK.11'}
+Checking room conflict between classes 6 and 7 in rooms {'VK.11', 'VK.08', 'VK.07'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
 Classes 6 and 7: Nachhilfe vs NH Physik
-  Shared rooms: {'VK.07', 'VK.08', 'VK.11'}
+  Shared rooms: {'VK.11', 'VK.08', 'VK.07'}
   Shared groups: {'Danilischina Mariia'}
   Must add constraints: True
-  [shared_groups] both_orders_possible (reversed) — leaving free
+  Classes share teacher: Tatarchuk Tetiana
+
+=== ADDING SEQUENTIAL CONSTRAINTS ===
+Classes 6 and 7: Nachhilfe vs NH Physik
+  Class 6 (Nachhilfe) in chain: True
+  Class 7 (NH Physik) in chain: True
+  Both classes are in chains - using standard sequential constraints
+  Applying direct sequential constraints
+  ✓ Added constraint sequential_69: End time calculation for class 6
+  ✓ Added constraint sequential_70: End time calculation for class 7
+  ✓ Added constraint sequential_71: Sequential ordering (i→j): class 6 before class 7
+  ✓ Added constraint sequential_72: Sequential ordering (j→i): class 7 before class 6
+  ✓ Added STRICT sequential constraints between classes 6 and 7 with min pause 1 slots
   Time overlap analysis using effective bounds:
     Class 6: 16:00-18:30 + 90min = 960-1200
-    Class 8: 15:00-19:00 + 45min = 900-1185
+    Class 8: 15:00-16:15 + 45min = 900-1020
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
   Time overlap analysis using effective bounds:
     Class 7: 16:00-19:15 + 45min = 960-1200
-    Class 8: 15:00-19:00 + 45min = 900-1185
+    Class 8: 15:00-16:15 + 45min = 900-1020
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
 
 === RESOURCE CONFLICT CONSTRAINTS SUMMARY ===
 Total class pairs: 36
-Processed pairs: 14
-Skipped pairs: 22
-Processing rate: 38.9%
+Processed pairs: 15
+Skipped pairs: 21
+Processing rate: 41.7%
 ==================================================
 
 Adding objective weights for timewindow optimization...
@@ -903,8 +1095,8 @@ Found 9 classes with time windows.
   Added window constraints for class 6: start between slots 96 and 126
   Updated effective bounds for class 7: EffectiveBounds(slot: 96-135, time: 16:00-19:15, source: time_window)
   Added window constraints for class 7: start between slots 96 and 135
-  Updated effective bounds for class 8: EffectiveBounds(slot: 84-132, time: 15:00-19:00, source: time_window)
-  Added window constraints for class 8: start between slots 84 and 132
+  Updated effective bounds for class 8: EffectiveBounds(slot: 84-99, time: 15:00-16:15, source: time_window)
+  Added window constraints for class 8: start between slots 84 and 99
 
 === ANALYZE RELATED CLASSES (REFACTORED) ===
 Using specialized modules for timeline, grouping, scheduling and constraints
@@ -928,42 +1120,43 @@ Finding independent groups for student_group '6B' on Mi
     Independent group 1/1: 3 classes
       Created timeline with 0 anchors, 1 free slots
 Creating placement plan for 6B_independent_1 on Mi
-  Plan type: sequential
+  Plan type: linked_chain
+Placing linked chain of 3 classes
+  Chain order: [0, 1, 2]
 Calculating sequential placement for 3 classes
   Available time: 225 min
   Required time: 175 min (classes: 165, pauses: 10)
     Class 0: 16:00-16:45
     Class 1: 16:50-18:05
     Class 2: 18:10-18:55
-      Created sequential placement plan (valid: True)
+      Created linked_chain placement plan (valid: True)
 Applying placement constraints...
-  Applying constraints for plan type: sequential
+  Applying constraints for plan type: linked_chain
 Adding chain sequence constraints...
-  Initializing linked chains...
   Processing chain with 3 classes
-  ✓ Added constraint chain_ordering_43: Chain: class 0 -> class 1 (gap: 10 slots)
+  ✓ Added constraint chain_ordering_73: Chain: class 0 -> class 1 (gap: 10 slots)
   Updated effective bounds for class 1: EffectiveBounds(slot: 96-126, time: 16:00-18:30, source: time_window)
   Added sequential constraint: Chain: class 0 -> class 1 (gap: 10 slots)
-  ✓ Added constraint chain_ordering_44: Chain: class 1 -> class 2 (gap: 16 slots)
+  ✓ Added constraint chain_ordering_74: Chain: class 1 -> class 2 (gap: 16 slots)
   Updated effective bounds for class 2: EffectiveBounds(slot: 96-132, time: 16:00-19:00, source: time_window)
   Added sequential constraint: Chain: class 1 -> class 2 (gap: 16 slots)
   Marked class 0 as having chain constraints applied
   Marked class 1 as having chain constraints applied
   Marked class 2 as having chain constraints applied
-  ✓ Added constraint time_window_45: Time window lower bound: class 0 >= slot 96
-  ✓ Added constraint time_window_46: Time window upper bound: class 0 <= slot 132
+  ✓ Added constraint time_window_75: Time window lower bound: class 0 >= slot 96
+  ✓ Added constraint time_window_76: Time window upper bound: class 0 <= slot 132
   Added window_bounds constraint: Window lower bound: class 0 >= slot 96
   Added window_bounds constraint: Window upper bound: class 0 <= slot 132
   Added window_bounds constraint: Window lower bound: class 0 >= slot 96
   Added window_bounds constraint: Window upper bound: class 0 <= slot 132
-  ✓ Added constraint time_window_47: Time window lower bound: class 1 >= slot 106
-  ✓ Added constraint time_window_48: Time window upper bound: class 1 <= slot 126
+  ✓ Added constraint time_window_77: Time window lower bound: class 1 >= slot 106
+  ✓ Added constraint time_window_78: Time window upper bound: class 1 <= slot 126
   Added window_bounds constraint: Window lower bound: class 1 >= slot 106
   Added window_bounds constraint: Window upper bound: class 1 <= slot 126
   Added window_bounds constraint: Window lower bound: class 1 >= slot 106
   Added window_bounds constraint: Window upper bound: class 1 <= slot 126
-  ✓ Added constraint time_window_49: Time window lower bound: class 2 >= slot 122
-  ✓ Added constraint time_window_50: Time window upper bound: class 2 <= slot 132
+  ✓ Added constraint time_window_79: Time window lower bound: class 2 >= slot 122
+  ✓ Added constraint time_window_80: Time window upper bound: class 2 <= slot 132
   Added window_bounds constraint: Window lower bound: class 2 >= slot 122
   Added window_bounds constraint: Window upper bound: class 2 <= slot 132
   Added window_bounds constraint: Window lower bound: class 2 >= slot 122
@@ -991,19 +1184,19 @@ Applying placement constraints...
   Applying constraints for plan type: sequential
 Adding chain sequence constraints...
   Processing chain with 2 classes
-  ✓ Added constraint chain_ordering_51: Chain: class 6 -> class 7 (gap: 19 slots)
+  ✓ Added constraint chain_ordering_81: Chain: class 6 -> class 7 (gap: 19 slots)
   Updated effective bounds for class 7: EffectiveBounds(slot: 96-135, time: 16:00-19:15, source: time_window)
   Added sequential constraint: Chain: class 6 -> class 7 (gap: 19 slots)
   Marked class 6 as having chain constraints applied
   Marked class 7 as having chain constraints applied
-  ✓ Added constraint time_window_52: Time window lower bound: class 6 >= slot 96
-  ✓ Added constraint time_window_53: Time window upper bound: class 6 <= slot 126
+  ✓ Added constraint time_window_82: Time window lower bound: class 6 >= slot 96
+  ✓ Added constraint time_window_83: Time window upper bound: class 6 <= slot 126
   Added window_bounds constraint: Window lower bound: class 6 >= slot 96
   Added window_bounds constraint: Window upper bound: class 6 <= slot 126
   Added window_bounds constraint: Window lower bound: class 6 >= slot 96
   Added window_bounds constraint: Window upper bound: class 6 <= slot 126
-  ✓ Added constraint time_window_54: Time window lower bound: class 7 >= slot 115
-  ✓ Added constraint time_window_55: Time window upper bound: class 7 <= slot 135
+  ✓ Added constraint time_window_84: Time window lower bound: class 7 >= slot 115
+  ✓ Added constraint time_window_85: Time window upper bound: class 7 <= slot 135
   Added window_bounds constraint: Window lower bound: class 7 >= slot 115
   Added window_bounds constraint: Window upper bound: class 7 <= slot 135
   Added window_bounds constraint: Window lower bound: class 7 >= slot 115
@@ -1017,12 +1210,12 @@ Finding independent groups for teacher 'Tchoudnovskaia Anna' on Mi
   Not enough classes (1) for independent grouping
     No independent groups found, using simple separation
     Adding simple separation constraints for 3 classes
-  ✓ Added constraint other_56: End time variable: end_1 = start_1 + 15
-  ✓ Added constraint other_57: End time variable: end_8 = start_8 + 9
+  ✓ Added constraint other_86: End time variable: end_1 = start_1 + 15
+  ✓ Added constraint other_87: End time variable: end_8 = start_8 + 9
       Same teacher but non-overlapping times [16:00-17:20] vs [15:00-15:45] - no constraint needed
       Skipping constraint for classes 1 and 8 - no conflict potential
-  ✓ Added constraint other_58: End time variable: end_2 = start_2 + 9
-  ✓ Added constraint other_59: End time variable: end_8 = start_8 + 9
+  ✓ Added constraint other_88: End time variable: end_2 = start_2 + 9
+  ✓ Added constraint other_89: End time variable: end_8 = start_8 + 9
       Same teacher but non-overlapping times [16:00-16:45] vs [15:00-15:45] - no constraint needed
       Skipping constraint for classes 2 and 8 - no conflict potential
   Processing teachers 'Rosov Boris' on Mi
@@ -1049,19 +1242,19 @@ Applying placement constraints...
   Applying constraints for plan type: linked_chain
 Adding chain sequence constraints...
   Processing chain with 2 classes
-  ✓ Added constraint chain_ordering_60: Chain: class 3 -> class 4 (gap: 10 slots)
+  ✓ Added constraint chain_ordering_90: Chain: class 3 -> class 4 (gap: 10 slots)
   Updated effective bounds for class 4: EffectiveBounds(slot: 96-106, time: 16:00-16:50, source: time_window)
   Added sequential constraint: Chain: class 3 -> class 4 (gap: 10 slots)
   Marked class 3 as having chain constraints applied
   Marked class 4 as having chain constraints applied
-  ✓ Added constraint time_window_61: Time window lower bound: class 3 >= slot 96
-  ✓ Added constraint time_window_62: Time window upper bound: class 3 <= slot 106
+  ✓ Added constraint time_window_91: Time window lower bound: class 3 >= slot 96
+  ✓ Added constraint time_window_92: Time window upper bound: class 3 <= slot 106
   Added window_bounds constraint: Window lower bound: class 3 >= slot 96
   Added window_bounds constraint: Window upper bound: class 3 <= slot 106
   Added window_bounds constraint: Window lower bound: class 3 >= slot 96
   Added window_bounds constraint: Window upper bound: class 3 <= slot 106
 DEBUG: Setting FIXED start time for class 4 at slot 106
-  ✓ Added constraint fixed_time_63: Fixed start time: class 4 == slot 106
+  ✓ Added constraint fixed_time_93: Fixed start time: class 4 == slot 106
   Added window_bounds constraint: Fixed start time: class 4 == slot 106
   Added 1 sequential constraints, 5 window constraints
   Processing teachers 'Tatarchuk Tetiana' on Mi
@@ -1070,8 +1263,8 @@ Finding independent groups for teacher 'Tatarchuk Tetiana' on Mi
   Not enough classes (1) for independent grouping
     No independent groups found, using simple separation
     Adding simple separation constraints for 3 classes
-  ✓ Added constraint other_64: End time variable: end_5 = start_5 + 15
-  ✓ Added constraint other_65: End time variable: end_6 = start_6 + 18
+  ✓ Added constraint other_94: End time variable: end_5 = start_5 + 15
+  ✓ Added constraint other_95: End time variable: end_6 = start_6 + 18
       Same teacher with overlapping times - constraint needed
 
 === ADD TIME SEPARATION CONSTRAINTS ===
@@ -1080,11 +1273,11 @@ Class 6: Nachhilfe - Danilischina Mariia (Teacher: Tatarchuk Tetiana)
 RESOURCE CONFLICT ANALYSIS:
   Same teacher: YES (Tatarchuk Tetiana vs Tatarchuk Tetiana)
   Shared groups: NO (none)
-  Shared rooms: YES ({'VK.07', 'VK.08', 'VK.11'})
+  Shared rooms: YES ({'VK.11', 'VK.08', 'VK.07'})
 [CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 6: Nachhilfe(Danilischina Mariia) -> sufficient_overlap_time_fallback
   Skipping separation constraints for 5 and 6 - cycle prevention exception
-  ✓ Added constraint other_66: End time variable: end_5 = start_5 + 15
-  ✓ Added constraint other_67: End time variable: end_7 = start_7 + 9
+  ✓ Added constraint other_96: End time variable: end_5 = start_5 + 15
+  ✓ Added constraint other_97: End time variable: end_7 = start_7 + 9
       Same teacher with overlapping times - constraint needed
 
 === ADD TIME SEPARATION CONSTRAINTS ===
@@ -1093,7 +1286,7 @@ Class 7: NH Physik - Danilischina Mariia (Teacher: Tatarchuk Tetiana)
 RESOURCE CONFLICT ANALYSIS:
   Same teacher: YES (Tatarchuk Tetiana vs Tatarchuk Tetiana)
   Shared groups: NO (none)
-  Shared rooms: YES ({'VK.07', 'VK.08', 'VK.11'})
+  Shared rooms: YES ({'VK.11', 'VK.08', 'VK.07'})
 [CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 7: NH Physik(Danilischina Mariia) -> sufficient_overlap_time_fallback
     Class i 5: Nachhilfe - Bogrez Tumarov
       Effective bounds: 16:00 - 18:45 (source: time_window)
@@ -1121,8 +1314,8 @@ SAME CHAIN CONSTRAINT:
   CONSTRAINT TYPE: One-way chain (class 5 → class 7)
   Duration slots: 15, pause slots: 1
   CP-SAT CONSTRAINT: start_var[5] + 15 + 1 ≤ start_var[7]
-  ✓ Added constraint chain_ordering_68: One-way chain: class 5 → class 7
-  ✓ Added constraint chain_ordering_69: One-way chain: class 5 → class 7
+  ✓ Added constraint chain_ordering_98: One-way chain: class 5 → class 7
+  ✓ Added constraint chain_ordering_99: One-way chain: class 5 → class 7
   ✓ Constraint saved for pair (5, 7)
 
 === ANALYSIS COMPLETE ===
@@ -1135,7 +1328,7 @@ Added 9 timewindow objectives to the model.
 Total classes: 9
 Classes with effective bounds: 9
 Update count: 13
-Last updated: 2025-07-21 19:15:20.836973
+Last updated: 2025-07-25 19:18:36.522236
 
 Bounds by source:
   time_window: 9
@@ -1164,58 +1357,51 @@ Detailed bounds per class:
   Class 7 (NH Physik): EffectiveBounds(slot: 96-135, time: 16:00-19:15, source: time_window)
     - timewindow_adapter: Window: 16:00-20:00
     - chain_ordering: Chain constraint: must start at least 19 slots after class 6
-  Class 8 (Russish): EffectiveBounds(slot: 84-132, time: 15:00-19:00, source: time_window)
-    - timewindow_adapter: Window: 15:00-19:45
+  Class 8 (Russish): EffectiveBounds(slot: 84-99, time: 15:00-16:15, source: time_window)
+    - timewindow_adapter: Window: 15:00-17:00
 ===================================
 Timewindow improvements applied successfully. Processed 7 class pairs.
 DEBUG: Applied timewindow improvements
 
 📊 MODEL STATISTICS:
   Variables: 9 assigned, 9 start, 9 room, 9 day
-  Constraints: 69 added, 22 skipped
-  Constraint types: time_window: 30, room_conflict: 24, chain_ordering: 6, other: 8, fixed_time: 1
+  Constraints: 99 added, 21 skipped
+  Constraint types: time_window: 30, sequential: 54, chain_ordering: 6, other: 8, fixed_time: 1
 
 🚀 Starting CP-SAT solver (time limit: 300s)...
-✅ Solution found: OPTIMAL
+❌ No solution found: INFEASIBLE
 
 📋 Generating constraint reports...
 
 📋 Exporting constraint registry to constraint_registry_full.txt...
 ✅ Constraint registry exported to constraint_registry_full.txt
+
+📋 Exporting constraint registry to constraint_registry_infeasible.txt...
+
+🔍 INFEASIBLE ANALYSIS:
+==================================================
+Total constraints: 99
+Detected conflicts: 0
+Constraint exceptions: 0
+
+🔥 Most constrained pairs:
+  Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana ↔ NH Physik, Danilischina Mariia, Tatarchuk Tetiana: 6 constraints (chain_ordering, sequential)
+  Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna: 5 constraints (chain_ordering, sequential)
+  Russish, 6B, Tchoudnovskaia Anna ↔ Mathe, 6B, Tchoudnovskaia Anna: 5 constraints (chain_ordering, sequential)
+
+Detailed report saved to: constraint_registry_infeasible.txt
+==================================================
+✅ Constraint registry exported to constraint_registry_infeasible.txt
 ✅ Brief error summary saved to log_Err.txt
 ✅ All constraint reports generated successfully
 
-Solution found in 0.07 seconds!
+No solution found within the time limit (0.06 seconds).
 
-=== Solution Summary ===
-Total scheduled classes: 9
+❌ PROBLEM IS INFEASIBLE - No valid solution exists with current constraints.
 
-Scheduled classes by day:
-  Mi: 9 classes
-
-Teacher load (top 5):
-  Tchoudnovskaia Anna: 3 classes
-  Tatarchuk Tetiana: 3 classes
-  Rosov Boris: 2 classes
-  Melnikov Pavel: 1 classes
-
-Room utilization (top 5):
-  VK.08: 3 classes
-  V0.06: 2 classes
-  V2.03: 2 classes
-  VK.11: 2 classes
-
-Class start time distribution:
-  16:00 - 17:00: 5 classes
-  17:00 - 18:00: 1 classes
-  18:00 - 19:00: 1 classes
-  19:00 - 20:00: 2 classes
-
-Exporting schedule to 'optimized_schedule.xlsx'...
-Export completed successfully.
-
-📋 Exporting constraint registry to constraint_registry_full.txt...
-✅ Constraint registry exported to constraint_registry_full.txt
-
-Schedule generation complete.
-Generated schedule saved to: c:\Konst\2025\Kolibri\Alla\Schedule\ScheduleGen_alpha_0.2\optimized_schedule.xlsx
+💡 Possible solutions:
+  1. Relax some time constraints
+  2. Add more rooms or increase room capacity
+  3. Adjust teacher availability
+  4. Reduce required classes or increase time slots
+  5. Review constraint_registry_infeasible.txt for detailed analysis

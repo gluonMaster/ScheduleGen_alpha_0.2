@@ -2,225 +2,371 @@ CONSTRAINT REGISTRY - INFEASIBLE ANALYSIS
 ============================================================
 
 📊 CONSTRAINT STATISTICS:
-Total added: 63
-Total skipped: 22
+Total added: 99
+Total skipped: 21
 Total exceptions: 0
 Total conflicts: 0
 
 🔍 POTENTIAL ISSUES ANALYSIS:
 --------------------------------------------------
-⚡ Ordering constraints: 0 sequential, 5 chain
+❌ Potentially redundant constraints for 13 class pairs:
+  - Classes 0 ↔ 1: 5 constraints
+    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna
+    📋 Types: chain_ordering, sequential
+  - Classes 0 ↔ 2: 4 constraints
+    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Mathe, 6B, Tchoudnovskaia Anna
+    📋 Types: sequential
+  - Classes 1 ↔ 2: 5 constraints
+    👨‍🏫 Russish, 6B, Tchoudnovskaia Anna ↔ Mathe, 6B, Tchoudnovskaia Anna
+    📋 Types: chain_ordering, sequential
+  - Classes 3 ↔ 4: 5 constraints
+    👨‍🏫 Schach, Schach Mi A, Rosov Boris ↔ Schach, Schach Mi B, Rosov Boris
+    📋 Types: chain_ordering, sequential
+  - Classes 3 ↔ 5: 4 constraints
+    👨‍🏫 Schach, Schach Mi A, Rosov Boris ↔ Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+    📋 Types: sequential
+  - Classes 3 ↔ 6: 4 constraints
+    👨‍🏫 Schach, Schach Mi A, Rosov Boris ↔ Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+    📋 Types: sequential
+  - Classes 3 ↔ 7: 4 constraints
+    👨‍🏫 Schach, Schach Mi A, Rosov Boris ↔ NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+    📋 Types: sequential
+  - Classes 4 ↔ 5: 4 constraints
+    👨‍🏫 Schach, Schach Mi B, Rosov Boris ↔ Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+    📋 Types: sequential
+  - Classes 4 ↔ 6: 4 constraints
+    👨‍🏫 Schach, Schach Mi B, Rosov Boris ↔ Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+    📋 Types: sequential
+  - Classes 4 ↔ 7: 4 constraints
+    👨‍🏫 Schach, Schach Mi B, Rosov Boris ↔ NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+    📋 Types: sequential
+
+⚡ Ordering constraints: 54 sequential, 6 chain
+  ⚠️  Potential 2-cycles detected: 58
+    Classes 0 ↔ 1
+    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna
+    Classes 0 ↔ 1
+    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna
+    Classes 0 ↔ 1
+    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna
+    Classes 0 ↔ 2
+    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Mathe, 6B, Tchoudnovskaia Anna
+    Classes 0 ↔ 2
+    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Mathe, 6B, Tchoudnovskaia Anna
+
+⏰ Fixed time constraints: 1
 
 🔥 Most constrained class pairs:
-  - Classes 3 ↔ 5: 3 constraints
-    👨‍🏫 Schach, Schach Mi A, Rosov Boris ↔ Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
-    📋 Types: room_conflict
-  - Classes 3 ↔ 6: 3 constraints
-    👨‍🏫 Schach, Schach Mi A, Rosov Boris ↔ Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
-    📋 Types: room_conflict
-  - Classes 3 ↔ 7: 3 constraints
-    👨‍🏫 Schach, Schach Mi A, Rosov Boris ↔ NH Physik, Danilischina Mariia, Tatarchuk Tetiana
-    📋 Types: room_conflict
-  - Classes 4 ↔ 5: 3 constraints
-    👨‍🏫 Schach, Schach Mi B, Rosov Boris ↔ Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
-    📋 Types: room_conflict
-  - Classes 4 ↔ 6: 3 constraints
-    👨‍🏫 Schach, Schach Mi B, Rosov Boris ↔ Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
-    📋 Types: room_conflict
+  - Classes 5 ↔ 7: 6 constraints
+    👨‍🏫 Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana ↔ NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+    📋 Types: chain_ordering, sequential
+  - Classes 0 ↔ 1: 5 constraints
+    👨‍🏫 Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna
+    📋 Types: chain_ordering, sequential
+  - Classes 1 ↔ 2: 5 constraints
+    👨‍🏫 Russish, 6B, Tchoudnovskaia Anna ↔ Mathe, 6B, Tchoudnovskaia Anna
+    📋 Types: chain_ordering, sequential
+  - Classes 3 ↔ 4: 5 constraints
+    👨‍🏫 Schach, Schach Mi A, Rosov Boris ↔ Schach, Schach Mi B, Rosov Boris
+    📋 Types: chain_ordering, sequential
+  - Classes 6 ↔ 7: 5 constraints
+    👨‍🏫 Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana ↔ NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+    📋 Types: chain_ordering, sequential
 
 📈 Constraint type distribution:
-  time_window: 26
-  room_conflict: 18
-  other: 10
-  chain_ordering: 5
-  separation: 4
+  sequential: 54
+  time_window: 30
+  other: 8
+  chain_ordering: 6
+  fixed_time: 1
 
 📁 Constraint origin distribution:
+  time_conflict_constraints: 54
   model_variables: 18
-  resource_constraints: 18
-  chain_constraints: 15
-  separation_constraints: 12
+  chain_constraints: 17
+  separation_constraints: 10
 
 🔢 Variable usage analysis:
   Most used variables:
-    start_vars[2]: 6 constraints
-    start_var[7]: 6 constraints
-    start_vars[0]: 5 constraints
-    start_vars[1]: 5 constraints
-    room_vars[5]: 4 constraints
-    room_vars[6]: 4 constraints
-    room_vars[7]: 4 constraints
-    start_var[6]: 4 constraints
-    start_var[5]: 4 constraints
-    start_var[3]: 3 constraints
+    start_var[7]: 14 constraints
+    start_var[5]: 12 constraints
+    start_var[6]: 12 constraints
+    start_var[3]: 11 constraints
+    start_var[1]: 10 constraints
+    start_var[4]: 10 constraints
+    start_var[2]: 9 constraints
+    seq_end_3: 8 constraints
+    seq_end_4: 8 constraints
+    seq_end_5: 8 constraints
 
 🔍 DETAILED CONSTRAINT ANALYSIS:
 --------------------------------------------------
-Class Pair: 3 ↔ 5
-👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+Class Pair: 5 ↔ 7
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
-📊 Total constraints: 3
-📋 By type:
-  - room_conflict: 3
-🔗 Detailed constraints:
-  1. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room match check (fixed i): classes 3 and 5
-     🔢 Variables: room_vars[5], same_room_3_5
-  2. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room mismatch check (fixed i): classes 3 and 5
-     🔢 Variables: room_vars[5], same_room_3_5
-  3. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Prevent room conflicts: classes 3 and 5
-     🔢 Variables: room_conflict_3_5
-
-Class Pair: 3 ↔ 6
-👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
-👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
-📊 Total constraints: 3
-📋 By type:
-  - room_conflict: 3
-🔗 Detailed constraints:
-  1. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room match check (fixed i): classes 3 and 6
-     🔢 Variables: room_vars[6], same_room_3_6
-  2. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room mismatch check (fixed i): classes 3 and 6
-     🔢 Variables: room_vars[6], same_room_3_6
-  3. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Prevent room conflicts: classes 3 and 6
-     🔢 Variables: room_conflict_3_6
-
-Class Pair: 3 ↔ 7
-👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
-📊 Total constraints: 3
+📊 Total constraints: 6
 📋 By type:
-  - room_conflict: 3
+  - sequential: 4
+  - chain_ordering: 2
 🔗 Detailed constraints:
-  1. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room match check (fixed i): classes 3 and 7
-     🔢 Variables: room_vars[7], same_room_3_7
-  2. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room mismatch check (fixed i): classes 3 and 7
-     🔢 Variables: room_vars[7], same_room_3_7
-  3. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Prevent room conflicts: classes 3 and 7
-     🔢 Variables: room_conflict_3_7
+  1. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 5
+     🔢 Variables: seq_end_5, start_var[5]
+  2. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 7
+     🔢 Variables: seq_end_7, start_var[7]
+  3. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (i→j): class 5 before class 7
+     🔢 Variables: seq_end_5, start_var[7], seq_strict_5_7
+  4. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (j→i): class 7 before class 5
+     🔢 Variables: seq_end_7, start_var[5], seq_strict_5_7
+  5. chain_ordering
+     📍 separation_constraints:add_time_separation_constraints
+     📄 One-way chain: class 5 → class 7
+     🔢 Variables: start_var[5], start_var[7]
+  6. chain_ordering
+     📍 separation_constraints:add_time_separation_constraints
+     📄 One-way chain: class 5 → class 7
+     🔢 Variables: start_var[5], start_var[7]
 
-Class Pair: 4 ↔ 5
-👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
-👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
-📊 Total constraints: 3
-📋 By type:
-  - room_conflict: 3
-🔗 Detailed constraints:
-  1. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room match check (fixed i): classes 4 and 5
-     🔢 Variables: room_vars[5], same_room_4_5
-  2. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room mismatch check (fixed i): classes 4 and 5
-     🔢 Variables: room_vars[5], same_room_4_5
-  3. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Prevent room conflicts: classes 4 and 5
-     🔢 Variables: room_conflict_4_5
-
-Class Pair: 4 ↔ 6
-👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
-👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
-📊 Total constraints: 3
-📋 By type:
-  - room_conflict: 3
-🔗 Detailed constraints:
-  1. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room match check (fixed i): classes 4 and 6
-     🔢 Variables: room_vars[6], same_room_4_6
-  2. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room mismatch check (fixed i): classes 4 and 6
-     🔢 Variables: room_vars[6], same_room_4_6
-  3. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Prevent room conflicts: classes 4 and 6
-     🔢 Variables: room_conflict_4_6
-
-Class Pair: 4 ↔ 7
-👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
-👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
-📊 Total constraints: 3
-📋 By type:
-  - room_conflict: 3
-🔗 Detailed constraints:
-  1. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room match check (fixed i): classes 4 and 7
-     🔢 Variables: room_vars[7], same_room_4_7
-  2. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Room mismatch check (fixed i): classes 4 and 7
-     🔢 Variables: room_vars[7], same_room_4_7
-  3. room_conflict
-     📍 resource_constraints:_add_room_conflict_constraints
-     📄 Prevent room conflicts: classes 4 and 7
-     🔢 Variables: room_conflict_4_7
-
-Class Pair: 0 ↔ 2
+Class Pair: 0 ↔ 1
 👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
-👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
-📊 Total constraints: 2
+👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
+📊 Total constraints: 5
 📋 By type:
-  - separation: 2
+  - sequential: 4
+  - chain_ordering: 1
 🔗 Detailed constraints:
-  1. separation
-     📍 chain_constraints:add_bidirectional_constraint
-     📄 Bidirectional separation (i→j): class 0 → class 2
-     🔢 Variables: start_vars[0], start_vars[2], i_before_j_0_2
-  2. separation
-     📍 chain_constraints:add_bidirectional_constraint
-     📄 Bidirectional separation (j→i): class 2 → class 0
-     🔢 Variables: start_vars[0], start_vars[2], i_before_j_0_2
+  1. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 0
+     🔢 Variables: seq_end_0, start_var[0]
+  2. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 1
+     🔢 Variables: seq_end_1, start_var[1]
+  3. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (i→j): class 0 before class 1
+     🔢 Variables: seq_end_0, start_var[1], seq_strict_0_1
+  4. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (j→i): class 1 before class 0
+     🔢 Variables: seq_end_1, start_var[0], seq_strict_0_1
+  5. chain_ordering
+     📍 chain_constraints:add_chain_sequence_constraints
+     📄 Chain: class 0 -> class 1 (gap: 10 slots)
+     🔢 Variables: start_var[0], start_var[1]
 
 Class Pair: 1 ↔ 2
 👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
-📊 Total constraints: 2
+📊 Total constraints: 5
 📋 By type:
-  - separation: 2
+  - sequential: 4
+  - chain_ordering: 1
 🔗 Detailed constraints:
-  1. separation
-     📍 chain_constraints:add_bidirectional_constraint
-     📄 Bidirectional separation (i→j): class 1 → class 2
-     🔢 Variables: start_vars[1], start_vars[2], i_before_j_1_2
-  2. separation
-     📍 chain_constraints:add_bidirectional_constraint
-     📄 Bidirectional separation (j→i): class 2 → class 1
-     🔢 Variables: start_vars[1], start_vars[2], i_before_j_1_2
+  1. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 1
+     🔢 Variables: seq_end_1, start_var[1]
+  2. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 2
+     🔢 Variables: seq_end_2, start_var[2]
+  3. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (i→j): class 1 before class 2
+     🔢 Variables: seq_end_1, start_var[2], seq_strict_1_2
+  4. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (j→i): class 2 before class 1
+     🔢 Variables: seq_end_2, start_var[1], seq_strict_1_2
+  5. chain_ordering
+     📍 chain_constraints:add_chain_sequence_constraints
+     📄 Chain: class 1 -> class 2 (gap: 16 slots)
+     🔢 Variables: start_var[1], start_var[2]
 
-Class Pair: 5 ↔ 7
-👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
-👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
-📊 Total constraints: 2
+Class Pair: 3 ↔ 4
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+📊 Total constraints: 5
 📋 By type:
-  - chain_ordering: 2
+  - sequential: 4
+  - chain_ordering: 1
 🔗 Detailed constraints:
-  1. chain_ordering
-     📍 separation_constraints:add_time_separation_constraints
-     📄 One-way chain: class 5 → class 7
-     🔢 Variables: start_var[5], start_var[7]
-  2. chain_ordering
-     📍 separation_constraints:add_time_separation_constraints
-     📄 One-way chain: class 5 → class 7
-     🔢 Variables: start_var[5], start_var[7]
+  1. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 3
+     🔢 Variables: seq_end_3, start_var[3]
+  2. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 4
+     🔢 Variables: seq_end_4, start_var[4]
+  3. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (i→j): class 3 before class 4
+     🔢 Variables: seq_end_3, start_var[4], seq_strict_3_4
+  4. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (j→i): class 4 before class 3
+     🔢 Variables: seq_end_4, start_var[3], seq_strict_3_4
+  5. chain_ordering
+     📍 chain_constraints:add_chain_sequence_constraints
+     📄 Chain: class 3 -> class 4 (gap: 10 slots)
+     🔢 Variables: start_var[3], start_var[4]
+
+Class Pair: 6 ↔ 7
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+📊 Total constraints: 5
+📋 By type:
+  - sequential: 4
+  - chain_ordering: 1
+🔗 Detailed constraints:
+  1. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 6
+     🔢 Variables: seq_end_6, start_var[6]
+  2. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 7
+     🔢 Variables: seq_end_7, start_var[7]
+  3. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (i→j): class 6 before class 7
+     🔢 Variables: seq_end_6, start_var[7], seq_strict_6_7
+  4. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (j→i): class 7 before class 6
+     🔢 Variables: seq_end_7, start_var[6], seq_strict_6_7
+  5. chain_ordering
+     📍 chain_constraints:add_chain_sequence_constraints
+     📄 Chain: class 6 -> class 7 (gap: 19 slots)
+     🔢 Variables: start_var[6], start_var[7]
+
+Class Pair: 0 ↔ 2
+👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
+👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
+📊 Total constraints: 4
+📋 By type:
+  - sequential: 4
+🔗 Detailed constraints:
+  1. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 0
+     🔢 Variables: seq_end_0, start_var[0]
+  2. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 2
+     🔢 Variables: seq_end_2, start_var[2]
+  3. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (i→j): class 0 before class 2
+     🔢 Variables: seq_end_0, start_var[2], seq_strict_0_2
+  4. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (j→i): class 2 before class 0
+     🔢 Variables: seq_end_2, start_var[0], seq_strict_0_2
+
+Class Pair: 3 ↔ 5
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+📊 Total constraints: 4
+📋 By type:
+  - sequential: 4
+🔗 Detailed constraints:
+  1. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 3
+     🔢 Variables: seq_end_3, start_var[3]
+  2. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 5
+     🔢 Variables: seq_end_5, start_var[5]
+  3. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (i→j): class 3 before class 5
+     🔢 Variables: seq_end_3, start_var[5], seq_strict_3_5
+  4. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (j→i): class 5 before class 3
+     🔢 Variables: seq_end_5, start_var[3], seq_strict_3_5
+
+Class Pair: 3 ↔ 6
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
+📊 Total constraints: 4
+📋 By type:
+  - sequential: 4
+🔗 Detailed constraints:
+  1. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 3
+     🔢 Variables: seq_end_3, start_var[3]
+  2. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 6
+     🔢 Variables: seq_end_6, start_var[6]
+  3. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (i→j): class 3 before class 6
+     🔢 Variables: seq_end_3, start_var[6], seq_strict_3_6
+  4. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (j→i): class 6 before class 3
+     🔢 Variables: seq_end_6, start_var[3], seq_strict_3_6
+
+Class Pair: 3 ↔ 7
+👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
+👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
+📊 Total constraints: 4
+📋 By type:
+  - sequential: 4
+🔗 Detailed constraints:
+  1. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 3
+     🔢 Variables: seq_end_3, start_var[3]
+  2. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 7
+     🔢 Variables: seq_end_7, start_var[7]
+  3. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (i→j): class 3 before class 7
+     🔢 Variables: seq_end_3, start_var[7], seq_strict_3_7
+  4. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (j→i): class 7 before class 3
+     🔢 Variables: seq_end_7, start_var[3], seq_strict_3_7
+
+Class Pair: 4 ↔ 5
+👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
+👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
+📊 Total constraints: 4
+📋 By type:
+  - sequential: 4
+🔗 Detailed constraints:
+  1. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 4
+     🔢 Variables: seq_end_4, start_var[4]
+  2. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 End time calculation for class 5
+     🔢 Variables: seq_end_5, start_var[5]
+  3. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (i→j): class 4 before class 5
+     🔢 Variables: seq_end_4, start_var[5], seq_strict_4_5
+  4. sequential
+     📍 time_conflict_constraints:add_sequential_constraints
+     📄 Sequential ordering (j→i): class 5 before class 4
+     🔢 Variables: seq_end_5, start_var[4], seq_strict_4_5
 
