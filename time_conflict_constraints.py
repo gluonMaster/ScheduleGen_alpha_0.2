@@ -8,7 +8,8 @@ from timewindow_utils import find_slot_for_time
 from sequential_scheduling import can_schedule_sequentially
 from constraint_registry import ConstraintType
 from effective_bounds_utils import get_effective_bounds, classify_bounds
-from linked_chain_utils import collect_full_chain, pick_best_anchor
+from linked_chain_utils import pick_best_anchor
+from chain_helpers import collect_full_chain_from_any_member
 
 def add_anchor_based_constraint(optimizer, flex_class_idx, flex_class, target_class_idx, target_class):
     """
@@ -44,7 +45,7 @@ def add_anchor_based_constraint(optimizer, flex_class_idx, flex_class, target_cl
     if not chain_classes and hasattr(target_class, 'linked_classes') and target_class.linked_classes:
         # target_class - начало цепочки
         try:
-            chain_classes = collect_full_chain(target_class)
+            chain_classes = collect_full_chain_from_any_member(target_class)
             print(f"  Found chain starting from target class: {len(chain_classes)} classes")
         except Exception as e:
             print(f"  Warning: Failed to collect chain from target class: {e}")
@@ -55,7 +56,7 @@ def add_anchor_based_constraint(optimizer, flex_class_idx, flex_class, target_cl
             root_class = target_class
             while hasattr(root_class, 'previous_class') and root_class.previous_class:
                 root_class = root_class.previous_class
-            chain_classes = collect_full_chain(root_class)
+            chain_classes = collect_full_chain_from_any_member(root_class)
             print(f"  Found chain from root class: {len(chain_classes)} classes")
         except Exception as e:
             print(f"  Warning: Failed to collect chain from root class: {e}")

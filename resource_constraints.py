@@ -9,6 +9,7 @@ from sequential_scheduling import can_schedule_sequentially as can_schedule_sequ
 from constraint_registry import ConstraintType
 from effective_bounds_utils import get_effective_bounds, EffectiveBounds
 from linked_chain_utils import are_classes_in_same_chain, get_chain_window
+from chain_helpers import invalidate_chain_window
 
 def times_overlap(optimizer, c1, c2, idx1=None, idx2=None):
     """
@@ -25,6 +26,12 @@ def times_overlap(optimizer, c1, c2, idx1=None, idx2=None):
         from linked_chain_utils import find_chain_containing_classes
         
         chain_indices = find_chain_containing_classes(optimizer, idx1, idx2)
+        
+        # Инвалидируем кеш окна цепочки перед получением окна
+        if chain_indices:
+            schedule_class = optimizer.classes[chain_indices[0]]
+            invalidate_chain_window(schedule_class)
+        
         chain_window = get_chain_window(optimizer, chain_indices)
         
         if chain_window is not None:

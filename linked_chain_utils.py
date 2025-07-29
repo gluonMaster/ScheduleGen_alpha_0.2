@@ -9,7 +9,8 @@ from timewindow_utils import are_classes_transitively_linked
 from time_utils import time_to_minutes, minutes_to_time
 
 __all__ = ['is_in_linked_chain', 'get_linked_chain_order', 'collect_full_chain', 'build_linked_chains',
-           'find_chain_containing_classes', 'get_chain_window', 'are_classes_in_same_chain', 'pick_best_anchor']
+           'find_chain_containing_classes', 'get_chain_window', 'are_classes_in_same_chain', 'pick_best_anchor',
+           'clear_chain_windows_cache']
 
 # Кеш для окон цепочек
 _chain_windows_cache = {}
@@ -77,6 +78,7 @@ def get_linked_chain_order(root):
     Returns:
         list: Список объектов классов в порядке от root до листовых потомков
     """
+    # Используем внутреннюю функцию collect_full_chain вместо внешнего импорта
     return collect_full_chain(root)
 
 
@@ -105,7 +107,7 @@ def collect_full_chain(root):
         visited.add(id(current_class))
         result.append(current_class)
         
-        # Устанавливаем связь с родителем
+        # Устанавливаем связь с родителем - это модификация структуры цепочки
         current_class.previous = parent
         
         # Инициализируем список детей

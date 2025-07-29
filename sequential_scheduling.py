@@ -6,9 +6,10 @@
 
 from time_utils import time_to_minutes, minutes_to_time
 from linked_chain_utils import (
-    collect_full_chain, find_chain_containing_classes, get_chain_window, 
+    find_chain_containing_classes, get_chain_window, 
     are_classes_in_same_chain, get_original_time_bounds, clear_chain_windows_cache
 )
+from chain_helpers import collect_full_chain_from_any_member, invalidate_chain_window
 from chain_scheduler import schedule_chain, chain_busy_intervals
 from effective_bounds_utils import get_effective_bounds, classify_bounds
 
@@ -19,7 +20,8 @@ def clear_analysis_cache():
     """Очистить кеш анализа для новой оптимизации."""
     global _analysis_cache
     _analysis_cache = {}
-    clear_chain_windows_cache()
+    # TODO: В будущем можно оптимизировать для селективной очистки кеша
+    clear_chain_windows_cache()  # Fallback: полная очистка кеша окон
     print("Analysis cache and chain windows cache cleared for new optimization")
 
 def is_class_in_linked_chain(schedule_class):
@@ -73,6 +75,13 @@ def analyze_same_chain_classes(optimizer, c1, c2, idx1, idx2, chain_indices, ver
         'required_time': None,
         'available_time': None
     }
+    
+    # Инвалидируем кеш окна цепочки перед получением окна
+    # Это гарантирует, что мы получим актуальное окно после возможных изменений
+    for idx in chain_indices:
+        schedule_class = optimizer.classes[idx]
+        invalidate_chain_window(schedule_class)
+        break  # Достаточно инвалидировать один раз для всей цепочки
     
     # Получаем окно цепочки
     chain_window = get_chain_window(optimizer, chain_indices)
@@ -139,7 +148,7 @@ def analyze_same_chain_classes(optimizer, c1, c2, idx1, idx2, chain_indices, ver
 def collect_full_chain_from_any_member(schedule_class):
     """
     Собирает полную цепочку занятий, начиная с любого элемента цепочки.
-    Использует функцию collect_full_chain из linked_chain_utils.
+    Использует улучшенную функцию из chain_helpers.
     
     Args:
         schedule_class: Любой элемент цепочки
@@ -147,8 +156,8 @@ def collect_full_chain_from_any_member(schedule_class):
     Returns:
         list: Полная цепочка занятий в правильном порядке
     """
-    from linked_chain_utils import collect_full_chain
-    return collect_full_chain(schedule_class)
+    from chain_helpers import collect_full_chain_from_any_member as collect_full_chain_improved
+    return collect_full_chain_improved(schedule_class)
 
 def can_schedule_sequentially(c1, c2, idx1=None, idx2=None, verbose=True, optimizer=None):
     """

@@ -273,11 +273,25 @@ class ScheduleReader:
                     main_class.next_class = section['C']
                     main_class.linked_classes.append(section['C'])
                     
+                    # Инвалидируем кеш окна цепочки после создания связи
+                    try:
+                        from chain_helpers import invalidate_chain_window
+                        invalidate_chain_window(main_class)
+                    except ImportError:
+                        pass  # chain_helpers может быть недоступен на этапе чтения
+                    
                     if 'D' in section:
                         # ИСПРАВЛЕНО: previous_class теперь ссылка на объект, а не строка
                         section['D'].previous_class = section['C']
                         section['C'].next_class = section['D']
                         main_class.linked_classes.append(section['D'])
+                        
+                        # Инвалидируем кеш окна цепочки после создания связи
+                        try:
+                            from chain_helpers import invalidate_chain_window
+                            invalidate_chain_window(section['C'])
+                        except ImportError:
+                            pass  # chain_helpers может быть недоступен на этапе чтения
         
         # Collect all classes including linked ones
         all_classes = []

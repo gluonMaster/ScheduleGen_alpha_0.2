@@ -16,7 +16,7 @@ Constraint #1:
 🔢 Variables: start_vars[0]
 📄 Description: Time window constraint: class 0 start >= 16:00
 ⏳ Condition: Class 0 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #2:
 🔗 Type: time_window
@@ -25,7 +25,7 @@ Constraint #2:
 🔢 Variables: start_vars[0]
 📄 Description: Time window constraint: class 0 end <= 19:45
 ⏳ Condition: Class 0 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #3:
 🔗 Type: time_window
@@ -34,7 +34,7 @@ Constraint #3:
 🔢 Variables: start_vars[1]
 📄 Description: Time window constraint: class 1 start >= 16:00
 ⏳ Condition: Class 1 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #4:
 🔗 Type: time_window
@@ -43,7 +43,7 @@ Constraint #4:
 🔢 Variables: start_vars[1]
 📄 Description: Time window constraint: class 1 end <= 19:45
 ⏳ Condition: Class 1 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #5:
 🔗 Type: time_window
@@ -52,7 +52,7 @@ Constraint #5:
 🔢 Variables: start_vars[2]
 📄 Description: Time window constraint: class 2 start >= 16:00
 ⏳ Condition: Class 2 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #6:
 🔗 Type: time_window
@@ -61,7 +61,7 @@ Constraint #6:
 🔢 Variables: start_vars[2]
 📄 Description: Time window constraint: class 2 end <= 19:45
 ⏳ Condition: Class 2 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #7:
 🔗 Type: time_window
@@ -70,7 +70,7 @@ Constraint #7:
 🔢 Variables: start_vars[3]
 📄 Description: Time window constraint: class 3 start >= 16:00
 ⏳ Condition: Class 3 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #8:
 🔗 Type: time_window
@@ -79,7 +79,7 @@ Constraint #8:
 🔢 Variables: start_vars[3]
 📄 Description: Time window constraint: class 3 end <= 17:35
 ⏳ Condition: Class 3 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #9:
 🔗 Type: time_window
@@ -88,7 +88,7 @@ Constraint #9:
 🔢 Variables: start_vars[4]
 📄 Description: Time window constraint: class 4 start >= 16:00
 ⏳ Condition: Class 4 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #10:
 🔗 Type: time_window
@@ -97,7 +97,7 @@ Constraint #10:
 🔢 Variables: start_vars[4]
 📄 Description: Time window constraint: class 4 end <= 17:35
 ⏳ Condition: Class 4 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #11:
 🔗 Type: time_window
@@ -106,7 +106,7 @@ Constraint #11:
 🔢 Variables: start_vars[5]
 📄 Description: Time window constraint: class 5 start >= 16:00
 ⏳ Condition: Class 5 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #12:
 🔗 Type: time_window
@@ -115,7 +115,7 @@ Constraint #12:
 🔢 Variables: start_vars[5]
 📄 Description: Time window constraint: class 5 end <= 20:00
 ⏳ Condition: Class 5 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #13:
 🔗 Type: time_window
@@ -124,7 +124,7 @@ Constraint #13:
 🔢 Variables: start_vars[6]
 📄 Description: Time window constraint: class 6 start >= 16:00
 ⏳ Condition: Class 6 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #14:
 🔗 Type: time_window
@@ -133,7 +133,7 @@ Constraint #14:
 🔢 Variables: start_vars[6]
 📄 Description: Time window constraint: class 6 end <= 20:00
 ⏳ Condition: Class 6 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #15:
 🔗 Type: time_window
@@ -142,7 +142,7 @@ Constraint #15:
 🔢 Variables: start_vars[7]
 📄 Description: Time window constraint: class 7 start >= 16:00
 ⏳ Condition: Class 7 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #16:
 🔗 Type: time_window
@@ -151,7 +151,7 @@ Constraint #16:
 🔢 Variables: start_vars[7]
 📄 Description: Time window constraint: class 7 end <= 20:00
 ⏳ Condition: Class 7 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #17:
 🔗 Type: time_window
@@ -160,7 +160,7 @@ Constraint #17:
 🔢 Variables: start_vars[8]
 📄 Description: Time window constraint: class 8 start >= 15:00
 ⏳ Condition: Class 8 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #18:
 🔗 Type: time_window
@@ -169,7 +169,7 @@ Constraint #18:
 🔢 Variables: start_vars[8]
 📄 Description: Time window constraint: class 8 end <= 17:00
 ⏳ Condition: Class 8 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #19:
 🔗 Type: sequential
@@ -178,7 +178,7 @@ Constraint #19:
 👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
 🔢 Variables: seq_end_0, start_var[0]
 📄 Description: End time calculation for class 0
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #20:
 🔗 Type: sequential
@@ -187,7 +187,7 @@ Constraint #20:
 👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
 🔢 Variables: seq_end_1, start_var[1]
 📄 Description: End time calculation for class 1
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #21:
 🔗 Type: sequential
@@ -196,7 +196,7 @@ Constraint #21:
 👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
 🔢 Variables: seq_end_0, start_var[1], seq_strict_0_1
 📄 Description: Sequential ordering (i→j): class 0 before class 1
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #22:
 🔗 Type: sequential
@@ -205,7 +205,7 @@ Constraint #22:
 👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
 🔢 Variables: seq_end_1, start_var[0], seq_strict_0_1
 📄 Description: Sequential ordering (j→i): class 1 before class 0
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #23:
 🔗 Type: sequential
@@ -214,7 +214,7 @@ Constraint #23:
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
 🔢 Variables: seq_end_0, start_var[0]
 📄 Description: End time calculation for class 0
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #24:
 🔗 Type: sequential
@@ -223,7 +223,7 @@ Constraint #24:
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
 🔢 Variables: seq_end_2, start_var[2]
 📄 Description: End time calculation for class 2
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #25:
 🔗 Type: sequential
@@ -232,7 +232,7 @@ Constraint #25:
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
 🔢 Variables: seq_end_0, start_var[2], seq_strict_0_2
 📄 Description: Sequential ordering (i→j): class 0 before class 2
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #26:
 🔗 Type: sequential
@@ -241,7 +241,7 @@ Constraint #26:
 👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
 🔢 Variables: seq_end_2, start_var[0], seq_strict_0_2
 📄 Description: Sequential ordering (j→i): class 2 before class 0
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #27:
 🔗 Type: sequential
@@ -250,7 +250,7 @@ Constraint #27:
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
 🔢 Variables: seq_end_1, start_var[1]
 📄 Description: End time calculation for class 1
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #28:
 🔗 Type: sequential
@@ -259,7 +259,7 @@ Constraint #28:
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
 🔢 Variables: seq_end_2, start_var[2]
 📄 Description: End time calculation for class 2
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #29:
 🔗 Type: sequential
@@ -268,7 +268,7 @@ Constraint #29:
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
 🔢 Variables: seq_end_1, start_var[2], seq_strict_1_2
 📄 Description: Sequential ordering (i→j): class 1 before class 2
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #30:
 🔗 Type: sequential
@@ -277,7 +277,7 @@ Constraint #30:
 👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
 🔢 Variables: seq_end_2, start_var[1], seq_strict_1_2
 📄 Description: Sequential ordering (j→i): class 2 before class 1
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #31:
 🔗 Type: sequential
@@ -286,7 +286,7 @@ Constraint #31:
 👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
 🔢 Variables: start_var[8], start_var[1]
 📄 Description: Anchor-based sequential: Russish before Russish
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #32:
 🔗 Type: sequential
@@ -295,7 +295,7 @@ Constraint #32:
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
 🔢 Variables: start_var[8], start_var[2]
 📄 Description: Anchor-based sequential: Russish before Mathe
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #33:
 🔗 Type: sequential
@@ -304,7 +304,7 @@ Constraint #33:
 👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
 🔢 Variables: seq_end_3, start_var[3]
 📄 Description: End time calculation for class 3
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #34:
 🔗 Type: sequential
@@ -313,7 +313,7 @@ Constraint #34:
 👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
 🔢 Variables: seq_end_4, start_var[4]
 📄 Description: End time calculation for class 4
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #35:
 🔗 Type: sequential
@@ -322,7 +322,7 @@ Constraint #35:
 👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
 🔢 Variables: seq_end_3, start_var[4], seq_strict_3_4
 📄 Description: Sequential ordering (i→j): class 3 before class 4
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #36:
 🔗 Type: sequential
@@ -331,7 +331,7 @@ Constraint #36:
 👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
 🔢 Variables: seq_end_4, start_var[3], seq_strict_3_4
 📄 Description: Sequential ordering (j→i): class 4 before class 3
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #37:
 🔗 Type: sequential
@@ -340,7 +340,7 @@ Constraint #37:
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 🔢 Variables: seq_end_3, start_var[3]
 📄 Description: End time calculation for class 3
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #38:
 🔗 Type: sequential
@@ -349,7 +349,7 @@ Constraint #38:
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 🔢 Variables: seq_end_5, start_var[5]
 📄 Description: End time calculation for class 5
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #39:
 🔗 Type: sequential
@@ -358,7 +358,7 @@ Constraint #39:
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 🔢 Variables: seq_end_3, start_var[5], seq_strict_3_5
 📄 Description: Sequential ordering (i→j): class 3 before class 5
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #40:
 🔗 Type: sequential
@@ -367,7 +367,7 @@ Constraint #40:
 👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
 🔢 Variables: seq_end_5, start_var[3], seq_strict_3_5
 📄 Description: Sequential ordering (j→i): class 5 before class 3
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #41:
 🔗 Type: sequential
@@ -376,7 +376,7 @@ Constraint #41:
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_3, start_var[3]
 📄 Description: End time calculation for class 3
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #42:
 🔗 Type: sequential
@@ -385,7 +385,7 @@ Constraint #42:
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_6, start_var[6]
 📄 Description: End time calculation for class 6
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #43:
 🔗 Type: sequential
@@ -394,7 +394,7 @@ Constraint #43:
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_3, start_var[6], seq_strict_3_6
 📄 Description: Sequential ordering (i→j): class 3 before class 6
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #44:
 🔗 Type: sequential
@@ -403,7 +403,7 @@ Constraint #44:
 👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
 🔢 Variables: seq_end_6, start_var[3], seq_strict_3_6
 📄 Description: Sequential ordering (j→i): class 6 before class 3
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #45:
 🔗 Type: sequential
@@ -412,7 +412,7 @@ Constraint #45:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_3, start_var[3]
 📄 Description: End time calculation for class 3
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #46:
 🔗 Type: sequential
@@ -421,7 +421,7 @@ Constraint #46:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_7, start_var[7]
 📄 Description: End time calculation for class 7
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #47:
 🔗 Type: sequential
@@ -430,7 +430,7 @@ Constraint #47:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_3, start_var[7], seq_strict_3_7
 📄 Description: Sequential ordering (i→j): class 3 before class 7
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #48:
 🔗 Type: sequential
@@ -439,7 +439,7 @@ Constraint #48:
 👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
 🔢 Variables: seq_end_7, start_var[3], seq_strict_3_7
 📄 Description: Sequential ordering (j→i): class 7 before class 3
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #49:
 🔗 Type: sequential
@@ -448,7 +448,7 @@ Constraint #49:
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 🔢 Variables: seq_end_4, start_var[4]
 📄 Description: End time calculation for class 4
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #50:
 🔗 Type: sequential
@@ -457,7 +457,7 @@ Constraint #50:
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 🔢 Variables: seq_end_5, start_var[5]
 📄 Description: End time calculation for class 5
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #51:
 🔗 Type: sequential
@@ -466,7 +466,7 @@ Constraint #51:
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 🔢 Variables: seq_end_4, start_var[5], seq_strict_4_5
 📄 Description: Sequential ordering (i→j): class 4 before class 5
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #52:
 🔗 Type: sequential
@@ -475,7 +475,7 @@ Constraint #52:
 👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
 🔢 Variables: seq_end_5, start_var[4], seq_strict_4_5
 📄 Description: Sequential ordering (j→i): class 5 before class 4
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #53:
 🔗 Type: sequential
@@ -484,7 +484,7 @@ Constraint #53:
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_4, start_var[4]
 📄 Description: End time calculation for class 4
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #54:
 🔗 Type: sequential
@@ -493,7 +493,7 @@ Constraint #54:
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_6, start_var[6]
 📄 Description: End time calculation for class 6
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #55:
 🔗 Type: sequential
@@ -502,7 +502,7 @@ Constraint #55:
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_4, start_var[6], seq_strict_4_6
 📄 Description: Sequential ordering (i→j): class 4 before class 6
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #56:
 🔗 Type: sequential
@@ -511,7 +511,7 @@ Constraint #56:
 👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
 🔢 Variables: seq_end_6, start_var[4], seq_strict_4_6
 📄 Description: Sequential ordering (j→i): class 6 before class 4
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #57:
 🔗 Type: sequential
@@ -520,7 +520,7 @@ Constraint #57:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_4, start_var[4]
 📄 Description: End time calculation for class 4
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #58:
 🔗 Type: sequential
@@ -529,7 +529,7 @@ Constraint #58:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_7, start_var[7]
 📄 Description: End time calculation for class 7
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #59:
 🔗 Type: sequential
@@ -538,7 +538,7 @@ Constraint #59:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_4, start_var[7], seq_strict_4_7
 📄 Description: Sequential ordering (i→j): class 4 before class 7
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #60:
 🔗 Type: sequential
@@ -547,7 +547,7 @@ Constraint #60:
 👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
 🔢 Variables: seq_end_7, start_var[4], seq_strict_4_7
 📄 Description: Sequential ordering (j→i): class 7 before class 4
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #61:
 🔗 Type: sequential
@@ -556,7 +556,7 @@ Constraint #61:
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_5, start_var[5]
 📄 Description: End time calculation for class 5
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #62:
 🔗 Type: sequential
@@ -565,7 +565,7 @@ Constraint #62:
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_6, start_var[6]
 📄 Description: End time calculation for class 6
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #63:
 🔗 Type: sequential
@@ -574,7 +574,7 @@ Constraint #63:
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_5, start_var[6], seq_strict_5_6
 📄 Description: Sequential ordering (i→j): class 5 before class 6
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #64:
 🔗 Type: sequential
@@ -583,7 +583,7 @@ Constraint #64:
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 🔢 Variables: seq_end_6, start_var[5], seq_strict_5_6
 📄 Description: Sequential ordering (j→i): class 6 before class 5
-🕐 Added: 19:18:36
+🕐 Added: 14:34:26
 ------------------------------
 Constraint #65:
 🔗 Type: sequential
@@ -592,7 +592,7 @@ Constraint #65:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_5, start_var[5]
 📄 Description: End time calculation for class 5
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #66:
 🔗 Type: sequential
@@ -601,7 +601,7 @@ Constraint #66:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_7, start_var[7]
 📄 Description: End time calculation for class 7
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #67:
 🔗 Type: sequential
@@ -610,7 +610,7 @@ Constraint #67:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_5, start_var[7], seq_strict_5_7
 📄 Description: Sequential ordering (i→j): class 5 before class 7
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #68:
 🔗 Type: sequential
@@ -619,7 +619,7 @@ Constraint #68:
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 🔢 Variables: seq_end_7, start_var[5], seq_strict_5_7
 📄 Description: Sequential ordering (j→i): class 7 before class 5
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #69:
 🔗 Type: sequential
@@ -628,7 +628,7 @@ Constraint #69:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_6, start_var[6]
 📄 Description: End time calculation for class 6
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #70:
 🔗 Type: sequential
@@ -637,7 +637,7 @@ Constraint #70:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_7, start_var[7]
 📄 Description: End time calculation for class 7
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #71:
 🔗 Type: sequential
@@ -646,7 +646,7 @@ Constraint #71:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_6, start_var[7], seq_strict_6_7
 📄 Description: Sequential ordering (i→j): class 6 before class 7
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #72:
 🔗 Type: sequential
@@ -655,7 +655,7 @@ Constraint #72:
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: seq_end_7, start_var[6], seq_strict_6_7
 📄 Description: Sequential ordering (j→i): class 7 before class 6
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #73:
 🔗 Type: chain_ordering
@@ -665,7 +665,7 @@ Constraint #73:
 🔢 Variables: start_var[0], start_var[1]
 📄 Description: Chain: class 0 -> class 1 (gap: 10 slots)
 ⏳ Condition: Class 0 must end before Class 1 starts
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #74:
 🔗 Type: chain_ordering
@@ -675,7 +675,7 @@ Constraint #74:
 🔢 Variables: start_var[1], start_var[2]
 📄 Description: Chain: class 1 -> class 2 (gap: 16 slots)
 ⏳ Condition: Class 1 must end before Class 2 starts
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #75:
 🔗 Type: time_window
@@ -684,7 +684,7 @@ Constraint #75:
 🔢 Variables: start_var[0]
 📄 Description: Time window lower bound: class 0 >= slot 96
 ⏳ Condition: Class 0 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #76:
 🔗 Type: time_window
@@ -693,7 +693,7 @@ Constraint #76:
 🔢 Variables: start_var[0]
 📄 Description: Time window upper bound: class 0 <= slot 132
 ⏳ Condition: Class 0 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #77:
 🔗 Type: time_window
@@ -702,7 +702,7 @@ Constraint #77:
 🔢 Variables: start_var[1]
 📄 Description: Time window lower bound: class 1 >= slot 106
 ⏳ Condition: Class 1 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #78:
 🔗 Type: time_window
@@ -711,7 +711,7 @@ Constraint #78:
 🔢 Variables: start_var[1]
 📄 Description: Time window upper bound: class 1 <= slot 126
 ⏳ Condition: Class 1 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #79:
 🔗 Type: time_window
@@ -720,7 +720,7 @@ Constraint #79:
 🔢 Variables: start_var[2]
 📄 Description: Time window lower bound: class 2 >= slot 122
 ⏳ Condition: Class 2 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #80:
 🔗 Type: time_window
@@ -729,7 +729,7 @@ Constraint #80:
 🔢 Variables: start_var[2]
 📄 Description: Time window upper bound: class 2 <= slot 132
 ⏳ Condition: Class 2 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #81:
 🔗 Type: chain_ordering
@@ -739,7 +739,7 @@ Constraint #81:
 🔢 Variables: start_var[6], start_var[7]
 📄 Description: Chain: class 6 -> class 7 (gap: 19 slots)
 ⏳ Condition: Class 6 must end before Class 7 starts
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #82:
 🔗 Type: time_window
@@ -748,7 +748,7 @@ Constraint #82:
 🔢 Variables: start_var[6]
 📄 Description: Time window lower bound: class 6 >= slot 96
 ⏳ Condition: Class 6 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #83:
 🔗 Type: time_window
@@ -757,7 +757,7 @@ Constraint #83:
 🔢 Variables: start_var[6]
 📄 Description: Time window upper bound: class 6 <= slot 126
 ⏳ Condition: Class 6 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #84:
 🔗 Type: time_window
@@ -766,7 +766,7 @@ Constraint #84:
 🔢 Variables: start_var[7]
 📄 Description: Time window lower bound: class 7 >= slot 115
 ⏳ Condition: Class 7 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #85:
 🔗 Type: time_window
@@ -775,7 +775,7 @@ Constraint #85:
 🔢 Variables: start_var[7]
 📄 Description: Time window upper bound: class 7 <= slot 135
 ⏳ Condition: Class 7 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #86:
 🔗 Type: other
@@ -783,7 +783,7 @@ Constraint #86:
 👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
 🔢 Variables: start_var[1], end_var[1]
 📄 Description: End time variable: end_1 = start_1 + 15
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #87:
 🔗 Type: other
@@ -791,7 +791,7 @@ Constraint #87:
 👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
 🔢 Variables: start_var[8], end_var[8]
 📄 Description: End time variable: end_8 = start_8 + 9
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #88:
 🔗 Type: other
@@ -799,7 +799,7 @@ Constraint #88:
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
 🔢 Variables: start_var[2], end_var[2]
 📄 Description: End time variable: end_2 = start_2 + 9
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #89:
 🔗 Type: other
@@ -807,7 +807,7 @@ Constraint #89:
 👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
 🔢 Variables: start_var[8], end_var[8]
 📄 Description: End time variable: end_8 = start_8 + 9
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #90:
 🔗 Type: chain_ordering
@@ -817,7 +817,7 @@ Constraint #90:
 🔢 Variables: start_var[3], start_var[4]
 📄 Description: Chain: class 3 -> class 4 (gap: 10 slots)
 ⏳ Condition: Class 3 must end before Class 4 starts
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #91:
 🔗 Type: time_window
@@ -826,7 +826,7 @@ Constraint #91:
 🔢 Variables: start_var[3]
 📄 Description: Time window lower bound: class 3 >= slot 96
 ⏳ Condition: Class 3 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #92:
 🔗 Type: time_window
@@ -835,7 +835,7 @@ Constraint #92:
 🔢 Variables: start_var[3]
 📄 Description: Time window upper bound: class 3 <= slot 106
 ⏳ Condition: Class 3 must be within time window
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #93:
 🔗 Type: fixed_time
@@ -844,7 +844,7 @@ Constraint #93:
 🔢 Variables: start_var[4]
 📄 Description: Fixed start time: class 4 == slot 106
 ⏳ Condition: Class 4 has fixed start time
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #94:
 🔗 Type: other
@@ -852,7 +852,7 @@ Constraint #94:
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 🔢 Variables: start_var[5], end_var[5]
 📄 Description: End time variable: end_5 = start_5 + 15
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #95:
 🔗 Type: other
@@ -860,7 +860,7 @@ Constraint #95:
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: start_var[6], end_var[6]
 📄 Description: End time variable: end_6 = start_6 + 18
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #96:
 🔗 Type: other
@@ -868,7 +868,7 @@ Constraint #96:
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 🔢 Variables: start_var[5], end_var[5]
 📄 Description: End time variable: end_5 = start_5 + 15
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #97:
 🔗 Type: other
@@ -876,7 +876,7 @@ Constraint #97:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 🔢 Variables: start_var[7], end_var[7]
 📄 Description: End time variable: end_7 = start_7 + 9
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #98:
 🔗 Type: chain_ordering
@@ -886,7 +886,7 @@ Constraint #98:
 🔢 Variables: start_var[5], start_var[7]
 📄 Description: One-way chain: class 5 → class 7
 ⏳ Condition: Class 5 must end before Class 7 starts
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 Constraint #99:
 🔗 Type: chain_ordering
@@ -896,7 +896,7 @@ Constraint #99:
 🔢 Variables: start_var[5], start_var[7]
 📄 Description: One-way chain: class 5 → class 7
 ⏳ Condition: Class 5 must end before Class 7 starts
-🕐 Added: 19:18:36
+🕐 Added: 14:34:27
 ------------------------------
 ⏭️ SKIPPED CONSTRAINTS:
 --------------------------------------------------
@@ -906,7 +906,7 @@ Skipped #1:
 👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
 👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #2:
 🔗 Type: resource_conflict
@@ -914,7 +914,7 @@ Skipped #2:
 👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
 👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #3:
 🔗 Type: resource_conflict
@@ -922,7 +922,7 @@ Skipped #3:
 👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #4:
 🔗 Type: resource_conflict
@@ -930,7 +930,7 @@ Skipped #4:
 👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #5:
 🔗 Type: resource_conflict
@@ -938,7 +938,7 @@ Skipped #5:
 👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #6:
 🔗 Type: resource_conflict
@@ -946,7 +946,7 @@ Skipped #6:
 👨‍🏫 Class 0: Kunst, 6B, Melnikov Pavel
 👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #7:
 🔗 Type: resource_conflict
@@ -954,7 +954,7 @@ Skipped #7:
 👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
 👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #8:
 🔗 Type: resource_conflict
@@ -962,7 +962,7 @@ Skipped #8:
 👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
 👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #9:
 🔗 Type: resource_conflict
@@ -970,7 +970,7 @@ Skipped #9:
 👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #10:
 🔗 Type: resource_conflict
@@ -978,7 +978,7 @@ Skipped #10:
 👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #11:
 🔗 Type: resource_conflict
@@ -986,7 +986,7 @@ Skipped #11:
 👨‍🏫 Class 1: Russish, 6B, Tchoudnovskaia Anna
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #12:
 🔗 Type: resource_conflict
@@ -994,7 +994,7 @@ Skipped #12:
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
 👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #13:
 🔗 Type: resource_conflict
@@ -1002,7 +1002,7 @@ Skipped #13:
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
 👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #14:
 🔗 Type: resource_conflict
@@ -1010,7 +1010,7 @@ Skipped #14:
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #15:
 🔗 Type: resource_conflict
@@ -1018,7 +1018,7 @@ Skipped #15:
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #16:
 🔗 Type: resource_conflict
@@ -1026,7 +1026,7 @@ Skipped #16:
 👨‍🏫 Class 2: Mathe, 6B, Tchoudnovskaia Anna
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #17:
 🔗 Type: resource_conflict
@@ -1034,7 +1034,7 @@ Skipped #17:
 👨‍🏫 Class 3: Schach, Schach Mi A, Rosov Boris
 👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #18:
 🔗 Type: resource_conflict
@@ -1042,7 +1042,7 @@ Skipped #18:
 👨‍🏫 Class 4: Schach, Schach Mi B, Rosov Boris
 👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:26
 
 Skipped #19:
 🔗 Type: resource_conflict
@@ -1050,7 +1050,7 @@ Skipped #19:
 👨‍🏫 Class 5: Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana
 👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:27
 
 Skipped #20:
 🔗 Type: resource_conflict
@@ -1058,7 +1058,7 @@ Skipped #20:
 👨‍🏫 Class 6: Nachhilfe, Danilischina Mariia, Tatarchuk Tetiana
 👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:27
 
 Skipped #21:
 🔗 Type: resource_conflict
@@ -1066,5 +1066,5 @@ Skipped #21:
 👨‍🏫 Class 7: NH Physik, Danilischina Mariia, Tatarchuk Tetiana
 👨‍🏫 Class 8: Russish, 9G, Tchoudnovskaia Anna
 📄 Reason: No resource conflicts detected
-🕐 Skipped: 19:18:36
+🕐 Skipped: 14:34:27
 

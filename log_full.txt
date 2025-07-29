@@ -8,6 +8,16 @@ load C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\ort
 load C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\ortools\.libs\highs.dll...
 load C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\ortools\.libs\ortools.dll...
 Reading schedule data from 'xlsx_initial/schedule_planning.xlsx'...
+Chain windows cache cleared
+Chain window cache invalidated for class: Kunst (full cache clear)
+Chain windows cache cleared
+Chain window cache invalidated for class: Russish (full cache clear)
+Chain windows cache cleared
+Chain window cache invalidated for class: Schach (full cache clear)
+Chain windows cache cleared
+Chain window cache invalidated for class: Nachhilfe (full cache clear)
+Chain windows cache cleared
+Chain window cache invalidated for class: Nachhilfe (full cache clear)
 
 All classes to be processed:
   0: Kunst - 6B - Melnikov Pavel - Mi 16:00-19:45
@@ -283,7 +293,7 @@ CHAIN ANALYSIS:
   Class 0 in chain: True
     Chain composition: ['Kunst', 'Russish', 'Mathe']
   Class 1 in chain: True
-    Chain composition: ['Russish']
+    Chain composition: ['Kunst', 'Russish', 'Mathe']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 0: 16:00 - 19:45
   Class 1: 16:00 - 19:45
@@ -306,7 +316,7 @@ CHAIN ANALYSIS:
   Class 0 in chain: True
     Chain composition: ['Kunst', 'Russish', 'Mathe']
   Class 2 in chain: True
-    Chain composition: ['Mathe']
+    Chain composition: ['Kunst', 'Russish', 'Mathe']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 0: 16:00 - 19:45
   Class 2: 16:00 - 19:45
@@ -321,9 +331,9 @@ Class 1: Russish (6B) - Teacher: Tchoudnovskaia Anna
 Class 2: Mathe (6B) - Teacher: Tchoudnovskaia Anna
 CHAIN ANALYSIS:
   Class 1 in chain: True
-    Chain composition: ['Russish']
+    Chain composition: ['Kunst', 'Russish', 'Mathe']
   Class 2 in chain: True
-    Chain composition: ['Mathe']
+    Chain composition: ['Kunst', 'Russish', 'Mathe']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 1: 16:00 - 19:45
   Class 2: 16:00 - 19:45
@@ -338,7 +348,7 @@ Class 2: Mathe (6B) - Teacher: Tchoudnovskaia Anna
 Class 8: Russish (9G) - Teacher: Tchoudnovskaia Anna
 CHAIN ANALYSIS:
   Class 2 in chain: True
-    Chain composition: ['Mathe']
+    Chain composition: ['Kunst', 'Russish', 'Mathe']
   Class 8 in chain: False
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 2: 16:00 - 19:45
@@ -357,7 +367,7 @@ CHAIN ANALYSIS:
   Class 3 in chain: True
     Chain composition: ['Schach', 'Schach']
   Class 4 in chain: True
-    Chain composition: ['Schach']
+    Chain composition: ['Schach', 'Schach']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 3: 16:00 - 17:35
   Class 4: 16:00 - 17:35
@@ -392,7 +402,7 @@ CHAIN ANALYSIS:
   Class 3 in chain: True
     Chain composition: ['Schach', 'Schach']
   Class 6 in chain: True
-    Chain composition: ['Nachhilfe']
+    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 3: 16:00 - 17:35
   Class 6: 16:00 - 20:00
@@ -410,7 +420,7 @@ CHAIN ANALYSIS:
   Class 3 in chain: True
     Chain composition: ['Schach', 'Schach']
   Class 7 in chain: True
-    Chain composition: ['NH Physik']
+    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 3: 16:00 - 17:35
   Class 7: 16:00 - 20:00
@@ -425,7 +435,7 @@ Class 4: Schach (Schach Mi B) - Teacher: Rosov Boris
 Class 5: Nachhilfe (Bogrez Tumarov) - Teacher: Tatarchuk Tetiana
 CHAIN ANALYSIS:
   Class 4 in chain: True
-    Chain composition: ['Schach']
+    Chain composition: ['Schach', 'Schach']
   Class 5 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
 WINDOW vs WINDOW ANALYSIS (fallback):
@@ -443,9 +453,9 @@ Class 4: Schach (Schach Mi B) - Teacher: Rosov Boris
 Class 6: Nachhilfe (Danilischina Mariia) - Teacher: Tatarchuk Tetiana
 CHAIN ANALYSIS:
   Class 4 in chain: True
-    Chain composition: ['Schach']
+    Chain composition: ['Schach', 'Schach']
   Class 6 in chain: True
-    Chain composition: ['Nachhilfe']
+    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 4: 16:00 - 17:35
   Class 6: 16:00 - 20:00
@@ -461,9 +471,9 @@ Class 4: Schach (Schach Mi B) - Teacher: Rosov Boris
 Class 7: NH Physik (Danilischina Mariia) - Teacher: Tatarchuk Tetiana
 CHAIN ANALYSIS:
   Class 4 in chain: True
-    Chain composition: ['Schach']
+    Chain composition: ['Schach', 'Schach']
   Class 7 in chain: True
-    Chain composition: ['NH Physik']
+    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 4: 16:00 - 17:35
   Class 7: 16:00 - 20:00
@@ -480,7 +490,7 @@ CHAIN ANALYSIS:
   Class 5 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
   Class 6 in chain: True
-    Chain composition: ['Nachhilfe']
+    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 5: 16:00 - 20:00
   Class 6: 16:00 - 20:00
@@ -497,7 +507,7 @@ CHAIN ANALYSIS:
   Class 5 in chain: True
     Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
   Class 7 in chain: True
-    Chain composition: ['NH Physik']
+    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 5: 16:00 - 20:00
   Class 7: 16:00 - 20:00
@@ -512,9 +522,9 @@ Class 6: Nachhilfe (Danilischina Mariia) - Teacher: Tatarchuk Tetiana
 Class 7: NH Physik (Danilischina Mariia) - Teacher: Tatarchuk Tetiana
 CHAIN ANALYSIS:
   Class 6 in chain: True
-    Chain composition: ['Nachhilfe']
+    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
   Class 7 in chain: True
-    Chain composition: ['NH Physik']
+    Chain composition: ['Nachhilfe', 'Nachhilfe', 'NH Physik']
 WINDOW vs WINDOW ANALYSIS (fallback):
   Class 6: 16:00 - 20:00
   Class 7: 16:00 - 20:00
@@ -561,11 +571,11 @@ SEQUENTIAL SCHEDULING: Room VK.08 can fit both window classes sequentially:
   Scheduling reason: sufficient_overlap_time_fallback
 
 Conflict check completed.
-Checking room conflict between classes 0 and 1 in rooms {'V0.06', 'V2.07'}
+Checking room conflict between classes 0 and 1 in rooms {'V2.07', 'V0.06'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
 Classes 0 and 1: Kunst vs Russish
-  Shared rooms: {'V0.06', 'V2.07'}
+  Shared rooms: {'V2.07', 'V0.06'}
   Shared groups: {'6B'}
   Must add constraints: True
 Initialized effective_bounds system
@@ -940,11 +950,11 @@ Classes 4 and 7: Schach vs NH Physik
     Class 8: 15:00-16:15 + 45min = 900-1020
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
-Checking room conflict between classes 5 and 6 in rooms {'VK.11', 'VK.08', 'VK.07'}
+Checking room conflict between classes 5 and 6 in rooms {'VK.11', 'VK.07', 'VK.08'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
 Classes 5 and 6: Nachhilfe vs Nachhilfe
-  Shared rooms: {'VK.11', 'VK.08', 'VK.07'}
+  Shared rooms: {'VK.11', 'VK.07', 'VK.08'}
   Shared groups: set()
   Must add constraints: True
   Classes share teacher: Tatarchuk Tetiana
@@ -960,11 +970,11 @@ Classes 5 and 6: Nachhilfe vs Nachhilfe
   ✓ Added constraint sequential_63: Sequential ordering (i→j): class 5 before class 6
   ✓ Added constraint sequential_64: Sequential ordering (j→i): class 6 before class 5
   ✓ Added STRICT sequential constraints between classes 5 and 6 with min pause 1 slots
-Checking room conflict between classes 5 and 7 in rooms {'VK.11', 'VK.08', 'VK.07'}
+Checking room conflict between classes 5 and 7 in rooms {'VK.11', 'VK.07', 'VK.08'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
 Classes 5 and 7: Nachhilfe vs NH Physik
-  Shared rooms: {'VK.11', 'VK.08', 'VK.07'}
+  Shared rooms: {'VK.11', 'VK.07', 'VK.08'}
   Shared groups: set()
   Must add constraints: True
   Classes share teacher: Tatarchuk Tetiana
@@ -985,11 +995,11 @@ Classes 5 and 7: Nachhilfe vs NH Physik
     Class 8: 15:00-16:15 + 45min = 900-1020
     Overlap: YES
   ⚠️  Skipped constraint resource_conflict: No resource conflicts detected
-Checking room conflict between classes 6 and 7 in rooms {'VK.11', 'VK.08', 'VK.07'}
+Checking room conflict between classes 6 and 7 in rooms {'VK.11', 'VK.07', 'VK.08'}
 
 === ADDING TIME CONFLICT CONSTRAINTS ===
 Classes 6 and 7: Nachhilfe vs NH Physik
-  Shared rooms: {'VK.11', 'VK.08', 'VK.07'}
+  Shared rooms: {'VK.11', 'VK.07', 'VK.08'}
   Shared groups: {'Danilischina Mariia'}
   Must add constraints: True
   Classes share teacher: Tatarchuk Tetiana
@@ -1273,7 +1283,7 @@ Class 6: Nachhilfe - Danilischina Mariia (Teacher: Tatarchuk Tetiana)
 RESOURCE CONFLICT ANALYSIS:
   Same teacher: YES (Tatarchuk Tetiana vs Tatarchuk Tetiana)
   Shared groups: NO (none)
-  Shared rooms: YES ({'VK.11', 'VK.08', 'VK.07'})
+  Shared rooms: YES ({'VK.11', 'VK.07', 'VK.08'})
 [CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 6: Nachhilfe(Danilischina Mariia) -> sufficient_overlap_time_fallback
   Skipping separation constraints for 5 and 6 - cycle prevention exception
   ✓ Added constraint other_96: End time variable: end_5 = start_5 + 15
@@ -1286,7 +1296,7 @@ Class 7: NH Physik - Danilischina Mariia (Teacher: Tatarchuk Tetiana)
 RESOURCE CONFLICT ANALYSIS:
   Same teacher: YES (Tatarchuk Tetiana vs Tatarchuk Tetiana)
   Shared groups: NO (none)
-  Shared rooms: YES ({'VK.11', 'VK.08', 'VK.07'})
+  Shared rooms: YES ({'VK.11', 'VK.07', 'VK.08'})
 [CACHED] Class 5: Nachhilfe(Bogrez Tumarov) + Class 7: NH Physik(Danilischina Mariia) -> sufficient_overlap_time_fallback
     Class i 5: Nachhilfe - Bogrez Tumarov
       Effective bounds: 16:00 - 18:45 (source: time_window)
@@ -1328,7 +1338,7 @@ Added 9 timewindow objectives to the model.
 Total classes: 9
 Classes with effective bounds: 9
 Update count: 13
-Last updated: 2025-07-25 19:18:36.522236
+Last updated: 2025-07-29 14:34:20.708886
 
 Bounds by source:
   time_window: 9
@@ -1385,9 +1395,9 @@ Detected conflicts: 0
 Constraint exceptions: 0
 
 🔥 Most constrained pairs:
-  Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana ↔ NH Physik, Danilischina Mariia, Tatarchuk Tetiana: 6 constraints (chain_ordering, sequential)
-  Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna: 5 constraints (chain_ordering, sequential)
-  Russish, 6B, Tchoudnovskaia Anna ↔ Mathe, 6B, Tchoudnovskaia Anna: 5 constraints (chain_ordering, sequential)
+  Nachhilfe, Bogrez Tumarov, Tatarchuk Tetiana ↔ NH Physik, Danilischina Mariia, Tatarchuk Tetiana: 6 constraints (sequential, chain_ordering)
+  Kunst, 6B, Melnikov Pavel ↔ Russish, 6B, Tchoudnovskaia Anna: 5 constraints (sequential, chain_ordering)
+  Russish, 6B, Tchoudnovskaia Anna ↔ Mathe, 6B, Tchoudnovskaia Anna: 5 constraints (sequential, chain_ordering)
 
 Detailed report saved to: constraint_registry_infeasible.txt
 ==================================================
@@ -1395,7 +1405,7 @@ Detailed report saved to: constraint_registry_infeasible.txt
 ✅ Brief error summary saved to log_Err.txt
 ✅ All constraint reports generated successfully
 
-No solution found within the time limit (0.06 seconds).
+No solution found within the time limit (0.05 seconds).
 
 ❌ PROBLEM IS INFEASIBLE - No valid solution exists with current constraints.
 
